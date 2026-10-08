@@ -39,6 +39,15 @@
   text-shadow: 0 0 40px rgb(200 16 46 / 0.35);
 }
 
+.rig {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: 20px;
+  width: 100%;
+}
+
 .console {
   display: flex;
   align-items: stretch;

@@ -1,0 +1,149 @@
+.deck {
+  display: flex;
+  flex-direction: column;
+  width: 340px;
+  max-width: 100%;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #1b1b20, #121215);
+  border: 1px solid var(--oss-edge);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.05),
+    0 30px 60px -20px rgb(0 0 0 / 0.8);
+  overflow: hidden;
+}
+
+.head {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border-bottom: 1px solid var(--oss-edge);
+}
+
+.cover {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 4px;
+  object-fit: cover;
+  border: 1px solid var(--oss-edge);
+  background: #0b0b0d;
+}
+
+.headText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.album {
+  font-family: var(--mantine-font-family-headings);
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--oss-text);
+}
+
+.scLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.list {
+  flex: 1;
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  max-height: 260px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  text-align: left;
+  transition: background 150ms ease;
+}
+
+.track:hover {
+  background: rgb(255 255 255 / 0.04);
+}
+
+.track:focus-visible {
+  outline: 2px solid var(--oss-sky);
+  outline-offset: -2px;
+}
+
+.num,
+.time {
+  flex: none;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.75rem;
+  color: var(--oss-muted);
+}
+
+.trackTitle {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.track[data-current] {
+  background: rgb(200 16 46 / 0.12);
+}
+
+.track[data-current] .num,
+.track[data-current] .trackTitle {
+  color: #ff4d64;
+}
+
+.track[data-playing] .num {
+  text-shadow: 0 0 8px rgb(200 16 46 / 0.9);
+  animation: blink 1s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.foot {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 14px 12px;
+  border-top: 1px solid var(--oss-edge);
+}
+
+.progress {
+  height: 3px;
+  margin: 0 -14px;
+  background: #050506;
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  background: var(--oss-sky);
+  box-shadow: 0 0 8px var(--oss-sky);
+  transform-origin: left;
+  transition: transform 250ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track[data-playing] .num {
+    animation: none;
+  }
+}

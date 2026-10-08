@@ -11,8 +11,19 @@ export const site = {
   genres: ['Rock', 'Punk', 'Metal', 'Ska'],
   playingLiveSince: 2004,
   recordingWorkshopGrad: 2011,
-  /** Profile URL, e.g. https://soundcloud.com/your-name. The player and the Catalog read every public track from it. */
-  soundcloud: '',
+  soundcloud: 'https://soundcloud.com/joshua-small-325495450',
+} as const;
+
+/**
+ * The album the console plays when it powers on. It is a private SoundCloud set, so the player
+ * needs the API URL with its secret token (from SoundCloud's embed code), not the page URL.
+ */
+export const featuredAlbum = {
+  title: 'User Agreement',
+  artist: 'Joshua Small',
+  pageUrl: 'https://soundcloud.com/joshua-small-325495450/sets/user-agreement/s-qRVRJX4AsJg',
+  playerUrl:
+    'https://api.soundcloud.com/playlists/soundcloud:playlists:2283071274?secret_token=s-qRVRJX4AsJg',
 } as const;
 
 /** Sister sites and profiles. Leave a URL empty to hide its link. */

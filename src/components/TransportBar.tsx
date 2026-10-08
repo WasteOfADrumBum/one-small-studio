@@ -9,7 +9,7 @@ import {
 import { usePlayer } from '@/lib/player';
 import { usePower } from '@/lib/power';
 import { artwork } from '@/lib/soundcloud';
-import { site } from '@/lib/site';
+import { featuredAlbum, site } from '@/lib/site';
 import classes from './TransportBar.module.css';
 
 /** The DAW-style transport pinned to the top: it drives the SoundCloud player from anywhere on the page. */
@@ -72,7 +72,7 @@ export function TransportBar() {
                 ? 'Loading SoundCloud…'
                 : status === 'error'
                   ? 'SoundCloud is not responding'
-                  : 'Music coming soon')}
+                  : featuredAlbum.title)}
           </Text>
         </div>
       </div>

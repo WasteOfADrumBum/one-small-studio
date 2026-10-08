@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { site } from './site';
+import { featuredAlbum } from './site';
 import { loadWidgetApi, widgetSrc, type ScSound, type ScWidget } from './soundcloud';
 
 type Status = 'off' | 'loading' | 'ready' | 'error';
@@ -28,20 +28,20 @@ type Player = {
 const PlayerContext = createContext<Player | null>(null);
 
 /**
- * One hidden SoundCloud widget loaded with the whole profile, shared by the top transport bar, the
- * hero's Power switch and the Catalog. Nothing plays until a visitor clicks something.
+ * One hidden SoundCloud widget loaded with the featured album, shared by the top transport bar, the
+ * hero's tracklist deck and the Catalog. Nothing plays until a visitor clicks something.
  */
 export function PlayerProvider({ children }: { children: ReactNode }) {
   const frame = useRef<HTMLIFrameElement>(null);
   const widget = useRef<ScWidget | null>(null);
-  const [status, setStatus] = useState<Status>(site.soundcloud ? 'loading' : 'off');
+  const [status, setStatus] = useState<Status>(featuredAlbum.playerUrl ? 'loading' : 'off');
   const [tracks, setTracks] = useState<ScSound[]>([]);
   const [current, setCurrent] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    if (!site.soundcloud || !frame.current) return;
+    if (!featuredAlbum.playerUrl || !frame.current) return;
     const iframe = frame.current;
     let cancelled = false;
     let refetch: ReturnType<typeof setTimeout> | undefined;
@@ -97,10 +97,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       value={{ status, tracks, current, playing, progress, play, pause, toggle, next, prev }}
     >
       {children}
-      {site.soundcloud && (
+      {featuredAlbum.playerUrl && (
         <iframe
           ref={frame}
-          src={widgetSrc(site.soundcloud)}
+          src={widgetSrc(featuredAlbum.playerUrl)}
           title="SoundCloud player"
           allow="autoplay"
           tabIndex={-1}

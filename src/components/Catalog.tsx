@@ -1,13 +1,4 @@
-import {
-  Anchor,
-  Button,
-  Container,
-  Skeleton,
-  Stack,
-  Text,
-  Title,
-  UnstyledButton,
-} from '@mantine/core';
+import { Anchor, Button, Container, Group, Stack, Text, Title } from '@mantine/core';
 import {
   IconBrandSoundcloud,
   IconPlayerPauseFilled,
@@ -16,19 +7,21 @@ import {
 import { usePlayer } from '@/lib/player';
 import { usePower } from '@/lib/power';
 import { artwork, formatTime } from '@/lib/soundcloud';
-import { site } from '@/lib/site';
-import { LedMeter } from './LedMeter';
+import { featuredAlbum, site } from '@/lib/site';
 import classes from './Catalog.module.css';
 
-/** Section 5, "The Catalog": every public track on the SoundCloud profile, playable in place. */
+/** Section 4, "The Catalog": releases, starting with the featured album. The admin adds more later. */
 export function Catalog() {
-  const { status, tracks, current, playing, play, toggle } = usePlayer();
+  const { status, tracks, playing, play, toggle } = usePlayer();
   const { setPowered } = usePower();
+  const ready = status === 'ready' && tracks.length > 0;
+  const cover = tracks[0] ? artwork(tracks[0]) : null;
+  const runtime = tracks.reduce((sum, t) => sum + t.duration, 0);
 
-  const onTrack = (index: number) => {
+  const onPlay = () => {
     setPowered(true);
-    if (index === current && status === 'ready') toggle();
-    else play(index);
+    if (playing) toggle();
+    else play();
   };
 
   return (
@@ -40,91 +33,55 @@ export function Catalog() {
             The catalog
           </Title>
           <Text c="dimmed" maw={620}>
-            Records I played on, tracked, mixed and produced. Hit any cover and the transport up top
-            takes over.
+            Records I played on, tracked, mixed and produced.
           </Text>
         </Stack>
 
-        {status === 'loading' && (
-          <div className={classes.grid}>
-            {Array.from({ length: 8 }, (_, i) => (
-              <Skeleton key={i} className={classes.skeleton} />
-            ))}
+        <article className={classes.release}>
+          <div className={classes.sleeve} data-playing={playing || undefined}>
+            <span className={classes.vinyl} aria-hidden="true" />
+            {cover ? (
+              <img src={cover} alt={`${featuredAlbum.title} cover`} className={classes.cover} />
+            ) : (
+              <span className={classes.cover} />
+            )}
           </div>
-        )}
-
-        {status === 'ready' && (
-          <ol className={classes.grid}>
-            {tracks.map((track, i) => {
-              const art = artwork(track);
-              const isCurrent = i === current && playing;
-              return (
-                <li key={track.id}>
-                  <UnstyledButton
-                    className={classes.card}
-                    data-current={isCurrent || undefined}
-                    onClick={() => onTrack(i)}
-                    aria-label={`${isCurrent ? 'Pause' : 'Play'} ${track.title}`}
-                  >
-                    <div className={classes.cover}>
-                      {art ? (
-                        <img src={art} alt="" loading="lazy" />
-                      ) : (
-                        <span className={classes.noArt} />
-                      )}
-                      <span className={classes.playIcon}>
-                        {isCurrent ? (
-                          <IconPlayerPauseFilled size={28} />
-                        ) : (
-                          <IconPlayerPlayFilled size={28} />
-                        )}
-                      </span>
-                      {isCurrent && (
-                        <span className={classes.meters}>
-                          <LedMeter active speed={0.8} />
-                          <LedMeter active speed={1.1} />
-                        </span>
-                      )}
-                    </div>
-                    <span className={classes.trackTitle}>{track.title}</span>
-                    <span className="label">
-                      {formatTime(track.duration)}
-                      {track.genre ? ` · ${track.genre}` : ''}
-                    </span>
-                  </UnstyledButton>
-                </li>
-              );
-            })}
-          </ol>
-        )}
-
-        {(status === 'off' || status === 'error') && (
-          <div className={classes.empty}>
+          <Stack gap="sm" className={classes.info}>
+            <span className="label">Featured album</span>
+            <Title order={3} className={classes.album}>
+              {featuredAlbum.title}
+            </Title>
             <Text c="dimmed">
-              {status === 'off'
-                ? 'The tapes are still being pulled from the shelf. Tracks land here as soon as my SoundCloud is hooked up.'
-                : 'SoundCloud is not answering right now.'}
+              {featuredAlbum.artist}
+              {ready && ` · ${tracks.length} tracks · ${formatTime(runtime)}`}
             </Text>
-            {site.soundcloud && (
+            <Group gap="sm" mt="sm">
+              <Button
+                onClick={onPlay}
+                disabled={!ready}
+                leftSection={
+                  playing ? <IconPlayerPauseFilled size={16} /> : <IconPlayerPlayFilled size={16} />
+                }
+              >
+                {playing ? 'Pause' : 'Play the album'}
+              </Button>
               <Button
                 component="a"
-                href={site.soundcloud}
+                href={featuredAlbum.pageUrl}
                 target="_blank"
                 rel="noreferrer"
                 variant="outline"
                 leftSection={<IconBrandSoundcloud size={18} />}
               >
-                Listen on SoundCloud
+                Open on SoundCloud
               </Button>
-            )}
-          </div>
-        )}
+            </Group>
+          </Stack>
+        </article>
 
-        {status === 'ready' && site.soundcloud && (
-          <Anchor href={site.soundcloud} target="_blank" rel="noreferrer" className={classes.more}>
-            <IconBrandSoundcloud size={18} /> More on SoundCloud
-          </Anchor>
-        )}
+        <Anchor href={site.soundcloud} target="_blank" rel="noreferrer" className={classes.more}>
+          <IconBrandSoundcloud size={18} /> Everything else is on my SoundCloud
+        </Anchor>
       </Container>
     </section>
   );
