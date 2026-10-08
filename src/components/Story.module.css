@@ -1,0 +1,190 @@
+.story {
+  padding: 96px 0;
+  min-height: 100svh;
+}
+
+.heading {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  text-transform: uppercase;
+}
+
+/* Wide screens with motion: the arrangement. */
+.arrangement {
+  --lane-h: 108px;
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  grid-template-rows: 40px auto;
+  border-top: 1px solid var(--oss-edge);
+  border-bottom: 1px solid var(--oss-edge);
+  background: var(--oss-panel);
+}
+
+.counter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  background: #050506;
+  border-right: 1px solid var(--oss-edge);
+}
+
+.counterValue {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 1.1rem;
+  color: var(--oss-sky);
+  text-shadow: 0 0 8px rgb(94 200 242 / 0.6);
+}
+
+.lanes {
+  grid-row: 2;
+  border-right: 1px solid var(--oss-edge);
+}
+
+.laneName {
+  height: var(--lane-h);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--oss-edge);
+  font-family: var(--mantine-font-family-headings);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.viewport {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  position: relative;
+  overflow: hidden;
+}
+
+.track {
+  position: relative;
+  height: calc(40px + var(--lane-h) * 4);
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0 149px,
+    rgb(255 255 255 / 0.04) 149px 150px
+  );
+}
+
+.ruler {
+  display: flex;
+  height: 40px;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--oss-edge);
+  background: #050506;
+}
+
+.bar {
+  flex: none;
+  padding: 0 0 6px 6px;
+  border-left: 1px solid var(--oss-edge);
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.75rem;
+  color: var(--oss-muted);
+}
+
+.region {
+  --tint: var(--oss-crimson);
+  position: absolute;
+  top: calc(40px + var(--row) * var(--lane-h) + 8px);
+  height: calc(var(--lane-h) - 16px);
+  padding: 8px 10px;
+  overflow: hidden;
+  border-radius: 4px;
+  border: 1px solid var(--tint);
+  background: color-mix(in srgb, var(--tint) 22%, var(--oss-panel));
+  font-size: 0.85rem;
+}
+
+.region[data-lane='Stage'] {
+  --tint: #7d37b8;
+}
+
+.region[data-lane='Studio'] {
+  --tint: #2a9bd6;
+}
+
+.region[data-lane='Life'] {
+  --tint: var(--oss-ruby);
+}
+
+.region strong {
+  font-family: var(--mantine-font-family-headings);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-right: 8px;
+}
+
+.regionYears {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.72rem;
+  color: var(--oss-muted);
+}
+
+.region p {
+  margin: 4px 0 0;
+  color: #cfcfd6;
+  max-width: 420px;
+}
+
+.playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--oss-sky);
+  box-shadow: 0 0 12px var(--oss-sky);
+  pointer-events: none;
+}
+
+.playhead::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -6px;
+  border: 7px solid transparent;
+  border-top: 10px solid var(--oss-sky);
+}
+
+/* Phones, and anyone who prefers less motion: a plain list. */
+.list {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 20px;
+  border-left: 2px solid var(--oss-edge);
+}
+
+.list li {
+  position: relative;
+  padding: 0 0 32px 4px;
+}
+
+.list li::before {
+  content: '';
+  position: absolute;
+  left: -28px;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--oss-crimson);
+  box-shadow: 0 0 10px rgb(200 16 46 / 0.7);
+}
+
+.list h3 {
+  margin: 4px 0;
+  text-transform: uppercase;
+}
+
+@media (max-width: $mantine-breakpoint-md), (prefers-reduced-motion: reduce) {
+  .arrangement {
+    display: none;
+  }
+
+  .list {
+    display: block;
+  }
+}

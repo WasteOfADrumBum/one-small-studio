@@ -1,0 +1,10 @@
+.outro {
+  padding: 120px 0 48px;
+  border-top: 1px solid var(--oss-edge);
+  background: linear-gradient(180deg, transparent, rgb(75 30 107 / 0.18));
+}
+
+.heading {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  text-transform: uppercase;
+}
