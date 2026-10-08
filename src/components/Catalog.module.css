@@ -1,0 +1,119 @@
+.catalog {
+  padding: 96px 0;
+}
+
+.heading {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  text-transform: uppercase;
+}
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 24px;
+}
+
+.skeleton {
+  aspect-ratio: 1;
+  height: auto;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.cover {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 4px;
+  border: 1px solid var(--oss-edge);
+  background: var(--oss-panel);
+  transition:
+    transform 250ms ease,
+    border-color 250ms ease,
+    box-shadow 250ms ease;
+}
+
+.cover img,
+.noArt {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.noArt {
+  background:
+    radial-gradient(circle at 50% 50%, #050506 0 8%, #1e1e23 8.5% 12%, #0b0b0d 12.5%),
+    repeating-radial-gradient(circle, #121215 0 2px, #0d0d10 2px 4px);
+}
+
+.playIcon {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: rgb(10 10 11 / 0.5);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.card:hover .cover,
+.card:focus-visible .cover,
+.card[data-current] .cover {
+  transform: translateY(-4px);
+  border-color: var(--oss-crimson);
+  box-shadow: 0 16px 40px -12px rgb(200 16 46 / 0.5);
+}
+
+.card:hover .playIcon,
+.card:focus-visible .playIcon,
+.card[data-current] .playIcon {
+  opacity: 1;
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--oss-sky);
+  outline-offset: 4px;
+}
+
+.meters {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: flex;
+  gap: 3px;
+}
+
+.trackTitle {
+  font-family: var(--mantine-font-family-headings);
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.empty {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding: 32px;
+  border: 1px dashed var(--oss-edge);
+  border-radius: 8px;
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 32px;
+}

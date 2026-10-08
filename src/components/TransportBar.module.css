@@ -1,0 +1,93 @@
+.bar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 20px;
+  background: rgb(10 10 11 / 0.82);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--oss-edge);
+}
+
+.wordmark {
+  flex: none;
+  font-family: var(--mantine-font-family-headings);
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--oss-text);
+  text-decoration: none;
+}
+
+.wordmark span {
+  color: var(--oss-crimson);
+}
+
+.controls {
+  flex: none;
+}
+
+.nowPlaying {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.art {
+  width: 40px;
+  height: 40px;
+  border-radius: 3px;
+  object-fit: cover;
+  border: 1px solid var(--oss-edge);
+}
+
+.meta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.title {
+  color: var(--oss-text);
+}
+
+.sc {
+  flex: none;
+  display: grid;
+  color: var(--oss-muted);
+  transition: color 200ms ease;
+}
+
+.sc:hover {
+  color: #ff5500;
+}
+
+.progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--oss-sky);
+  box-shadow: 0 0 8px var(--oss-sky);
+  transform-origin: left;
+  transition: transform 250ms linear;
+}
+
+@media (max-width: $mantine-breakpoint-sm) {
+  .bar {
+    gap: 12px;
+    padding: 0 12px;
+  }
+
+  .wordmark {
+    display: none;
+  }
+}

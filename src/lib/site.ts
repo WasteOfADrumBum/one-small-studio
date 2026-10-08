@@ -11,11 +11,13 @@ export const site = {
   genres: ['Rock', 'Punk', 'Metal', 'Ska'],
   playingLiveSince: 2004,
   recordingWorkshopGrad: 2011,
+  /** Profile URL, e.g. https://soundcloud.com/your-name. The player and the Catalog read every public track from it. */
+  soundcloud: '',
 } as const;
 
 /** Sister sites and profiles. Leave a URL empty to hide its link. */
 export const links = [
-  { label: 'SoundCloud', href: '' },
+  { label: 'SoundCloud', href: site.soundcloud },
   { label: 'One Small Photo', href: '' },
   { label: 'Web dev portfolio', href: '' },
 ] as const;
