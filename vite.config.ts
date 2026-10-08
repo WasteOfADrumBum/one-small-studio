@@ -8,7 +8,8 @@ export default defineConfig({
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
   server: {
-    // The Express API runs on its own port in development (npm run dev starts both).
-    proxy: { '/api': 'http://localhost:3001' },
+    // The Express API runs on its own port in development (npm run dev starts both). Keep the
+    // browser's Host header so the API's same-origin check passes, as it does on Vercel.
+    proxy: { '/api': { target: 'http://localhost:3001', changeOrigin: false } },
   },
 });

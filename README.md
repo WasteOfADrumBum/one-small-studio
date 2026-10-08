@@ -8,16 +8,16 @@ This is a personal, non-commercial showcase: no rates, booking or sales. It runs
 
 ## Stack
 
-| Layer    | Tool                                                    |
-| -------- | ------------------------------------------------------- |
-| Frontend | React 19 + TypeScript on Vite                           |
-| UI       | Mantine, with a custom dark console theme               |
-| Motion   | GSAP ScrollTrigger for scroll scrubbing, Motion for UI  |
-| API      | Node + Express 5, deployed as one Vercel function       |
-| Database | MongoDB Atlas with Mongoose (lands with the admin)      |
-| Music    | SoundCloud Widget API and oEmbed (lands with the admin) |
-| Hosting  | Vercel Hobby                                            |
-| CI       | GitHub Actions: format, lint, type check and build      |
+| Layer    | Tool                                                      |
+| -------- | --------------------------------------------------------- |
+| Frontend | React 19 + TypeScript on Vite                             |
+| UI       | Mantine, with a custom dark console theme                 |
+| Motion   | GSAP ScrollTrigger for scroll scrubbing, Motion for UI    |
+| API      | Node + Express 5, deployed as one Vercel function         |
+| Database | MongoDB Atlas with Mongoose (contact inbox)               |
+| Music    | SoundCloud Widget API, driven by the profile in `site.ts` |
+| Hosting  | Vercel Hobby                                              |
+| CI       | GitHub Actions: format, lint, type check and build        |
 
 ## Develop
 
@@ -38,8 +38,8 @@ npm run dev      # site on http://localhost:5173, API on http://localhost:3001
 
 ## Layout
 
-- `src/` the site. `src/lib/site.ts` holds names, years and links; `src/content/story.ts` holds
-  the timeline.
+- `src/` the site. `src/lib/site.ts` holds names, years, links and the SoundCloud profile;
+  `src/content/` holds the timeline and the gear rack.
 - `server/app.ts` the Express app. `server/dev.ts` runs it locally.
 - `api/index.ts` hands the same app to Vercel; `vercel.json` routes `/api/*` to it.
 

@@ -4,10 +4,12 @@ import { motion, useReducedMotion } from 'motion/react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { site } from '@/lib/site';
+import { featuredAlbum, site } from '@/lib/site';
 import { usePower } from '@/lib/power';
+import { usePlayer } from '@/lib/player';
 import { Knob } from './Knob';
 import { LedMeter } from './LedMeter';
+import { Deck } from './Deck';
 import classes from './Hero.module.css';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -27,7 +29,16 @@ const CHANNELS = [
 /** Section 1, "Soundcheck": the console that wakes up when the visitor hits Power. */
 export function Hero() {
   const root = useRef<HTMLElement>(null);
-  const { powered, toggle } = usePower();
+  const { powered, setPowered } = usePower();
+  const player = usePlayer();
+
+  // The click on Power is the visitor's opt-in to sound, so the reel starts here when it can.
+  const onPower = () => {
+    const on = !powered;
+    setPowered(on);
+    if (on && player.status === 'ready' && player.tracks.length > 0) player.play();
+    if (!on) player.pause();
+  };
   const reduceMotion = useReducedMotion();
   const words = site.name.split(' ');
 
@@ -63,7 +74,7 @@ export function Hero() {
   );
 
   return (
-    <section ref={root} className={classes.hero} aria-labelledby="hero-title">
+    <section ref={root} id="top" className={classes.hero} aria-labelledby="hero-title">
       <Container size="lg" className={classes.inner}>
         <Stack gap="xs" align="center" ta="center">
           <span className="label">
@@ -87,35 +98,40 @@ export function Hero() {
           </Text>
         </Stack>
 
-        <div className={classes.console} data-powered={powered || undefined}>
-          {CHANNELS.map((channel) => (
-            <div key={channel.label} className={classes.strip}>
-              <Knob label="Gain" />
-              <LedMeter active={powered} speed={channel.speed} />
-              <span className={classes.channelName}>{channel.label}</span>
-            </div>
-          ))}
+        <div className={classes.rig}>
+          <div className={classes.console} data-powered={powered || undefined}>
+            {CHANNELS.map((channel) => (
+              <div key={channel.label} className={classes.strip}>
+                <Knob label="Gain" />
+                <LedMeter active={powered} speed={channel.speed} />
+                <span className={classes.channelName}>{channel.label}</span>
+              </div>
+            ))}
 
-          <div className={classes.master}>
-            <UnstyledButton
-              className={classes.power}
-              onClick={toggle}
-              aria-pressed={powered}
-              aria-label={powered ? 'Power off the console' : 'Power on the console'}
-            >
-              <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
-                <path d="M12 3v9" />
-                <path d="M6.3 7.2a8 8 0 1 0 11.4 0" />
-              </svg>
-            </UnstyledButton>
-            <span className="label">{powered ? 'On air' : 'Power'}</span>
+            <div className={classes.master}>
+              <UnstyledButton
+                className={classes.power}
+                onClick={onPower}
+                aria-pressed={powered}
+                aria-label={powered ? 'Power off the console' : 'Power on the console'}
+              >
+                <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+                  <path d="M12 3v9" />
+                  <path d="M6.3 7.2a8 8 0 1 0 11.4 0" />
+                </svg>
+              </UnstyledButton>
+              <span className="label">{powered ? 'On air' : 'Power'}</span>
+            </div>
           </div>
+          <Deck />
         </div>
 
         <Text className={classes.hint} size="sm" c="dimmed" ta="center">
           {powered
-            ? 'The console is live. Scroll down for the story.'
-            : 'Hit power to bring the board up. Nothing plays until you do.'}
+            ? player.playing
+              ? 'On air. The transport up top follows you down the page.'
+              : 'The console is live. Scroll down for the story.'
+            : `Hit power to bring the board up and spin ${featuredAlbum.title}. Nothing plays until you do.`}
         </Text>
       </Container>
     </section>

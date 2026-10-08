@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useState, type ReactNode } from
 
 const STORAGE_KEY = 'oss-power';
 
-type Power = { powered: boolean; toggle: () => void };
+type Power = { powered: boolean; setPowered: (on: boolean) => void };
 
 const PowerContext = createContext<Power | null>(null);
 
@@ -16,23 +16,22 @@ function readStored(): boolean {
 
 /**
  * The console's power state. Turning it on is the visitor's opt-in: browsers block sound until
- * someone clicks, so the background reel (phase three) starts from this switch, never on load.
+ * someone clicks, so the SoundCloud reel starts from this switch (or the play button), never on load.
+ * Only the light show is remembered between visits; sound always waits for a click.
  */
 export function PowerProvider({ children }: { children: ReactNode }) {
   const [powered, setPowered] = useState(readStored);
 
-  const toggle = useCallback(() => {
-    setPowered((on) => {
-      try {
-        localStorage.setItem(STORAGE_KEY, on ? 'off' : 'on');
-      } catch {
-        // Private windows can refuse storage; the switch still works for this visit.
-      }
-      return !on;
-    });
+  const set = useCallback((on: boolean) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, on ? 'on' : 'off');
+    } catch {
+      // Private windows can refuse storage; the switch still works for this visit.
+    }
+    setPowered(on);
   }, []);
 
-  return <PowerContext value={{ powered, toggle }}>{children}</PowerContext>;
+  return <PowerContext value={{ powered, setPowered: set }}>{children}</PowerContext>;
 }
 
 export function usePower(): Power {
