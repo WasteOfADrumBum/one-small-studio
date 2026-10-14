@@ -9,10 +9,21 @@
   gap: clamp(32px, 5vw, 64px);
 }
 
-/* ---- The wall and its ledge ---- */
+/* ---- The wall and its record shelf ---- */
 
+/* A soft wash from the room light above, so the black shelf reads against the wall. */
 .wall {
+  position: relative;
   min-width: 0;
+}
+
+.wall::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -40px 0 30%;
+  background: radial-gradient(ellipse 60% 70% at 40% 30%, rgb(255 236 214 / 0.06), transparent 70%);
+  pointer-events: none;
 }
 
 .ledge {
@@ -20,8 +31,8 @@
   display: flex;
   gap: 0;
   margin: 0;
-  /* Room for the selected record to slide out past the last sleeve. */
-  padding: 8px calc(var(--sleeve) * 0.42) 0 4px;
+  /* Room for the selected record to slide out past the last sleeve, and for the shelf's ends. */
+  padding: 8px calc(var(--sleeve) * 0.42 + 18px) 0 18px;
   list-style: none;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
@@ -41,28 +52,107 @@
   margin-left: -14px;
 }
 
-/* A shallow walnut ledge: lit top surface, front lip, and its shadow on the wall. */
+/*
+ * A matte black, powder-coated record shelf: a retaining lip the sleeves lean on, a shallow top seen
+ * from just above, and a thick front edge catching the light along its top. Each sleeve brings its
+ * own length of shelf; the first and last bring the end returns and wall brackets.
+ */
 .shelf {
   position: relative;
   z-index: 2;
-  height: 16px;
-  margin: -6px -10px 0;
-  border-radius: 1px 1px 3px 3px;
-  background: linear-gradient(180deg, #a7754c 0 3px, transparent 3px), var(--oss-wood);
-  box-shadow:
-    inset 0 -2px 0 rgb(0 0 0 / 0.35),
-    4px 14px 16px -8px rgb(0 0 0 / 0.9);
+  display: flex;
+  flex-direction: column;
+  margin: -9px -14px 0;
+  filter: drop-shadow(4px 16px 12px rgb(0 0 0 / 0.85));
 }
 
 .item:last-child .shelf {
-  margin-right: calc(var(--sleeve) * -0.42);
+  margin-right: calc(var(--sleeve) * -0.42 - 14px);
+}
+
+/* The lip stands proud of the top, in front of the sleeves' bottom edge. */
+.lip {
+  height: 9px;
+  margin: 0 4px;
+  border-radius: 2px 2px 0 0;
+  background: var(--oss-matte);
+  box-shadow:
+    var(--oss-edge-highlight),
+    inset 0 -1px 0 rgb(0 0 0 / 0.6);
+}
+
+.shelfTop {
+  height: 10px;
+  background: var(--oss-matte-top);
+  clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 100%, 0 100%);
+}
+
+.shelfFront {
+  position: relative;
+  height: 20px;
+  border-radius: 0 0 2px 2px;
+  background: var(--oss-matte);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.2),
+    inset 0 2px 0 rgb(255 255 255 / 0.05),
+    inset 0 -2px 0 rgb(0 0 0 / 0.55);
+}
+
+/* End returns: the shelf's sides turn back toward the wall. */
+.item:first-child .shelfFront::before,
+.item:last-child .shelfFront::after {
+  content: '';
+  position: absolute;
+  top: -19px;
+  bottom: 0;
+  width: 8px;
+  background: var(--oss-matte);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18);
+}
+
+.item:first-child .shelfFront::before {
+  left: 0;
+  border-radius: 2px 0 0 2px;
+  box-shadow:
+    inset 1px 1px 0 rgb(255 255 255 / 0.22),
+    inset -1px 0 0 rgb(0 0 0 / 0.5);
+}
+
+.item:last-child .shelfFront::after {
+  right: 0;
+  border-radius: 0 2px 2px 0;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.18),
+    inset 1px 0 0 rgb(0 0 0 / 0.5);
+}
+
+/* Wall brackets under each end. */
+.item:first-child .shelf::after,
+.item:last-child .shelf::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  width: 10px;
+  height: 22px;
+  background: linear-gradient(90deg, #17171a, #232328);
+  clip-path: polygon(0 0, 100% 0, 100% 15%, 20% 100%, 0 100%);
+  box-shadow: inset 1px 0 0 rgb(255 255 255 / 0.12);
+}
+
+.item:first-child .shelf::after {
+  left: 28px;
+}
+
+.item:last-child .shelf::before {
+  right: 28px;
+  transform: scaleX(-1);
 }
 
 .caption {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  margin: 18px 0 0;
+  margin: 30px 0 0;
   padding-right: 12px;
   font-size: 0.9rem;
   color: var(--oss-muted);
@@ -198,10 +288,10 @@
 
   .ledge {
     --sleeve: min(62vw, 250px);
-    padding-right: calc(var(--sleeve) * 0.3);
+    padding-right: calc(var(--sleeve) * 0.3 + 18px);
   }
 
   .item:last-child .shelf {
-    margin-right: calc(var(--sleeve) * -0.3);
+    margin-right: calc(var(--sleeve) * -0.3 - 14px);
   }
 }

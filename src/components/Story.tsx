@@ -1,4 +1,4 @@
-import { useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
+import { useCallback, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import { useReducedMotion } from 'motion/react';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { eras, lanes, timelineEnd, timelineStart, yearLabel, type Era } from '@/content/story';
@@ -6,6 +6,7 @@ import { SectionHeader } from './SectionHeader';
 import { StudioMonitor } from './StudioMonitor';
 import { Waveform } from './Waveform';
 import { useDragScroll } from './useDragScroll';
+import { useTimelineScroll } from './useTimelineScroll';
 import classes from './Story.module.css';
 
 const years = Array.from({ length: timelineEnd - timelineStart }, (_, i) => timelineStart + i);
@@ -15,7 +16,7 @@ const decades = Array.from(new Set(years.map((y) => Math.floor(y / 10) * 10))).m
   to: Math.min(d + 10, timelineEnd),
 }));
 
-/** Clips in time order: the order the inspector steps through and screen readers hear. */
+/** Clips in time order: the order keyboard focus steps through and screen readers hear. */
 const clips = [...eras].sort(
   (a, b) => a.start - b.start || lanes.indexOf(a.lane) - lanes.indexOf(b.lane),
 );
@@ -46,8 +47,8 @@ const clipLabel = (era: Era) => `${era.title}, ${era.lane} track, ${yearLabel(er
 
 /**
  * Section 2, "The Story": the timeline as an edit window on a studio monitor. The session scrolls
- * sideways inside the screen with fixed track headers; clips are selectable and the inspector below
- * shows the full story of the selected one.
+ * sideways inside the screen with fixed track headers; clips are selectable, and the desk unit
+ * under the monitor shows the full story of the selected one.
  */
 export function Story() {
   const [selected, setSelected] = useState(0);
@@ -57,17 +58,22 @@ export function Story() {
   const drag = useDragScroll(viewport);
   const era = clips[selected];
 
+  const headWidth = useCallback(
+    () => viewport.current?.querySelector<HTMLElement>('[data-track-head]')?.offsetWidth ?? 0,
+    [],
+  );
+  const timeline = useTimelineScroll(viewport, headWidth, !!reduceMotion);
+  const firstYear = timelineStart + Math.floor(timeline.from * years.length);
+  const lastYear = Math.min(
+    timelineEnd - 1,
+    timelineStart + Math.ceil(timeline.to * years.length) - 1,
+  );
+
+  // Selection never scrolls the timeline by itself; keyboard focus brings a clip into view.
   const select = (index: number, focus = false) => {
     const next = Math.max(0, Math.min(clips.length - 1, index));
     setSelected(next);
-    const el = clipRefs.current[next];
-    if (!el) return;
-    el.scrollIntoView({
-      behavior: reduceMotion ? 'auto' : 'smooth',
-      inline: 'nearest',
-      block: 'nearest',
-    });
-    if (focus) el.focus({ preventScroll: true });
+    if (focus) clipRefs.current[next]?.focus();
   };
 
   const onClipKey = (event: KeyboardEvent, index: number) => {
@@ -100,7 +106,21 @@ export function Story() {
           is what the road and the studio looked like.
         </SectionHeader>
 
-        <StudioMonitor>
+        <StudioMonitor
+          notes={
+            <div className={classes.notes} aria-live="polite" aria-atomic="true">
+              <div className={classes.notesHead}>
+                <span className={classes.notesLabel}>Session notes</span>
+                <span className={classes.notesLane} data-lane={era.lane}>
+                  {era.lane} · clip {selected + 1} of {clips.length}
+                </span>
+              </div>
+              <h3 className={classes.notesTitle}>{era.title}</h3>
+              <p className={classes.notesYears}>{yearLabel(era)}</p>
+              <p className={classes.notesBody}>{era.body}</p>
+            </div>
+          }
+        >
           <div className={classes.window}>
             <div className={classes.titleBar} aria-hidden="true">
               <span className={classes.lights}>
@@ -119,8 +139,9 @@ export function Story() {
                 <button
                   type="button"
                   className={classes.navButton}
-                  onClick={() => select(selected - 1)}
-                  disabled={selected === 0}
+                  onClick={() => timeline.page(-1)}
+                  disabled={!timeline.canEarlier}
+                  aria-controls="story-timeline"
                 >
                   <IconChevronLeft size={16} aria-hidden="true" />
                   Earlier
@@ -128,8 +149,9 @@ export function Story() {
                 <button
                   type="button"
                   className={classes.navButton}
-                  onClick={() => select(selected + 1)}
-                  disabled={selected === clips.length - 1}
+                  onClick={() => timeline.page(1)}
+                  disabled={!timeline.canLater}
+                  aria-controls="story-timeline"
                 >
                   Later
                   <IconChevronRight size={16} aria-hidden="true" />
@@ -142,13 +164,14 @@ export function Story() {
               <div className={classes.modes} aria-hidden="true">
                 <span>Grid · 1 year</span>
                 <span>
-                  {timelineStart} to {timelineEnd - 1}
+                  View {firstYear} to {lastYear}
                 </span>
               </div>
             </div>
 
             <div
               ref={viewport}
+              id="story-timeline"
               className={classes.viewport}
               data-dragging={drag.dragging || undefined}
               {...drag.handlers}
@@ -198,7 +221,7 @@ export function Story() {
                       style={{ '--lane-rows': laneRows[i] } as CSSProperties}
                       aria-hidden="true"
                     >
-                      <div className={classes.trackHead}>
+                      <div className={classes.trackHead} data-track-head>
                         <span className={classes.trackChip} />
                         <span className={classes.trackNum}>{i + 1}</span>
                         <span className={classes.trackName}>{lane}</span>
@@ -255,20 +278,6 @@ export function Story() {
             </div>
           </div>
         </StudioMonitor>
-
-        <article className={classes.inspector} aria-live="polite" aria-atomic="true">
-          <div className={classes.inspectorHead}>
-            <span className="label">
-              Clip {selected + 1} of {clips.length}
-            </span>
-            <span className={classes.inspectorLane} data-lane={era.lane}>
-              {era.lane}
-            </span>
-          </div>
-          <h3 className={classes.inspectorTitle}>{era.title}</h3>
-          <p className={classes.inspectorYears}>{yearLabel(era)}</p>
-          <p className={classes.inspectorBody}>{era.body}</p>
-        </article>
       </div>
     </section>
   );

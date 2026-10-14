@@ -439,7 +439,7 @@
   color: rgb(255 255 255 / 0.75);
 }
 
-/* Short clips give their room to the title; the years are in the counter and inspector. */
+/* Short clips give their room to the title; the years are in the counter and the session notes. */
 @container (max-width: 150px) {
   .clipYears {
     display: none;
@@ -509,70 +509,68 @@
   border-top: 9px solid var(--oss-sky);
 }
 
-/* ---- Inspector below the monitor ---- */
+/* ---- Session notes on the desk unit's display ---- */
 
-.inspector {
-  max-width: 760px;
-  margin: 36px auto 0;
-  padding: 20px 24px;
-  border-radius: 6px;
-  background: var(--oss-metal-charcoal);
-  box-shadow:
-    var(--oss-bevel),
-    0 0 0 1px #050506,
-    var(--oss-shadow-contact);
-}
-
-.inspectorHead {
+.notesHead {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px 16px;
 }
 
-.inspectorLane {
-  --tint: var(--oss-crimson);
-  padding: 2px 8px 2px 10px;
-  border-left: 4px solid var(--tint);
-  border-radius: 2px;
-  background: rgb(255 255 255 / 0.05);
+.notesLabel {
   font-family: var(--mantine-font-family-monospace);
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #d5d9dc;
-}
-
-.inspectorLane[data-lane='Stage'] {
-  --tint: #8c4fc4;
-}
-
-.inspectorLane[data-lane='Studio'] {
-  --tint: #2a9bd6;
-}
-
-.inspectorLane[data-lane='Life'] {
-  --tint: #c9962f;
-}
-
-.inspectorTitle {
-  margin: 10px 0 2px;
-  font-family: var(--mantine-font-family-headings);
-  font-size: 1.6rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.inspectorYears {
-  margin: 0;
-  font-family: var(--mantine-font-family-monospace);
-  font-size: 0.85rem;
   color: var(--oss-amber);
 }
 
-.inspectorBody {
-  margin: 10px 0 0;
-  color: #c9c9d0;
+.notesLane {
+  --tint: var(--oss-crimson);
+  padding-left: 8px;
+  border-left: 3px solid var(--tint);
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #a9b6bb;
+}
+
+.notesLane[data-lane='Stage'] {
+  --tint: #8c4fc4;
+}
+
+.notesLane[data-lane='Studio'] {
+  --tint: #2a9bd6;
+}
+
+.notesLane[data-lane='Life'] {
+  --tint: #c9962f;
+}
+
+.notesTitle {
+  margin: 10px 0 2px;
+  font-family: var(--mantine-font-family-headings);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: #eef3f5;
+}
+
+.notesYears {
+  margin: 0;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.85rem;
+  color: var(--oss-green);
+}
+
+.notesBody {
+  margin: 8px 0 0;
+  max-width: 70ch;
+  color: #c3ced2;
   line-height: 1.6;
 }
 
@@ -619,10 +617,6 @@
   .trackState {
     grid-column: 2;
     font-size: 0.55rem;
-  }
-
-  .inspector {
-    padding: 16px;
   }
 }
 

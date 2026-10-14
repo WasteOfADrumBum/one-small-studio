@@ -7,7 +7,8 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch;
-  gap: 12px;
+  /* Room between cases for the side panels the viewer can see. */
+  gap: 24px;
 }
 
 @media (max-width: $mantine-breakpoint-md) {
@@ -19,7 +20,7 @@
   .row > :last-child:nth-child(odd) {
     grid-column: 1 / -1;
     justify-self: center;
-    width: calc(50% - 6px);
+    width: calc(50% - 12px);
   }
 }
 

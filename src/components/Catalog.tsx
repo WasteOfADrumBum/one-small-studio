@@ -20,7 +20,7 @@ import classes from './Catalog.module.css';
 // Hand-placed, not random: small turns that repeat in a pattern.
 const TILTS = [-1.2, 0.8, -0.4, 1.1, -0.9];
 
-/** Section 4, "The Catalog": releases as sleeves on a record ledge, with liner notes for the pick. */
+/** Section 4, "The Catalog": releases as sleeves on a record shelf, with liner notes for the pick. */
 export function Catalog() {
   const { status, tracks, playing, play, toggle } = usePlayer();
   const { setPowered } = usePower();
@@ -66,7 +66,11 @@ export function Catalog() {
                     onSelect={() => setSelectedId(r.id)}
                     describedBy={`release-${r.id}`}
                   />
-                  <span className={classes.shelf} aria-hidden="true" />
+                  <span className={classes.shelf} aria-hidden="true">
+                    <span className={classes.lip} />
+                    <span className={classes.shelfTop} />
+                    <span className={classes.shelfFront} />
+                  </span>
                   <p id={`release-${r.id}`} className={classes.caption}>
                     <span className={classes.captionTitle}>{r.title}</span>
                     <span>

@@ -1,128 +1,114 @@
 /*
- * Rack cabinets. One rack unit (U) is the rhythm everything snaps to: faceplates are 1, 2 or 3 U tall
- * (growing only if their text needs it), and the rails carry three mounting holes per U.
+ * Rack cases. Carpet-covered boxes seen from slightly above and in front: a top surface and one
+ * narrow side for depth, a thick front frame with aluminium trim, and the gear set just behind it.
+ * One rack unit (U) is the rhythm everything snaps to; the rails carry three holes per U.
  */
 .cabinet {
   --u: 54px;
-  --rail: 22px;
-  --side: 14px;
+  --rail: 20px;
+  --frame: 14px;
+  --depth: 16px;
   position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
-/* Contact shadow under the plinth. */
+/* Contact shadow where the casters meet the floor. */
 .cabinet::after {
   content: '';
   position: absolute;
-  z-index: -1;
-  left: 2%;
-  right: -2%;
-  bottom: -16px;
-  height: 34px;
+  z-index: -2;
+  left: 1%;
+  right: -3%;
+  bottom: -18px;
+  height: 36px;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgb(0 0 0 / 0.9), transparent);
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.92), transparent);
   filter: blur(6px);
 }
 
-/* The outer cabinets show a sliver of their side panel, so the row reads as solid boxes. */
-.cabinet[data-edge]::before {
-  content: '';
+/* The lid, foreshortened: its back edge is narrower and leans toward the middle of the row. */
+.top {
+  flex: none;
+  align-self: flex-start;
+  width: 100%;
+  height: var(--depth);
+  background: var(--oss-fabric);
+  filter: brightness(1.35);
+  clip-path: polygon(
+    calc(var(--depth) * 0.5) 0,
+    calc(100% - var(--depth) * 0.5) 0,
+    100% 100%,
+    0 100%
+  );
+}
+
+.cabinet[data-side='right'] .top {
+  width: calc(100% + var(--depth));
+  clip-path: polygon(calc(var(--depth) * 0.7) 0, 100% 0, calc(100% - var(--depth)) 100%, 0 100%);
+}
+
+.cabinet[data-side='left'] .top {
+  width: calc(100% + var(--depth));
+  margin-left: calc(var(--depth) * -1);
+  clip-path: polygon(0 0, calc(100% - var(--depth) * 0.7) 0, 100% 100%, var(--depth) 100%);
+}
+
+/* One narrow side panel, receding from the front corner. */
+.sidePanel {
+  display: none;
   position: absolute;
   z-index: -1;
-  top: 6px;
-  bottom: 10px;
-  width: 12px;
-  background: var(--oss-wood-dark);
-  filter: brightness(0.7);
+  top: 0;
+  bottom: 22px;
+  width: var(--depth);
+  background: var(--oss-fabric-dark);
 }
 
-.cabinet[data-edge='left']::before {
-  left: -10px;
-  border-radius: 6px 0 0 4px;
-  transform: skewY(-8deg);
-  transform-origin: right top;
+.cabinet[data-side] .sidePanel {
+  display: block;
 }
 
-.cabinet[data-edge='right']::before {
-  right: -10px;
-  border-radius: 0 6px 4px 0;
-  transform: skewY(8deg);
-  transform-origin: left top;
+.cabinet[data-side='right'] .sidePanel {
+  left: 100%;
+  /* The far side is lit less: the key light is up and to the left. */
+  background: var(--oss-fabric);
+  filter: brightness(1.15);
+  box-shadow: inset 2px 0 0 #45474c;
+  clip-path: polygon(0 var(--depth), 100% 0, 100% calc(100% - var(--depth)), 0 100%);
 }
 
-.top {
-  height: 16px;
-  border-radius: 5px 5px 0 0;
-  background: var(--oss-wood);
-  box-shadow:
-    inset 0 2px 0 rgb(255 225 190 / 0.3),
-    inset 0 -3px 0 rgb(0 0 0 / 0.35);
+.cabinet[data-side='left'] .sidePanel {
+  right: 100%;
+  background: var(--oss-fabric);
+  filter: brightness(1.6);
+  box-shadow: inset -2px 0 0 #74777d;
+  clip-path: polygon(0 0, 100% var(--depth), 100% 100%, 0 calc(100% - var(--depth)));
 }
 
+/* The thick front frame, with aluminium trim along its edges and a seam under the lid. */
 .frame {
   flex: 1;
-  padding: 0 var(--side);
-  background: var(--oss-wood);
-  box-shadow:
-    inset 1px 0 0 rgb(255 225 190 / 0.18),
-    inset -1px 0 0 rgb(0 0 0 / 0.35);
-}
-
-/* The dark bay the gear mounts into. */
-.bay {
-  position: relative;
-  height: 100%;
-  box-sizing: border-box;
-  padding: calc(var(--u) / 6) 0 calc(var(--u) / 3);
-  background: var(--oss-metal-cavity);
-  box-shadow:
-    inset 0 8px 12px -4px rgb(0 0 0 / 0.9),
-    inset 6px 0 8px -6px rgb(0 0 0 / 0.9),
-    inset -6px 0 8px -6px rgb(0 0 0 / 0.9);
-}
-
-/* Recessed mounting rails with three holes per rack unit. */
-.rail {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: var(--rail);
-  background:
-    radial-gradient(
-        ellipse 3px 2.4px at 50% 50%,
-        #020203 0 2.2px,
-        rgb(255 255 255 / 0.12) 2.6px,
-        transparent 3px
-      )
-      0 calc(var(--u) / -6) / 100% calc(var(--u) / 3) repeat-y,
-    linear-gradient(90deg, #4a4c52 0%, #6f7278 45%, #45474c 100%);
-  box-shadow:
-    inset 0 6px 8px -2px rgb(0 0 0 / 0.85),
-    inset 0 -1px 0 rgb(0 0 0 / 0.5);
-}
-
-.rail[data-side='left'] {
-  left: 0;
-}
-
-.rail[data-side='right'] {
-  right: 0;
-}
-
-/* The category nameplate, on its own 1U panel at the top of the rack. */
-.plate {
-  position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  height: calc(var(--u) * 2 / 3);
-  margin: 0 var(--rail);
+  flex-direction: column;
+  padding: 0 var(--frame) var(--frame);
+  background: var(--oss-fabric);
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 0.1),
+    inset 0 3px 0 rgb(0 0 0 / 0.6),
+    inset 3px 0 0 #74777d,
+    inset 4px 0 0 rgb(0 0 0 / 0.5),
+    inset -3px 0 0 #45474c,
+    inset -4px 0 0 rgb(0 0 0 / 0.5),
+    inset 0 -3px 0 #3d3f44;
 }
 
-.plateTitle {
-  margin: 0;
+/* The case's name badge, riveted to the carpet above the rails. */
+.plate {
+  align-self: center;
+  margin: 10px 0 10px;
   padding: 4px 14px;
   border-radius: 2px;
   background: var(--oss-aluminum);
@@ -138,6 +124,46 @@
   text-transform: uppercase;
 }
 
+/* The opening the gear mounts into, a few millimetres behind the front edge. */
+.bay {
+  position: relative;
+  flex: 1;
+  padding: 4px 0 calc(var(--u) / 6);
+  border-radius: 2px;
+  background: var(--oss-metal-cavity);
+  box-shadow:
+    0 0 0 2px #070708,
+    0 1px 0 2px rgb(255 255 255 / 0.06);
+}
+
+/* Recessed mounting rails with three holes per rack unit. */
+.rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--rail);
+  background:
+    radial-gradient(
+        ellipse 3px 2.4px at 50% 50%,
+        #020203 0 2.2px,
+        rgb(255 255 255 / 0.12) 2.6px,
+        transparent 3px
+      )
+      0 calc(var(--u) / -6 + 4px) / 100% calc(var(--u) / 3) repeat-y,
+    linear-gradient(90deg, #4a4c52 0%, #7a7d83 45%, #45474c 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.2),
+    inset 0 -1px 0 rgb(0 0 0 / 0.5);
+}
+
+.rail[data-side='left'] {
+  left: 0;
+}
+
+.rail[data-side='right'] {
+  right: 0;
+}
+
 .units {
   position: relative;
   display: flex;
@@ -145,7 +171,51 @@
   gap: 1px;
 }
 
-/* ---- A mounted unit ---- */
+/* The front frame's shadow falling onto the gear behind it. Decoration only. */
+.lipShadow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow:
+    inset 0 10px 10px -6px rgb(0 0 0 / 0.85),
+    inset 8px 0 8px -6px rgb(0 0 0 / 0.75),
+    inset -6px 0 8px -6px rgb(0 0 0 / 0.6);
+}
+
+/* A heavy base on two casters. */
+.plinth {
+  position: relative;
+  flex: none;
+  height: 16px;
+  margin: 0 4px 6px;
+  border-radius: 0 0 4px 4px;
+  background: var(--oss-fabric-dark);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    inset 0 -2px 0 rgb(0 0 0 / 0.6);
+}
+
+.caster {
+  position: absolute;
+  bottom: -8px;
+  width: 22px;
+  height: 14px;
+  border-radius: 3px 3px 7px 7px;
+  background:
+    radial-gradient(circle at 50% 75%, #2b2b30 0 5px, transparent 5.5px),
+    linear-gradient(180deg, #8d9097 0 4px, #18181b 4px);
+  box-shadow: 0 2px 2px rgb(0 0 0 / 0.7);
+}
+
+.caster:first-child {
+  left: 12%;
+}
+
+.caster:last-child {
+  right: 12%;
+}
+
+/* ---- A unit: rack-mount faceplate, or gear standing on a rack shelf ---- */
 
 .unit {
   --plate: var(--oss-metal-charcoal);
@@ -156,50 +226,6 @@
   display: grid;
   grid-template-columns: var(--rail) minmax(0, 1fr) var(--rail);
   min-height: calc(var(--size) * var(--u) - 1px);
-  background: var(--plate);
-  /* Lit along the top edge, a hard seam at the bottom, and a little shadow on the unit below. */
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.14),
-    inset 0 -1px 0 rgb(0 0 0 / 0.55),
-    0 2px 2px -1px rgb(0 0 0 / 0.8);
-  border-radius: 2px;
-}
-
-.unit[data-finish='silver'] {
-  --plate: var(--oss-aluminum);
-  --ink: #141518;
-  --ink-soft: #383a40;
-  --accent: #9b111e;
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.7),
-    inset 0 -1px 0 rgb(0 0 0 / 0.35),
-    0 2px 2px -1px rgb(0 0 0 / 0.8);
-}
-
-.unit[data-finish='black'] {
-  --plate: var(--oss-metal-black);
-}
-
-.unit[data-finish='oxblood'] {
-  --plate: var(--oss-brushed-grain), linear-gradient(180deg, #4d1a22 0%, #34121a 100%);
-  --ink-soft: #d4b8bd;
-  --accent: #ff8f9e;
-}
-
-.unit[data-finish='slate'] {
-  --plate: var(--oss-brushed-grain), linear-gradient(180deg, #2b3a4a 0%, #1d2834 100%);
-  --ink-soft: #b9c7d4;
-  --accent: #8fd3f5;
-}
-
-.unit[data-finish='olive'] {
-  --plate: var(--oss-brushed-grain), linear-gradient(180deg, #3b3e2b 0%, #292b1d 100%);
-  --ink-soft: #cfd1bb;
-  --accent: #e7cc7c;
-}
-
-.unit[data-finish='filler'] {
-  --plate: linear-gradient(180deg, #1f1f23 0%, #17171a 100%);
 }
 
 .ear {
@@ -214,15 +240,50 @@
   justify-content: center;
 }
 
+.unit[data-mount='rack'] {
+  background: var(--plate);
+  border-radius: 2px;
+  /* Lit along the top edge, a hard seam at the bottom, and a little shadow on the unit below. */
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.14),
+    inset 0 -1px 0 rgb(0 0 0 / 0.55),
+    0 2px 2px -1px rgb(0 0 0 / 0.8);
+}
+
+.unit[data-kind='filler'] {
+  --plate: linear-gradient(180deg, #1f1f23 0%, #17171a 100%);
+}
+
+.unit[data-kind='effects'] {
+  --plate: var(--oss-metal-black);
+}
+
+.unit[data-kind='drum-module'] {
+  --plate: var(--oss-brushed-grain), linear-gradient(180deg, #2b2d33 0%, #1c1d21 100%);
+  --accent: var(--oss-green);
+}
+
+/* Scarlett red enclosure; the dark front panel is the hardware strip. */
+.unit[data-kind='interface'] {
+  --plate: var(--oss-scarlett);
+  --ink: #ffffff;
+  --ink-soft: #fde4e7;
+  --accent: #ffffff;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.3),
+    inset 0 -1px 0 rgb(0 0 0 / 0.45),
+    0 2px 2px -1px rgb(0 0 0 / 0.8);
+}
+
 .face {
   container-type: inline-size;
   display: flex;
   align-items: center;
   gap: 12px;
   min-width: 0;
-  padding: 8px 6px;
-  border-left: 1px solid rgb(0 0 0 / 0.18);
-  border-right: 1px solid rgb(0 0 0 / 0.18);
+  padding: 8px 8px;
+  border-left: 1px solid rgb(0 0 0 / 0.2);
+  border-right: 1px solid rgb(0 0 0 / 0.2);
 }
 
 .text {
@@ -242,7 +303,7 @@
 }
 
 .unit[data-size='3'] .name {
-  font-size: 1.35rem;
+  font-size: 1.3rem;
 }
 
 .model {
@@ -262,142 +323,521 @@
   color: var(--ink-soft);
 }
 
-.unit[data-size='1'] .note {
-  margin-top: 1px;
-  font-size: 0.8rem;
-  line-height: 1.3;
-}
+/* ---- Rack shelf: a cantilever tray bolted to the rails, the gear standing on it ---- */
 
-/* ---- Faceplate hardware ---- */
-
-.detail {
-  flex: none;
+.shelf {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  flex-direction: column;
+  min-width: 0;
 }
 
-.detail[data-detail='knobs'][data-size='3'] {
-  display: grid;
-  grid-template-columns: repeat(2, auto);
-}
-
-/* Narrow faceplates drop decoration before their text gets cramped. */
-@container (max-width: 250px) {
-  .detail {
-    display: none !important;
-  }
-}
-
-.vu {
-  display: block;
-  width: 92px;
-  padding: 4px;
-  border-radius: 3px;
-  background: #1a1a1c;
-  box-shadow:
-    inset 0 1px 2px rgb(0 0 0 / 0.8),
-    0 1px 0 rgb(255 255 255 / 0.4);
-}
-
-.vu svg {
-  display: block;
-  width: 100%;
-  border-radius: 2px;
-  /* The meter window is backlit: a real light source. */
-  background: radial-gradient(ellipse at 50% 100%, #ffd27a 0%, #f2b04e 70%, #d18b2c 100%);
-}
-
-.vuScale,
-.vuRed {
-  fill: none;
-  stroke-width: 2;
-}
-
-.vuScale {
-  stroke: #3a2a12;
-}
-
-.vuRed {
-  stroke: #b0101c;
-  stroke-width: 3;
-}
-
-.vuNeedle {
-  stroke: #111;
-  stroke-width: 1.4;
-  stroke-linecap: round;
-}
-
-.vu text {
-  font-family: var(--mantine-font-family-monospace);
-  font-size: 7px;
-  fill: #3a2a12;
-}
-
-.display {
+.shelfBody {
+  container-type: inline-size;
+  flex: 1;
   display: flex;
   align-items: flex-end;
-  gap: 3px;
-  width: 84px;
-  height: 40px;
-  padding: 6px 8px;
-  box-sizing: border-box;
-  border-radius: 3px;
-  background: #07100b;
-  box-shadow:
-    inset 0 1px 3px rgb(0 0 0 / 0.9),
-    0 1px 0 rgb(255 255 255 / 0.08);
+  gap: 14px;
+  padding: 8px 8px 0;
 }
 
-.display i {
-  flex: 1;
-  height: calc(var(--h) * 100%);
-  background: linear-gradient(0deg, var(--oss-green) 0 70%, var(--oss-amber) 70%);
+.shelfBody .text {
+  align-self: center;
+}
+
+.tray {
+  height: 9px;
+  margin: 0 -2px;
+  border-radius: 1px;
+  background: var(--oss-aluminum-dark);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.35),
+    inset 0 -2px 0 rgb(0 0 0 / 0.45),
+    0 3px 4px rgb(0 0 0 / 0.75);
+}
+
+/* The shelf's ears are its folded brackets, so they share the tray's metal. */
+.unit[data-mount='shelf'] .ear {
+  justify-content: flex-end;
+  padding-bottom: 0;
+}
+
+.unit[data-mount='shelf'] .ear::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 9px;
+  background: var(--oss-aluminum-dark);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3);
+}
+
+.unit[data-mount='shelf'] .ear > :first-child:not(:last-child) {
+  display: none;
+}
+
+/* Everything drawn on a shelf casts its shadow down onto the tray. */
+.laptop,
+.ampHead,
+.cab,
+.drum,
+.cymbals {
+  position: relative;
+  flex: none;
+  display: block;
+  filter: drop-shadow(3px 4px 3px rgb(0 0 0 / 0.75));
+}
+
+/* Laptop running a DAW edit window. */
+.laptop {
+  width: 118px;
+  margin-bottom: 0;
+}
+
+.laptopScreen {
+  position: relative;
+  display: block;
+  height: 76px;
+  margin: 0 8px;
+  border: 4px solid #0b0b0d;
+  border-bottom-width: 6px;
+  border-radius: 5px 5px 2px 2px;
+  background:
+    linear-gradient(90deg, #262a31 0 16%, transparent 16%),
+    repeating-linear-gradient(180deg, #14171c 0 13px, #181b21 13px 14px);
+  box-shadow: 0 0 0 1px #3b3d43;
+}
+
+.laptopScreen i {
+  position: absolute;
+  height: 8px;
+  border-radius: 1px;
   opacity: 0.85;
 }
 
-.leds {
-  display: grid;
-  grid-template-columns: repeat(2, 7px);
-  gap: 6px;
+.laptopScreen i:nth-child(1) {
+  top: 3px;
 }
 
-.detail[data-size='1'] .leds {
-  grid-template-columns: repeat(4, 7px);
+.laptopScreen i:nth-child(2) {
+  top: 17px;
 }
 
-.pads {
+.laptopScreen i:nth-child(3) {
+  top: 31px;
+}
+
+.laptopScreen i:nth-child(4) {
+  top: 45px;
+}
+
+.laptopScreen i:nth-child(5) {
+  top: 59px;
+}
+
+.laptopBase {
+  display: block;
+  height: 7px;
+  background: var(--oss-aluminum);
+  clip-path: polygon(4% 0, 96% 0, 100% 100%, 0 100%);
+  box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.3);
+}
+
+/* Amp head: tolex box, carry strap, grille up top, a silver control strip below. */
+.ampHead {
+  width: 136px;
+  padding-top: 8px;
+}
+
+.handle {
+  position: absolute;
+  top: 0;
+  left: 34%;
+  right: 34%;
+  height: 10px;
+  border: 3px solid #0e0e10;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+}
+
+.ampCage {
+  position: relative;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: stretch;
+  height: 46px;
+  padding: 6px 10px;
+  box-sizing: border-box;
+  border-radius: 5px 5px 0 0;
+  background: var(--oss-fabric-nap), linear-gradient(180deg, #232327, #19191c);
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 0.1),
+    inset 0 0 0 1px #0b0b0d;
+}
+
+/* Lid of the head, seen from above. */
+.ampCage::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  top: -6px;
+  height: 6px;
+  background: #2b2b30;
+  clip-path: polygon(4% 0, 96% 0, 100% 100%, 0 100%);
+}
+
+.ampCage i {
+  width: 3px;
+  border-radius: 1px;
+  background: linear-gradient(180deg, #9a9da3, #55585e);
+}
+
+.ampPanel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px;
+  padding: 6px 7px;
+  border-radius: 0 0 4px 4px;
+  background: var(--oss-aluminum);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.6),
+    inset 0 -2px 0 rgb(0 0 0 / 0.35),
+    0 0 0 1px #0b0b0d;
+}
+
+/* Speaker cab: tolex, grille cloth with the speakers ghosting through, metal corners. */
+.cab {
+  width: 110px;
+  height: 124px;
+  padding: 8px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  background: var(--oss-fabric);
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 0.12),
+    inset 0 0 0 1px #0b0b0d;
+}
+
+.cab::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  top: -6px;
+  height: 6px;
+  background: #26262b;
+  clip-path: polygon(4% 0, 96% 0, 100% 100%, 0 100%);
+}
+
+.grille {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  height: 100%;
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(-45deg, rgb(0 0 0 / 0.35) 0 1px, transparent 1px 3px), #2a2a2e;
+  box-shadow:
+    inset 0 0 0 2px #121214,
+    inset 0 2px 4px rgb(0 0 0 / 0.7);
+}
+
+.grille i {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgb(0 0 0 / 0.35) 0 30%,
+    rgb(0 0 0 / 0.15) 31% 64%,
+    transparent 66%
+  );
+}
+
+.corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: radial-gradient(circle at 35% 30%, #e1e3e6, #6a6d73);
+  box-shadow: 0 1px 1px rgb(0 0 0 / 0.6);
+}
+
+.corner[data-c='tl'] {
+  top: 0;
+  left: 0;
+  border-radius: 4px 0 6px 0;
+}
+
+.corner[data-c='tr'] {
+  top: 0;
+  right: 0;
+  border-radius: 0 4px 0 6px;
+}
+
+.corner[data-c='bl'] {
+  bottom: 0;
+  left: 0;
+  border-radius: 0 6px 0 4px;
+}
+
+.corner[data-c='br'] {
+  bottom: 0;
+  right: 0;
+  border-radius: 6px 0 4px 0;
+}
+
+/* An acoustic drum, side on: chrome hoops, the shell's finish, and its lugs. */
+.drum {
+  --finish: linear-gradient(180deg, #2c2c31 0%, #0c0c0e 45%, #1b1b1f 60%, #050506 100%);
+  width: 108px;
+  margin-bottom: 1px;
+}
+
+.drum[data-shell='silver'] {
+  --finish:
+    radial-gradient(circle, rgb(255 255 255 / 0.55) 0 0.6px, transparent 1px) 0 0 / 5px 4px,
+    linear-gradient(180deg, #d9dce1 0%, #8f939a 45%, #c3c6cc 62%, #6c7077 100%);
+}
+
+.hoop {
+  display: block;
+  height: 6px;
+  margin: 0 -3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #f2f3f5 0%, #9a9da3 55%, #55585e 100%);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.5);
+}
+
+/* The batter head, just visible over the top hoop. */
+.drum::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  top: -5px;
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 45% 40%, #f4f1e8, #c9c4b6);
+}
+
+.shellBody {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 50px;
+  background: var(--finish);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    inset 6px 0 8px -4px rgb(255 255 255 / 0.1),
+    inset -8px 0 8px -4px rgb(0 0 0 / 0.55);
+}
+
+.shellBody i {
+  width: 6px;
+  height: 18px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #6d7076 0%, #f0f1f3 45%, #8d9097 100%);
+  box-shadow: 0 1px 1px rgb(0 0 0 / 0.6);
+}
+
+/* Cymbals on a stand: bronze discs, each with a bell. */
+.cymbals {
+  width: 112px;
+  height: 84px;
+}
+
+.cymbals::before {
+  content: '';
+  position: absolute;
+  left: calc(50% - 1.5px);
+  top: 4px;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(90deg, #6d7076, #e1e3e6, #6d7076);
+}
+
+.cymbals::after {
+  content: '';
+  position: absolute;
+  left: 30%;
+  right: 30%;
+  bottom: 0;
+  height: 4px;
+  border-radius: 2px;
+  background: #55585e;
+}
+
+.cymbals i {
+  position: absolute;
+  height: 7px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #e9c46a 0%, #b8862b 50%, #7a5518 100%);
+  box-shadow: inset 0 1px 0 rgb(255 245 210 / 0.6);
+}
+
+.cymbals i::after {
+  content: '';
+  position: absolute;
+  left: calc(50% - 9px);
+  top: -4px;
+  width: 18px;
+  height: 8px;
+  border-radius: 50% 50% 0 0;
+  background: linear-gradient(180deg, #e9c46a, #b8862b);
+}
+
+.cymbals i:nth-child(1) {
+  top: 8px;
+  left: 4px;
+  right: 4px;
+}
+
+.cymbals i:nth-child(2) {
+  top: 34px;
+  left: 12px;
+  right: 12px;
+}
+
+.cymbals i:nth-child(3) {
+  top: 56px;
+  left: 18px;
+  right: 18px;
+}
+
+/* ---- Rack-mount faceplate hardware ---- */
+
+.hw {
+  flex: none;
   display: grid;
-  grid-template-columns: repeat(2, 22px);
+  align-items: center;
+  gap: 6px 8px;
+}
+
+/* Focusrite: the dark front panel with combo inputs and gain controls ringed by halos. */
+.hw[data-hw='interface'] {
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  grid-auto-flow: column;
+  padding: 6px 8px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #1c1c20, #0f0f12);
+  box-shadow:
+    inset 0 1px 2px rgb(0 0 0 / 0.8),
+    0 1px 0 rgb(255 255 255 / 0.25);
+}
+
+.combo {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #000 0 3px, transparent 3.5px),
+    radial-gradient(circle at 50% 22%, #000 0 1.6px, transparent 2px),
+    radial-gradient(circle at 26% 64%, #000 0 1.6px, transparent 2px),
+    radial-gradient(circle at 74% 64%, #000 0 1.6px, transparent 2px),
+    radial-gradient(circle, #2c2c31 0 9px, #8d9097 9.5px 11px, #3a3a40 11.5px);
+  box-shadow: 0 1px 1px rgb(0 0 0 / 0.8);
+}
+
+.gains {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 4px;
+  grid-row: 1 / span 2;
+}
+
+.halo {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px rgb(95 224 138 / 0.75);
+}
+
+/* Small backlit displays: the only lit things on a faceplate. */
+.lcd {
+  grid-area: lcd;
+  display: grid;
+  place-items: center;
+  min-width: 56px;
+  height: 24px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  border-radius: 2px;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  background: #120405;
+  color: #ff5a6a;
+  text-shadow: 0 0 4px rgb(255 77 100 / 0.55);
+  box-shadow:
+    inset 0 1px 3px rgb(0 0 0 / 0.9),
+    0 1px 0 rgb(255 255 255 / 0.1);
+}
+
+.lcd[data-tone='green'] {
+  background: #04100a;
+  color: var(--oss-green);
+  text-shadow: 0 0 4px rgb(95 224 138 / 0.5);
+}
+
+.paramKnobs {
+  grid-area: knobs;
+  display: flex;
+  gap: 4px;
+}
+
+.keys {
+  grid-area: keys;
+  display: grid;
+  grid-template-columns: repeat(3, 14px);
   gap: 5px;
 }
 
-.pads i {
-  height: 18px;
-  border-radius: 3px;
-  background: linear-gradient(180deg, #4a4a52, #2c2c32);
+.keys i {
+  height: 10px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #4a4a52, #26262b);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.15),
     0 2px 2px rgb(0 0 0 / 0.6);
 }
 
-.grille {
-  width: 84px;
-  height: 64px;
+.keys[data-pads] {
+  grid-template-columns: repeat(4, 14px);
+  gap: 4px;
+}
+
+.keys[data-pads] i {
+  height: 14px;
   border-radius: 3px;
-  background:
-    radial-gradient(circle, #050506 1.4px, transparent 1.8px) 0 0 / 6px 6px,
-    #2a2a30;
-  box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.8);
+  background: linear-gradient(180deg, #3a3d44, #1f2025);
 }
 
-/* Two rows of punched ventilation slots. */
-.detail[data-size='1'] .grille {
-  width: 96px;
-  height: 30px;
+/* Boss: preset display, parameter knobs, and a block of buttons. */
+.hw[data-hw='effects'] {
+  grid-template-areas:
+    'lcd keys'
+    'knobs keys';
 }
 
+/* Alesis: kit display over grouped pads, with a big data dial beside them. */
+.hw[data-hw='module'] {
+  grid-template-areas:
+    'lcd dial'
+    'keys dial';
+}
+
+.hw[data-hw='module'] > :nth-child(2) {
+  grid-area: dial;
+}
+
+/* Two rows of punched ventilation slots on a filler panel. */
 .vent {
   flex: 1;
   height: 16px;
@@ -409,23 +849,34 @@
   filter: drop-shadow(0 1px 0 rgb(255 255 255 / 0.07));
 }
 
-/* The plinth the cabinet stands on. */
-.plinth {
-  height: 14px;
-  margin: 0 6px;
-  border-radius: 0 0 3px 3px;
-  background: linear-gradient(180deg, #1a120c, #0d0907);
-  box-shadow: inset 0 1px 0 rgb(255 225 190 / 0.12);
+/* Narrow units drop decoration before their text gets cramped. */
+@container (max-width: 270px) {
+  .hw,
+  .shelfBody > [aria-hidden='true'] {
+    display: none;
+  }
 }
 
 @media (max-width: $mantine-breakpoint-sm) {
   .cabinet {
     --u: 52px;
-    --rail: 18px;
-    --side: 10px;
+    --rail: 16px;
+    --frame: 10px;
   }
 
-  .cabinet[data-edge]::before {
+  /* Stacked one above another, the cases face straight on. */
+  .cabinet[data-side] .sidePanel {
     display: none;
+  }
+
+  .cabinet[data-side] .top {
+    width: 100%;
+    margin-left: 0;
+    clip-path: polygon(
+      calc(var(--depth) * 0.5) 0,
+      calc(100% - var(--depth) * 0.5) 0,
+      100% 100%,
+      0 100%
+    );
   }
 }

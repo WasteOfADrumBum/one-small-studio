@@ -20,7 +20,7 @@ export function Studio() {
             <RackCabinet
               key={group.name}
               title={group.name}
-              edge={i === 0 ? 'left' : i === gear.length - 1 ? 'right' : undefined}
+              side={i === 0 ? 'right' : i === gear.length - 1 ? 'left' : undefined}
             >
               {group.items.map((item) => (
                 <RackUnit key={`${item.brand}-${item.model}`} item={item} />
