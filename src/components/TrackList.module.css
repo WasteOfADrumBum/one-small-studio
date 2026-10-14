@@ -1,0 +1,136 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.track:focus-visible {
+  outline: 2px solid var(--oss-sky);
+  outline-offset: -2px;
+}
+
+.num,
+.time {
+  flex: none;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.75rem;
+}
+
+.num {
+  width: 2ch;
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.placeholder {
+  height: 14px;
+  margin: 11px 10px;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.06);
+}
+
+.message {
+  margin: 0;
+  padding: 10px;
+  font-size: 0.875rem;
+}
+
+.message a {
+  color: inherit;
+}
+
+/* Lit text on the console display. */
+.list[data-variant='screen'] .track {
+  color: #d9e3e6;
+}
+
+.list[data-variant='screen'] .num,
+.list[data-variant='screen'] .time {
+  color: #7f9097;
+}
+
+.list[data-variant='screen'] .track:hover {
+  background: rgb(255 255 255 / 0.05);
+}
+
+.list[data-variant='screen'] .track[data-current] {
+  background: rgb(95 224 138 / 0.1);
+  box-shadow: inset 2px 0 0 var(--oss-green);
+}
+
+.list[data-variant='screen'] .track[data-current] .num,
+.list[data-variant='screen'] .track[data-current] .title {
+  color: var(--oss-green);
+}
+
+.message[data-variant='screen'] {
+  color: #b5c2c7;
+}
+
+/* Ink on the liner notes. */
+.list[data-variant='notes'] {
+  border-top: 1px solid rgb(0 0 0 / 0.15);
+}
+
+.list[data-variant='notes'] li {
+  border-bottom: 1px solid rgb(0 0 0 / 0.1);
+}
+
+.list[data-variant='notes'] .track {
+  color: #1d1a17;
+  border-radius: 0;
+}
+
+.list[data-variant='notes'] .num,
+.list[data-variant='notes'] .time {
+  color: #5a524a;
+}
+
+.list[data-variant='notes'] .track:hover {
+  background: rgb(0 0 0 / 0.05);
+}
+
+.list[data-variant='notes'] .track[data-current] {
+  box-shadow: inset 3px 0 0 var(--oss-crimson);
+}
+
+.list[data-variant='notes'] .track[data-current] .title {
+  font-weight: 600;
+  color: #8a0b20;
+}
+
+.list[data-variant='notes'] .track:focus-visible {
+  outline-color: #0b5f86;
+}
+
+.list[data-variant='notes'] .placeholder {
+  background: rgb(0 0 0 / 0.08);
+}
+
+.message[data-variant='notes'] {
+  color: #3a332d;
+}

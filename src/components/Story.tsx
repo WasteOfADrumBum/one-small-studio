@@ -1,130 +1,275 @@
-import { useRef, useState, type CSSProperties } from 'react';
-import { Container, Stack, Text, Title } from '@mantine/core';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
-import { eras, lanes, timelineEnd, timelineStart, yearLabel } from '@/content/story';
+import { useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
+import { useReducedMotion } from 'motion/react';
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import { eras, lanes, timelineEnd, timelineStart, yearLabel, type Era } from '@/content/story';
+import { SectionHeader } from './SectionHeader';
+import { StudioMonitor } from './StudioMonitor';
+import { Waveform } from './Waveform';
+import { useDragScroll } from './useDragScroll';
 import classes from './Story.module.css';
 
-gsap.registerPlugin(ScrollTrigger, useGSAP);
-
-const YEAR_PX = 150;
-const PLAYHEAD = 0.3; // fraction of the viewport width where the playhead stands
 const years = Array.from({ length: timelineEnd - timelineStart }, (_, i) => timelineStart + i);
-const trackWidth = years.length * YEAR_PX;
+const decades = Array.from(new Set(years.map((y) => Math.floor(y / 10) * 10))).map((d) => ({
+  label: `${d}s`,
+  from: Math.max(d, timelineStart),
+  to: Math.min(d + 10, timelineEnd),
+}));
+
+/** Clips in time order: the order the inspector steps through and screen readers hear. */
+const clips = [...eras].sort(
+  (a, b) => a.start - b.start || lanes.indexOf(a.lane) - lanes.indexOf(b.lane),
+);
 
 /**
- * Section 2, "The Story": the timeline as a DAW arrangement. On wide screens the section pins and the
- * lanes scroll sideways past a fixed playhead; on phones and with reduced motion it is a plain list.
+ * Stacks overlapping clips on a lane into extra rows, the way a DAW shows alternate playlists, and
+ * works out where each lane starts.
+ */
+function layout() {
+  const rowOf = new Map<Era, number>();
+  const laneRows = lanes.map((lane) => {
+    const ends: number[] = [];
+    for (const era of clips.filter((e) => e.lane === lane)) {
+      let row = ends.findIndex((end) => end <= era.start);
+      if (row === -1) row = ends.push(0) - 1;
+      ends[row] = era.end ?? timelineEnd;
+      rowOf.set(era, row);
+    }
+    return Math.max(1, ends.length);
+  });
+  const laneTop = laneRows.map((_, i) => laneRows.slice(0, i).reduce((a, b) => a + b, 0));
+  return { rowOf, laneRows, laneTop, totalRows: laneRows.reduce((a, b) => a + b, 0) };
+}
+
+const { rowOf, laneRows, laneTop, totalRows } = layout();
+
+const clipLabel = (era: Era) => `${era.title}, ${era.lane} track, ${yearLabel(era)}`;
+
+/**
+ * Section 2, "The Story": the timeline as an edit window on a studio monitor. The session scrolls
+ * sideways inside the screen with fixed track headers; clips are selectable and the inspector below
+ * shows the full story of the selected one.
  */
 export function Story() {
-  const root = useRef<HTMLElement>(null);
-  const track = useRef<HTMLDivElement>(null);
-  const [year, setYear] = useState(timelineStart);
+  const [selected, setSelected] = useState(0);
+  const viewport = useRef<HTMLDivElement>(null);
+  const clipRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const reduceMotion = useReducedMotion();
+  const drag = useDragScroll(viewport);
+  const era = clips[selected];
 
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia();
-      mm.add('(min-width: 62em) and (prefers-reduced-motion: no-preference)', () => {
-        const el = track.current!;
-        const viewport = el.parentElement!;
-        // Scroll until the last year sits under the playhead.
-        const distance = () => trackWidth - viewport.clientWidth * PLAYHEAD;
-        gsap.fromTo(
-          el,
-          { x: () => viewport.clientWidth * PLAYHEAD },
-          {
-            x: () => viewport.clientWidth * PLAYHEAD - distance(),
-            ease: 'none',
-            scrollTrigger: {
-              trigger: root.current,
-              start: 'top top',
-              end: () => `+=${distance()}`,
-              pin: true,
-              scrub: 0.6,
-              invalidateOnRefresh: true,
-              onUpdate: (self) =>
-                setYear(Math.floor(timelineStart + (self.progress * distance()) / YEAR_PX)),
-            },
-          },
-        );
-      });
-    },
-    { scope: root },
-  );
+  const select = (index: number, focus = false) => {
+    const next = Math.max(0, Math.min(clips.length - 1, index));
+    setSelected(next);
+    const el = clipRefs.current[next];
+    if (!el) return;
+    el.scrollIntoView({
+      behavior: reduceMotion ? 'auto' : 'smooth',
+      inline: 'nearest',
+      block: 'nearest',
+    });
+    if (focus) el.focus({ preventScroll: true });
+  };
+
+  const onClipKey = (event: KeyboardEvent, index: number) => {
+    const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
+    if (step) {
+      event.preventDefault();
+      select(index + step, true);
+    } else if (event.key === 'Home' || event.key === 'End') {
+      event.preventDefault();
+      select(event.key === 'Home' ? 0 : clips.length - 1, true);
+    }
+  };
+
+  const sessionStyle = {
+    '--years': years.length,
+    '--rows': totalRows,
+    '--sel-x': era.start - timelineStart,
+    '--sel-w': (era.end ?? timelineEnd) - era.start,
+  } as CSSProperties;
 
   return (
-    <section ref={root} id="story" className={classes.story} aria-labelledby="story-title">
-      <Container size="lg">
-        <Stack gap={4} mb="xl">
-          <span className="label">Track 02 · The story</span>
-          <Title id="story-title" order={2} className={classes.heading}>
-            Thirty years, one arrangement
-          </Title>
-          <Text c="dimmed" maw={620}>
-            This is a look back, not a sales pitch. I don&apos;t tour or take gigs anymore, but this
-            is what the road and the studio looked like.
-          </Text>
-        </Stack>
-      </Container>
+    <section id="story" className={classes.story} aria-labelledby="story-title">
+      <div className="oss-container">
+        <SectionHeader
+          label="Track 02 · The story"
+          id="story-title"
+          title="Thirty years, one arrangement"
+        >
+          This is a look back, not a sales pitch. I don&apos;t tour or take gigs anymore, but this
+          is what the road and the studio looked like.
+        </SectionHeader>
 
-      <div className={classes.arrangement} aria-hidden="true">
-        <div className={classes.counter}>
-          <span className="label">Bar</span>
-          <span className={classes.counterValue}>{Math.min(year, timelineEnd - 1)}</span>
-        </div>
-        <div className={classes.lanes}>
-          {lanes.map((lane) => (
-            <div key={lane} className={classes.laneName}>
-              {lane}
-            </div>
-          ))}
-        </div>
-        <div className={classes.viewport}>
-          <div ref={track} className={classes.track} style={{ width: trackWidth }}>
-            <div className={classes.ruler}>
-              {years.map((y) => (
-                <span key={y} className={classes.bar} style={{ width: YEAR_PX }}>
-                  {y % 5 === 0 || y === timelineStart ? y : ''}
-                </span>
-              ))}
-            </div>
-            {eras.map((era) => (
-              <article
-                key={era.title}
-                className={classes.region}
-                data-lane={era.lane}
-                style={
-                  {
-                    left: (era.start - timelineStart) * YEAR_PX,
-                    width: ((era.end ?? timelineEnd) - era.start) * YEAR_PX - 4,
-                    '--row': lanes.indexOf(era.lane),
-                  } as CSSProperties
-                }
-              >
-                <strong>{era.title}</strong>
-                <span className={classes.regionYears}>{yearLabel(era)}</span>
-                <p>{era.body}</p>
-              </article>
-            ))}
-          </div>
-          <div className={classes.playhead} style={{ left: `${PLAYHEAD * 100}%` }} />
-        </div>
-      </div>
-
-      <Container size="lg">
-        <ol className={classes.list}>
-          {eras.map((era) => (
-            <li key={era.title} data-lane={era.lane}>
-              <span className="label">
-                {era.lane} · {yearLabel(era)}
+        <StudioMonitor>
+          <div className={classes.window}>
+            <div className={classes.titleBar} aria-hidden="true">
+              <span className={classes.lights}>
+                <i />
+                <i />
+                <i />
               </span>
-              <Title order={3}>{era.title}</Title>
-              <Text c="dimmed">{era.body}</Text>
-            </li>
-          ))}
-        </ol>
-      </Container>
+              <span>Edit: The Story</span>
+              <span className={classes.titleMeta}>
+                {lanes.length} tracks · {clips.length} clips
+              </span>
+            </div>
+
+            <div className={classes.toolbar}>
+              <div className={classes.nav}>
+                <button
+                  type="button"
+                  className={classes.navButton}
+                  onClick={() => select(selected - 1)}
+                  disabled={selected === 0}
+                >
+                  <IconChevronLeft size={16} aria-hidden="true" />
+                  Earlier
+                </button>
+                <button
+                  type="button"
+                  className={classes.navButton}
+                  onClick={() => select(selected + 1)}
+                  disabled={selected === clips.length - 1}
+                >
+                  Later
+                  <IconChevronRight size={16} aria-hidden="true" />
+                </button>
+              </div>
+              <div className={classes.counter} aria-hidden="true">
+                <span className={classes.counterLabel}>Selection</span>
+                <span className={classes.counterValue}>{yearLabel(era)}</span>
+              </div>
+              <div className={classes.modes} aria-hidden="true">
+                <span>Grid · 1 year</span>
+                <span>
+                  {timelineStart} to {timelineEnd - 1}
+                </span>
+              </div>
+            </div>
+
+            <div
+              ref={viewport}
+              className={classes.viewport}
+              data-dragging={drag.dragging || undefined}
+              {...drag.handlers}
+            >
+              <div className={classes.session} style={sessionStyle}>
+                {/* Ruler: decades over years. */}
+                <div className={classes.rulerRow} aria-hidden="true">
+                  <div className={classes.corner}>
+                    <span>Era</span>
+                    <span>Year</span>
+                  </div>
+                  <div className={classes.ruler}>
+                    <div className={classes.decades}>
+                      {decades.map((d) => (
+                        <span
+                          key={d.label}
+                          style={
+                            {
+                              '--x': d.from - timelineStart,
+                              '--w': d.to - d.from,
+                            } as CSSProperties
+                          }
+                        >
+                          {d.label}
+                        </span>
+                      ))}
+                    </div>
+                    <div className={classes.years}>
+                      {years.map((y) => (
+                        <span key={y} data-major={y % 5 === 0 || undefined}>
+                          {y}
+                        </span>
+                      ))}
+                    </div>
+                    <span className={classes.selectionBand} />
+                  </div>
+                </div>
+
+                {/* Tracks: fixed headers and the lanes behind the clips. */}
+                {lanes.map((lane, i) => {
+                  const ongoing = eras.some((e) => e.lane === lane && e.end === null);
+                  return (
+                    <div
+                      key={lane}
+                      className={classes.trackRow}
+                      data-lane={lane}
+                      style={{ '--lane-rows': laneRows[i] } as CSSProperties}
+                      aria-hidden="true"
+                    >
+                      <div className={classes.trackHead}>
+                        <span className={classes.trackChip} />
+                        <span className={classes.trackNum}>{i + 1}</span>
+                        <span className={classes.trackName}>{lane}</span>
+                        <span className={classes.trackState} data-on={ongoing || undefined}>
+                          <span className={classes.trackLed} />
+                          {ongoing ? 'Ongoing' : 'Closed'}
+                        </span>
+                      </div>
+                      <div className={classes.lane} />
+                    </div>
+                  );
+                })}
+
+                <div
+                  className={classes.clips}
+                  role="group"
+                  aria-label="Timeline clips, earliest first"
+                >
+                  {clips.map((c, i) => (
+                    <button
+                      key={c.title}
+                      ref={(el) => {
+                        clipRefs.current[i] = el;
+                      }}
+                      type="button"
+                      className={classes.clip}
+                      data-lane={c.lane}
+                      aria-pressed={i === selected}
+                      aria-label={clipLabel(c)}
+                      title={c.title}
+                      onClick={() => !drag.moved() && select(i)}
+                      onKeyDown={(e) => onClipKey(e, i)}
+                      style={
+                        {
+                          '--x': c.start - timelineStart,
+                          '--w': (c.end ?? timelineEnd) - c.start,
+                          '--r': laneTop[lanes.indexOf(c.lane)] + (rowOf.get(c) ?? 0),
+                        } as CSSProperties
+                      }
+                    >
+                      <span className={classes.clipName}>
+                        <span className={classes.clipText}>
+                          <span className={classes.clipTitle}>{c.title}</span>
+                          <span className={classes.clipYears}>{yearLabel(c)}</span>
+                        </span>
+                      </span>
+                      <Waveform seed={c.title} lane={c.lane} className={classes.wave} />
+                    </button>
+                  ))}
+                </div>
+
+                <span className={classes.playhead} aria-hidden="true" />
+              </div>
+            </div>
+          </div>
+        </StudioMonitor>
+
+        <article className={classes.inspector} aria-live="polite" aria-atomic="true">
+          <div className={classes.inspectorHead}>
+            <span className="label">
+              Clip {selected + 1} of {clips.length}
+            </span>
+            <span className={classes.inspectorLane} data-lane={era.lane}>
+              {era.lane}
+            </span>
+          </div>
+          <h3 className={classes.inspectorTitle}>{era.title}</h3>
+          <p className={classes.inspectorYears}>{yearLabel(era)}</p>
+          <p className={classes.inspectorBody}>{era.body}</p>
+        </article>
+      </div>
     </section>
   );
 }

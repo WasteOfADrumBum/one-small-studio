@@ -1,0 +1,431 @@
+/*
+ * Rack cabinets. One rack unit (U) is the rhythm everything snaps to: faceplates are 1, 2 or 3 U tall
+ * (growing only if their text needs it), and the rails carry three mounting holes per U.
+ */
+.cabinet {
+  --u: 54px;
+  --rail: 22px;
+  --side: 14px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Contact shadow under the plinth. */
+.cabinet::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 2%;
+  right: -2%;
+  bottom: -16px;
+  height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.9), transparent);
+  filter: blur(6px);
+}
+
+/* The outer cabinets show a sliver of their side panel, so the row reads as solid boxes. */
+.cabinet[data-edge]::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 6px;
+  bottom: 10px;
+  width: 12px;
+  background: var(--oss-wood-dark);
+  filter: brightness(0.7);
+}
+
+.cabinet[data-edge='left']::before {
+  left: -10px;
+  border-radius: 6px 0 0 4px;
+  transform: skewY(-8deg);
+  transform-origin: right top;
+}
+
+.cabinet[data-edge='right']::before {
+  right: -10px;
+  border-radius: 0 6px 4px 0;
+  transform: skewY(8deg);
+  transform-origin: left top;
+}
+
+.top {
+  height: 16px;
+  border-radius: 5px 5px 0 0;
+  background: var(--oss-wood);
+  box-shadow:
+    inset 0 2px 0 rgb(255 225 190 / 0.3),
+    inset 0 -3px 0 rgb(0 0 0 / 0.35);
+}
+
+.frame {
+  flex: 1;
+  padding: 0 var(--side);
+  background: var(--oss-wood);
+  box-shadow:
+    inset 1px 0 0 rgb(255 225 190 / 0.18),
+    inset -1px 0 0 rgb(0 0 0 / 0.35);
+}
+
+/* The dark bay the gear mounts into. */
+.bay {
+  position: relative;
+  height: 100%;
+  box-sizing: border-box;
+  padding: calc(var(--u) / 6) 0 calc(var(--u) / 3);
+  background: var(--oss-metal-cavity);
+  box-shadow:
+    inset 0 8px 12px -4px rgb(0 0 0 / 0.9),
+    inset 6px 0 8px -6px rgb(0 0 0 / 0.9),
+    inset -6px 0 8px -6px rgb(0 0 0 / 0.9);
+}
+
+/* Recessed mounting rails with three holes per rack unit. */
+.rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--rail);
+  background:
+    radial-gradient(
+        ellipse 3px 2.4px at 50% 50%,
+        #020203 0 2.2px,
+        rgb(255 255 255 / 0.12) 2.6px,
+        transparent 3px
+      )
+      0 calc(var(--u) / -6) / 100% calc(var(--u) / 3) repeat-y,
+    linear-gradient(90deg, #4a4c52 0%, #6f7278 45%, #45474c 100%);
+  box-shadow:
+    inset 0 6px 8px -2px rgb(0 0 0 / 0.85),
+    inset 0 -1px 0 rgb(0 0 0 / 0.5);
+}
+
+.rail[data-side='left'] {
+  left: 0;
+}
+
+.rail[data-side='right'] {
+  right: 0;
+}
+
+/* The category nameplate, on its own 1U panel at the top of the rack. */
+.plate {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(var(--u) * 2 / 3);
+  margin: 0 var(--rail);
+}
+
+.plateTitle {
+  margin: 0;
+  padding: 4px 14px;
+  border-radius: 2px;
+  background: var(--oss-aluminum);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.7),
+    inset 0 -1px 0 rgb(0 0 0 / 0.3),
+    0 2px 3px rgb(0 0 0 / 0.7);
+  color: #1b1c1f;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.units {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/* ---- A mounted unit ---- */
+
+.unit {
+  --plate: var(--oss-metal-charcoal);
+  --ink: #f0f0f2;
+  --ink-soft: #b8b8c0;
+  --accent: var(--oss-crimson-bright);
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--rail) minmax(0, 1fr) var(--rail);
+  min-height: calc(var(--size) * var(--u) - 1px);
+  background: var(--plate);
+  /* Lit along the top edge, a hard seam at the bottom, and a little shadow on the unit below. */
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.14),
+    inset 0 -1px 0 rgb(0 0 0 / 0.55),
+    0 2px 2px -1px rgb(0 0 0 / 0.8);
+  border-radius: 2px;
+}
+
+.unit[data-finish='silver'] {
+  --plate: var(--oss-aluminum);
+  --ink: #141518;
+  --ink-soft: #383a40;
+  --accent: #9b111e;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.7),
+    inset 0 -1px 0 rgb(0 0 0 / 0.35),
+    0 2px 2px -1px rgb(0 0 0 / 0.8);
+}
+
+.unit[data-finish='black'] {
+  --plate: var(--oss-metal-black);
+}
+
+.unit[data-finish='oxblood'] {
+  --plate: var(--oss-brushed-grain), linear-gradient(180deg, #4d1a22 0%, #34121a 100%);
+  --ink-soft: #d4b8bd;
+  --accent: #ff8f9e;
+}
+
+.unit[data-finish='slate'] {
+  --plate: var(--oss-brushed-grain), linear-gradient(180deg, #2b3a4a 0%, #1d2834 100%);
+  --ink-soft: #b9c7d4;
+  --accent: #8fd3f5;
+}
+
+.unit[data-finish='olive'] {
+  --plate: var(--oss-brushed-grain), linear-gradient(180deg, #3b3e2b 0%, #292b1d 100%);
+  --ink-soft: #cfd1bb;
+  --accent: #e7cc7c;
+}
+
+.unit[data-finish='filler'] {
+  --plate: linear-gradient(180deg, #1f1f23 0%, #17171a 100%);
+}
+
+.ear {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--u) / 6 - 4.5px) 0;
+}
+
+.unit[data-size='1'] .ear {
+  justify-content: center;
+}
+
+.face {
+  container-type: inline-size;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 8px 6px;
+  border-left: 1px solid rgb(0 0 0 / 0.18);
+  border-right: 1px solid rgb(0 0 0 / 0.18);
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--mantine-font-family-headings);
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.unit[data-size='3'] .name {
+  font-size: 1.35rem;
+}
+
+.model {
+  margin-left: 4px;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.note {
+  margin: 3px 0 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+
+.unit[data-size='1'] .note {
+  margin-top: 1px;
+  font-size: 0.8rem;
+  line-height: 1.3;
+}
+
+/* ---- Faceplate hardware ---- */
+
+.detail {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.detail[data-detail='knobs'][data-size='3'] {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+}
+
+/* Narrow faceplates drop decoration before their text gets cramped. */
+@container (max-width: 250px) {
+  .detail {
+    display: none !important;
+  }
+}
+
+.vu {
+  display: block;
+  width: 92px;
+  padding: 4px;
+  border-radius: 3px;
+  background: #1a1a1c;
+  box-shadow:
+    inset 0 1px 2px rgb(0 0 0 / 0.8),
+    0 1px 0 rgb(255 255 255 / 0.4);
+}
+
+.vu svg {
+  display: block;
+  width: 100%;
+  border-radius: 2px;
+  /* The meter window is backlit: a real light source. */
+  background: radial-gradient(ellipse at 50% 100%, #ffd27a 0%, #f2b04e 70%, #d18b2c 100%);
+}
+
+.vuScale,
+.vuRed {
+  fill: none;
+  stroke-width: 2;
+}
+
+.vuScale {
+  stroke: #3a2a12;
+}
+
+.vuRed {
+  stroke: #b0101c;
+  stroke-width: 3;
+}
+
+.vuNeedle {
+  stroke: #111;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+.vu text {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 7px;
+  fill: #3a2a12;
+}
+
+.display {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  width: 84px;
+  height: 40px;
+  padding: 6px 8px;
+  box-sizing: border-box;
+  border-radius: 3px;
+  background: #07100b;
+  box-shadow:
+    inset 0 1px 3px rgb(0 0 0 / 0.9),
+    0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+.display i {
+  flex: 1;
+  height: calc(var(--h) * 100%);
+  background: linear-gradient(0deg, var(--oss-green) 0 70%, var(--oss-amber) 70%);
+  opacity: 0.85;
+}
+
+.leds {
+  display: grid;
+  grid-template-columns: repeat(2, 7px);
+  gap: 6px;
+}
+
+.detail[data-size='1'] .leds {
+  grid-template-columns: repeat(4, 7px);
+}
+
+.pads {
+  display: grid;
+  grid-template-columns: repeat(2, 22px);
+  gap: 5px;
+}
+
+.pads i {
+  height: 18px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #4a4a52, #2c2c32);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.15),
+    0 2px 2px rgb(0 0 0 / 0.6);
+}
+
+.grille {
+  width: 84px;
+  height: 64px;
+  border-radius: 3px;
+  background:
+    radial-gradient(circle, #050506 1.4px, transparent 1.8px) 0 0 / 6px 6px,
+    #2a2a30;
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.8);
+}
+
+/* Two rows of punched ventilation slots. */
+.detail[data-size='1'] .grille {
+  width: 96px;
+  height: 30px;
+}
+
+.vent {
+  flex: 1;
+  height: 16px;
+  margin: 0 10%;
+  background:
+    repeating-linear-gradient(90deg, #040405 0 26px, transparent 26px 34px) 0 0 / 100% 5px no-repeat,
+    repeating-linear-gradient(90deg, #040405 0 26px, transparent 26px 34px) 17px 100% / 100% 5px
+      no-repeat;
+  filter: drop-shadow(0 1px 0 rgb(255 255 255 / 0.07));
+}
+
+/* The plinth the cabinet stands on. */
+.plinth {
+  height: 14px;
+  margin: 0 6px;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(180deg, #1a120c, #0d0907);
+  box-shadow: inset 0 1px 0 rgb(255 225 190 / 0.12);
+}
+
+@media (max-width: $mantine-breakpoint-sm) {
+  .cabinet {
+    --u: 52px;
+    --rail: 18px;
+    --side: 10px;
+  }
+
+  .cabinet[data-edge]::before {
+    display: none;
+  }
+}

@@ -1,18 +1,10 @@
 import { useState, type FormEvent } from 'react';
-import {
-  Alert,
-  Button,
-  Container,
-  Select,
-  SimpleGrid,
-  Stack,
-  Text,
-  Textarea,
-  TextInput,
-  Title,
-} from '@mantine/core';
+import { Alert, Button, Select, SimpleGrid, Textarea, TextInput } from '@mantine/core';
 import { IconCheck, IconSend } from '@tabler/icons-react';
 import { contactReasons, contactSchema, type ContactInput } from '@/lib/contact';
+import { Led } from './hardware/Led';
+import { Screw } from './hardware/Screw';
+import { SectionHeader } from './SectionHeader';
 import classes from './Contact.module.css';
 
 type Errors = Partial<Record<keyof ContactInput, string>>;
@@ -59,85 +51,106 @@ export function Contact() {
 
   return (
     <section id="contact" className={classes.contact} aria-labelledby="contact-title">
-      <Container size="sm">
-        <Stack gap={4} mb="xl">
-          <span className="label">Track 05 · Talkback</span>
-          <Title id="contact-title" order={2} className={classes.heading}>
-            Hit the talkback
-          </Title>
-          <Text c="dimmed">
-            Not for hire, but always up for talking shop. Musicians, engineers, old bandmates: say
-            hello.
-          </Text>
-        </Stack>
+      <div className={`oss-container ${classes.inner}`}>
+        <SectionHeader label="Track 05 · Talkback" id="contact-title" title="Hit the talkback">
+          Not for hire, but always up for talking shop. Musicians, engineers, old bandmates: say
+          hello.
+        </SectionHeader>
 
-        {state === 'sent' ? (
-          <Alert color="crimson" icon={<IconCheck />} title="Message received">
-            Thanks for reaching out. I&apos;ll get back to you at the email you gave.
-          </Alert>
-        ) : (
-          <form onSubmit={onSubmit} noValidate className={classes.form}>
-            <SimpleGrid cols={{ base: 1, sm: 2 }}>
-              <TextInput
-                label="Name"
-                value={values.name}
-                onChange={(e) => set('name', e.currentTarget.value)}
-                error={errors.name}
-                autoComplete="name"
+        <div className={classes.panel}>
+          <Screw className={classes.tl} turn={15} />
+          <Screw className={classes.tr} turn={-30} />
+          <Screw className={classes.bl} turn={50} />
+          <Screw className={classes.br} turn={-10} />
+          <div className={classes.panelHead}>
+            <span className={classes.tbLamp}>
+              <Led
+                on={state !== 'idle' && state !== 'failed'}
+                color={state === 'sent' ? 'green' : 'amber'}
+                blink={state === 'sending'}
+              />
+              <span className="label">
+                Talkback ·{' '}
+                {state === 'sending'
+                  ? 'Sending'
+                  : state === 'sent'
+                    ? 'Received'
+                    : state === 'failed'
+                      ? 'Not sent'
+                      : 'Ready'}
+              </span>
+            </span>
+            <span className={classes.grille} aria-hidden="true" />
+          </div>
+
+          {state === 'sent' ? (
+            <Alert color="crimson" icon={<IconCheck />} title="Message received">
+              Thanks for reaching out. I&apos;ll get back to you at the email you gave.
+            </Alert>
+          ) : (
+            <form onSubmit={onSubmit} noValidate className={classes.form}>
+              <SimpleGrid cols={{ base: 1, sm: 2 }}>
+                <TextInput
+                  label="Name"
+                  value={values.name}
+                  onChange={(e) => set('name', e.currentTarget.value)}
+                  error={errors.name}
+                  autoComplete="name"
+                  required
+                />
+                <TextInput
+                  label="Email"
+                  type="email"
+                  value={values.email}
+                  onChange={(e) => set('email', e.currentTarget.value)}
+                  error={errors.email}
+                  autoComplete="email"
+                  required
+                />
+              </SimpleGrid>
+              <Select
+                label="What's it about?"
+                data={contactReasons.map((r) => ({ ...r }))}
+                value={values.reason}
+                onChange={(v) => v && set('reason', v as ContactInput['reason'])}
+                allowDeselect={false}
+              />
+              <Textarea
+                label="Message"
+                value={values.message}
+                onChange={(e) => set('message', e.currentTarget.value)}
+                error={errors.message}
+                minRows={5}
+                autosize
                 required
               />
-              <TextInput
-                label="Email"
-                type="email"
-                value={values.email}
-                onChange={(e) => set('email', e.currentTarget.value)}
-                error={errors.email}
-                autoComplete="email"
-                required
+              {/* Honeypot for bots; people never see it. */}
+              <input
+                className={classes.trap}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                name="website"
+                value={values.website}
+                onChange={(e) => set('website', e.currentTarget.value)}
               />
-            </SimpleGrid>
-            <Select
-              label="What's it about?"
-              data={contactReasons.map((r) => ({ ...r }))}
-              value={values.reason}
-              onChange={(v) => v && set('reason', v as ContactInput['reason'])}
-              allowDeselect={false}
-            />
-            <Textarea
-              label="Message"
-              value={values.message}
-              onChange={(e) => set('message', e.currentTarget.value)}
-              error={errors.message}
-              minRows={5}
-              autosize
-              required
-            />
-            {/* Honeypot for bots; people never see it. */}
-            <input
-              className={classes.trap}
-              tabIndex={-1}
-              autoComplete="off"
-              aria-hidden="true"
-              name="website"
-              value={values.website}
-              onChange={(e) => set('website', e.currentTarget.value)}
-            />
-            {state === 'failed' && (
-              <Alert color="red" variant="light">
-                {failure}
-              </Alert>
-            )}
-            <Button
-              type="submit"
-              loading={state === 'sending'}
-              rightSection={<IconSend size={16} />}
-              className={classes.send}
-            >
-              Send it
-            </Button>
-          </form>
-        )}
-      </Container>
+              {state === 'failed' && (
+                <Alert color="red" variant="light">
+                  {failure}
+                </Alert>
+              )}
+              <Button
+                type="submit"
+                loading={state === 'sending'}
+                rightSection={<IconSend size={16} />}
+                className={classes.send}
+              >
+                Send it
+              </Button>
+            </form>
+          )}
+        </div>
+      </div>
     </section>
   );
 }

@@ -1,88 +1,164 @@
-import { Anchor, Button, Container, Group, Stack, Text, Title } from '@mantine/core';
+import { useState } from 'react';
+import { Button } from '@mantine/core';
 import {
   IconBrandSoundcloud,
+  IconChevronLeft,
+  IconChevronRight,
   IconPlayerPauseFilled,
   IconPlayerPlayFilled,
 } from '@tabler/icons-react';
+import { releases } from '@/content/releases';
 import { usePlayer } from '@/lib/player';
 import { usePower } from '@/lib/power';
 import { artwork, formatTime } from '@/lib/soundcloud';
-import { featuredAlbum, site } from '@/lib/site';
+import { site } from '@/lib/site';
+import { RecordSleeve } from './RecordSleeve';
+import { SectionHeader } from './SectionHeader';
+import { TrackList } from './TrackList';
 import classes from './Catalog.module.css';
 
-/** Section 4, "The Catalog": releases, starting with the featured album. The admin adds more later. */
+// Hand-placed, not random: small turns that repeat in a pattern.
+const TILTS = [-1.2, 0.8, -0.4, 1.1, -0.9];
+
+/** Section 4, "The Catalog": releases as sleeves on a record ledge, with liner notes for the pick. */
 export function Catalog() {
   const { status, tracks, playing, play, toggle } = usePlayer();
   const { setPowered } = usePower();
+  const [selectedId, setSelectedId] = useState(releases[0]?.id);
+  const index = Math.max(
+    0,
+    releases.findIndex((r) => r.id === selectedId),
+  );
+  const release = releases[index];
   const ready = status === 'ready' && tracks.length > 0;
-  const cover = tracks[0] ? artwork(tracks[0]) : null;
+  const playerArt = tracks[0] ? artwork(tracks[0]) : null;
   const runtime = tracks.reduce((sum, t) => sum + t.duration, 0);
+
+  if (!release) return null;
+  const isPlayable = !!release.playable;
 
   const onPlay = () => {
     setPowered(true);
     if (playing) toggle();
     else play();
   };
+  const step = (by: number) =>
+    setSelectedId(releases[(index + by + releases.length) % releases.length].id);
 
   return (
     <section id="catalog" className={classes.catalog} aria-labelledby="catalog-title">
-      <Container size="lg">
-        <Stack gap={4} mb="xl">
-          <span className="label">Track 04 · The catalog</span>
-          <Title id="catalog-title" order={2} className={classes.heading}>
-            The catalog
-          </Title>
-          <Text c="dimmed" maw={620}>
-            Records I played on, tracked, mixed and produced.
-          </Text>
-        </Stack>
+      <div className="oss-container">
+        <SectionHeader label="Track 04 · The catalog" id="catalog-title" title="The catalog">
+          Records I played on, tracked, mixed and produced.
+        </SectionHeader>
 
-        <article className={classes.release}>
-          <div className={classes.sleeve} data-playing={playing || undefined}>
-            <span className={classes.vinyl} aria-hidden="true" />
-            {cover ? (
-              <img src={cover} alt={`${featuredAlbum.title} cover`} className={classes.cover} />
-            ) : (
-              <span className={classes.cover} />
+        <div className={classes.display}>
+          <div className={classes.wall}>
+            <ul className={classes.ledge} aria-label="Releases">
+              {releases.map((r, i) => (
+                <li key={r.id} className={classes.item}>
+                  <RecordSleeve
+                    title={r.title}
+                    artwork={r.artwork ?? (r.playable ? playerArt : null)}
+                    selected={r.id === release.id}
+                    spinning={!!r.playable && playing}
+                    tilt={TILTS[i % TILTS.length]}
+                    onSelect={() => setSelectedId(r.id)}
+                    describedBy={`release-${r.id}`}
+                  />
+                  <span className={classes.shelf} aria-hidden="true" />
+                  <p id={`release-${r.id}`} className={classes.caption}>
+                    <span className={classes.captionTitle}>{r.title}</span>
+                    <span>
+                      {r.artist} · {r.credit}
+                    </span>
+                  </p>
+                </li>
+              ))}
+            </ul>
+            {releases.length > 1 && (
+              <div className={classes.shelfNav}>
+                <button type="button" onClick={() => step(-1)} aria-label="Previous release">
+                  <IconChevronLeft size={18} aria-hidden="true" />
+                </button>
+                <span className="label">
+                  {index + 1} / {releases.length}
+                </span>
+                <button type="button" onClick={() => step(1)} aria-label="Next release">
+                  <IconChevronRight size={18} aria-hidden="true" />
+                </button>
+              </div>
             )}
+            <a href={site.soundcloud} target="_blank" rel="noreferrer" className={classes.more}>
+              <IconBrandSoundcloud size={18} aria-hidden="true" /> Everything else is on my
+              SoundCloud
+            </a>
           </div>
-          <Stack gap="sm" className={classes.info}>
-            <span className="label">Featured album</span>
-            <Title order={3} className={classes.album}>
-              {featuredAlbum.title}
-            </Title>
-            <Text c="dimmed">
-              {featuredAlbum.artist}
-              {ready && ` · ${tracks.length} tracks · ${formatTime(runtime)}`}
-            </Text>
-            <Group gap="sm" mt="sm">
-              <Button
-                onClick={onPlay}
-                disabled={!ready}
-                leftSection={
-                  playing ? <IconPlayerPauseFilled size={16} /> : <IconPlayerPlayFilled size={16} />
-                }
-              >
-                {playing ? 'Pause' : 'Play the album'}
-              </Button>
+
+          <article className={classes.notes} aria-labelledby="release-title">
+            <span className={classes.notesKicker}>Liner notes</span>
+            <h3 id="release-title" className={classes.album}>
+              {release.title}
+            </h3>
+            <dl className={classes.facts}>
+              <div>
+                <dt>Artist</dt>
+                <dd>{release.artist}</dd>
+              </div>
+              <div>
+                <dt>My part</dt>
+                <dd>{release.credit}</dd>
+              </div>
+              <div>
+                <dt>Format</dt>
+                <dd>{release.format}</dd>
+              </div>
+              {isPlayable && ready && (
+                <div>
+                  <dt>Length</dt>
+                  <dd>
+                    {tracks.length} tracks · {formatTime(runtime)}
+                  </dd>
+                </div>
+              )}
+            </dl>
+            <div className={classes.actions}>
+              {isPlayable && (
+                <Button
+                  onClick={onPlay}
+                  disabled={!ready}
+                  leftSection={
+                    playing ? (
+                      <IconPlayerPauseFilled size={16} />
+                    ) : (
+                      <IconPlayerPlayFilled size={16} />
+                    )
+                  }
+                >
+                  {playing ? 'Pause' : 'Play the album'}
+                </Button>
+              )}
               <Button
                 component="a"
-                href={featuredAlbum.pageUrl}
+                href={release.pageUrl}
                 target="_blank"
                 rel="noreferrer"
                 variant="outline"
+                color="dark"
+                className={classes.scButton}
                 leftSection={<IconBrandSoundcloud size={18} />}
               >
                 Open on SoundCloud
               </Button>
-            </Group>
-          </Stack>
-        </article>
-
-        <Anchor href={site.soundcloud} target="_blank" rel="noreferrer" className={classes.more}>
-          <IconBrandSoundcloud size={18} /> Everything else is on my SoundCloud
-        </Anchor>
-      </Container>
+            </div>
+            {isPlayable && (
+              <div className={classes.tracklist}>
+                <TrackList variant="notes" label={`${release.title} tracklist`} />
+              </div>
+            )}
+          </article>
+        </div>
+      </div>
     </section>
   );
 }

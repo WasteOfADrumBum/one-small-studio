@@ -18,6 +18,9 @@ type Player = {
   current: number;
   playing: boolean;
   progress: number;
+  /** 0 to 100, as the SoundCloud widget counts it. */
+  volume: number;
+  setVolume: (volume: number) => void;
   play: (index?: number) => void;
   pause: () => void;
   toggle: () => void;
@@ -39,6 +42,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [current, setCurrent] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [volume, setVolumeState] = useState(80);
 
   useEffect(() => {
     if (!featuredAlbum.playerUrl || !frame.current) return;
@@ -60,6 +64,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           loadSounds();
           // Long profiles fill in their track details lazily, so ask again once they have.
           refetch = setTimeout(loadSounds, 2500);
+          w.getVolume((v) => typeof v === 'number' && setVolumeState(Math.round(v)));
           setStatus('ready');
         });
         w.bind(PLAY, () => {
@@ -91,10 +96,28 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const toggle = useCallback(() => widget.current?.toggle(), []);
   const next = useCallback(() => widget.current?.next(), []);
   const prev = useCallback(() => widget.current?.prev(), []);
+  const setVolume = useCallback((v: number) => {
+    const clamped = Math.max(0, Math.min(100, Math.round(v)));
+    setVolumeState(clamped);
+    widget.current?.setVolume(clamped);
+  }, []);
 
   return (
     <PlayerContext
-      value={{ status, tracks, current, playing, progress, play, pause, toggle, next, prev }}
+      value={{
+        status,
+        tracks,
+        current,
+        playing,
+        progress,
+        volume,
+        setVolume,
+        play,
+        pause,
+        toggle,
+        next,
+        prev,
+      }}
     >
       {children}
       {featuredAlbum.playerUrl && (

@@ -1,190 +1,634 @@
 .story {
-  padding: 96px 0;
-  min-height: 100svh;
+  padding: var(--oss-section-space) 0;
 }
 
-.heading {
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  text-transform: uppercase;
+/* ---- The edit window on screen ---- */
+
+.window {
+  --year: 40px;
+  --head: 176px;
+  --row-h: 66px;
+  --ruler-h: 52px;
+  --ui: #15171a;
+  --ui-line: rgb(255 255 255 / 0.07);
+  display: flex;
+  flex-direction: column;
+  color: #d5d9dc;
+  background: #101114;
 }
 
-/* Wide screens with motion: the arrangement. */
-.arrangement {
-  --lane-h: 108px;
-  display: grid;
-  grid-template-columns: 120px 1fr;
-  grid-template-rows: 40px auto;
-  border-top: 1px solid var(--oss-edge);
-  border-bottom: 1px solid var(--oss-edge);
-  background: var(--oss-panel);
-}
-
-.counter {
+.titleBar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 12px;
+  height: 26px;
+  padding: 0 10px;
+  background: linear-gradient(180deg, #24262a, #1b1d20);
+  border-bottom: 1px solid #070708;
+  font-size: 0.72rem;
+  color: #a9adb3;
+}
+
+.lights {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.lights i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #3b3d42;
+}
+
+.titleMeta {
+  margin-left: auto;
+  font-family: var(--mantine-font-family-monospace);
+  color: #7d838a;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 10px;
+  background: var(--ui);
+  border-bottom: 1px solid #070708;
+}
+
+.nav {
+  display: flex;
+  gap: 6px;
+}
+
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
   padding: 0 12px;
-  background: #050506;
-  border-right: 1px solid var(--oss-edge);
+  border: 0;
+  border-radius: 4px;
+  color: #e6e8ea;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  background: linear-gradient(180deg, #34373c, #26282c);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    0 0 0 1px #08090a;
+  transition: transform 80ms ease;
+}
+
+.navButton:hover:not(:disabled) {
+  background: linear-gradient(180deg, #3d4046, #2c2f33);
+}
+
+.navButton:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.navButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* The big counter, like a DAW's main clock, showing the selected clip's span. */
+.counter {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 4px 12px;
+  border-radius: 3px;
+  background: #050607;
+  box-shadow: var(--oss-recess);
+}
+
+.counterLabel {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #6f7d73;
 }
 
 .counterValue {
   font-family: var(--mantine-font-family-monospace);
-  font-size: 1.1rem;
-  color: var(--oss-sky);
-  text-shadow: 0 0 8px rgb(94 200 242 / 0.6);
+  font-size: 1.05rem;
+  color: var(--oss-green);
+  white-space: nowrap;
 }
 
-.lanes {
-  grid-row: 2;
-  border-right: 1px solid var(--oss-edge);
-}
-
-.laneName {
-  height: var(--lane-h);
+.modes {
   display: flex;
-  align-items: center;
-  padding: 0 12px;
-  border-bottom: 1px solid var(--oss-edge);
-  font-family: var(--mantine-font-family-headings);
+  gap: 14px;
+  margin-left: auto;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  color: #7d838a;
 }
+
+/* ---- Scrolling session ---- */
 
 .viewport {
-  grid-row: 1 / span 2;
-  grid-column: 2;
-  position: relative;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: var(--head) 12px;
+  cursor: grab;
+  scrollbar-color: #3b3f45 #0b0c0e;
 }
 
-.track {
+.viewport[data-dragging] {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.session {
   position: relative;
-  height: calc(40px + var(--lane-h) * 4);
-  background-image: repeating-linear-gradient(
-    90deg,
-    transparent 0 149px,
-    rgb(255 255 255 / 0.04) 149px 150px
-  );
+  width: calc(var(--head) + var(--years) * var(--year));
+}
+
+.rulerRow,
+.trackRow {
+  display: flex;
+}
+
+.corner,
+.trackHead {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  flex: none;
+  width: var(--head);
+  box-sizing: border-box;
+  border-right: 1px solid #050506;
+  box-shadow: 4px 0 8px -4px rgb(0 0 0 / 0.7);
+}
+
+.corner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  height: var(--ruler-h);
+  padding: 0 10px;
+  background: var(--ui);
+  border-bottom: 1px solid #050506;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7d838a;
 }
 
 .ruler {
-  display: flex;
-  height: 40px;
-  align-items: flex-end;
-  border-bottom: 1px solid var(--oss-edge);
-  background: #050506;
-}
-
-.bar {
+  position: relative;
   flex: none;
-  padding: 0 0 6px 6px;
-  border-left: 1px solid var(--oss-edge);
-  font-family: var(--mantine-font-family-monospace);
-  font-size: 0.75rem;
-  color: var(--oss-muted);
+  width: calc(var(--years) * var(--year));
+  height: var(--ruler-h);
+  background: #121316;
+  border-bottom: 1px solid #050506;
 }
 
-.region {
-  --tint: var(--oss-crimson);
+.decades {
+  position: relative;
+  height: 20px;
+  border-bottom: 1px solid var(--ui-line);
+}
+
+.decades span {
   position: absolute;
-  top: calc(40px + var(--row) * var(--lane-h) + 8px);
-  height: calc(var(--lane-h) - 16px);
-  padding: 8px 10px;
-  overflow: hidden;
-  border-radius: 4px;
-  border: 1px solid var(--tint);
-  background: color-mix(in srgb, var(--tint) 22%, var(--oss-panel));
-  font-size: 0.85rem;
+  top: 3px;
+  bottom: 3px;
+  left: calc(var(--x) * var(--year) + 2px);
+  width: calc(var(--w) * var(--year) - 4px);
+  box-sizing: border-box;
+  padding: 0 8px;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.05);
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.66rem;
+  line-height: 14px;
+  letter-spacing: 0.1em;
+  color: #9aa1a8;
 }
 
-.region[data-lane='Stage'] {
-  --tint: #7d37b8;
+.years {
+  display: flex;
+  height: 31px;
 }
 
-.region[data-lane='Studio'] {
+.years span {
+  flex: none;
+  width: var(--year);
+  box-sizing: border-box;
+  padding: 12px 0 0 5px;
+  border-left: 1px solid #2b2e33;
+  background: linear-gradient(90deg, #3a3e44 0 1px, transparent 1px) 0 0 / 100% 8px no-repeat;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.66rem;
+  color: #8b9198;
+}
+
+.years span[data-major] {
+  border-left-color: #5a5f66;
+  color: #d5d9dc;
+}
+
+/* The selected clip's span, marked on the ruler the way a timeline selection is. */
+.selectionBand {
+  position: absolute;
+  bottom: 0;
+  height: 4px;
+  left: calc(var(--sel-x) * var(--year));
+  width: calc(var(--sel-w) * var(--year));
+  background: var(--oss-sky);
+  transition:
+    left 300ms ease,
+    width 300ms ease;
+}
+
+.trackRow {
+  height: calc(var(--lane-rows) * var(--row-h));
+  border-bottom: 1px solid #050506;
+}
+
+.trackHead {
+  --tint: var(--oss-crimson);
+  display: grid;
+  grid-template-columns: 6px 20px 1fr;
+  grid-template-rows: auto auto;
+  align-content: center;
+  column-gap: 8px;
+  row-gap: 4px;
+  padding: 0 10px 0 0;
+  background: linear-gradient(180deg, #1d1f23, #17191c);
+}
+
+.trackRow[data-lane='Stage'] .trackHead {
+  --tint: #8c4fc4;
+}
+
+.trackRow[data-lane='Studio'] .trackHead {
   --tint: #2a9bd6;
 }
 
-.region[data-lane='Life'] {
-  --tint: var(--oss-ruby);
+.trackRow[data-lane='Life'] .trackHead {
+  --tint: #c9962f;
 }
 
-.region strong {
-  font-family: var(--mantine-font-family-headings);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-right: 8px;
+.trackChip {
+  grid-row: 1 / span 2;
+  align-self: stretch;
+  background: var(--tint);
 }
 
-.regionYears {
+.trackNum {
   font-family: var(--mantine-font-family-monospace);
-  font-size: 0.72rem;
-  color: var(--oss-muted);
+  font-size: 0.7rem;
+  color: #7d838a;
+  text-align: right;
 }
 
-.region p {
-  margin: 4px 0 0;
-  color: #cfcfd6;
-  max-width: 420px;
+.trackName {
+  font-family: var(--mantine-font-family-headings);
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #eef0f2;
 }
 
+.trackState {
+  grid-column: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7d838a;
+}
+
+.trackLed {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34373c;
+}
+
+.trackState[data-on] .trackLed {
+  background: var(--oss-green);
+  box-shadow: var(--oss-glow-green);
+}
+
+.lane {
+  flex: none;
+  width: calc(var(--years) * var(--year));
+  /* Fine grid: a line per year, stronger every five. */
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgb(255 255 255 / 0.07) 0 1px,
+      transparent 1px calc(var(--year) * 5)
+    ),
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.03) 0 1px, transparent 1px var(--year)),
+    #121316;
+  background-position:
+    calc(var(--year) * 1) 0,
+    0 0,
+    0 0;
+}
+
+.trackRow:nth-of-type(odd) .lane {
+  background-color: #141518;
+}
+
+/* ---- Clips ---- */
+
+.clips {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.clip {
+  --tint: var(--oss-crimson);
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--ruler-h) + var(--r) * var(--row-h) + 6px);
+  left: calc(var(--head) + var(--x) * var(--year) + 1px);
+  width: calc(var(--w) * var(--year) - 3px);
+  height: calc(var(--row-h) - 12px);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  /* clip, not hidden: hidden would make each clip its own scroller and break the sticky name. */
+  overflow: clip;
+  border: 1px solid color-mix(in srgb, var(--tint) 70%, #000);
+  border-radius: 4px;
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  container-type: inline-size;
+  cursor: pointer;
+  pointer-events: auto;
+  background: color-mix(in srgb, var(--tint) 30%, #0d0e10);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 0.5);
+  transition:
+    box-shadow 150ms ease,
+    filter 150ms ease;
+}
+
+.clip[data-lane='Stage'] {
+  --tint: #8c4fc4;
+}
+
+.clip[data-lane='Studio'] {
+  --tint: #2a9bd6;
+}
+
+.clip[data-lane='Life'] {
+  --tint: #c9962f;
+}
+
+.clip:hover {
+  filter: brightness(1.15);
+}
+
+.clip:focus-visible {
+  outline: 2px solid var(--oss-sky);
+  outline-offset: 2px;
+  z-index: 3;
+}
+
+.clipName {
+  display: flex;
+  min-width: 0;
+  padding: 3px 7px;
+  background: color-mix(in srgb, var(--tint) 62%, #000);
+  font-size: 0.76rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Long clips keep their name in view as the session scrolls under the track headers. */
+.clipText {
+  position: sticky;
+  left: calc(var(--head) + 8px);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.clipTitle {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+
+.clipYears {
+  flex: none;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.65rem;
+  color: rgb(255 255 255 / 0.75);
+}
+
+/* Short clips give their room to the title; the years are in the counter and inspector. */
+@container (max-width: 150px) {
+  .clipYears {
+    display: none;
+  }
+}
+
+.wave {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+.wave path {
+  fill: color-mix(in srgb, var(--tint) 75%, #fff);
+  opacity: 0.85;
+}
+
+.wave line {
+  stroke: color-mix(in srgb, var(--tint) 75%, #fff);
+  stroke-width: 0.6;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.5;
+}
+
+/* Selected: inverted name bar and a white frame, so the state reads without colour. */
+.clip[aria-pressed='true'] {
+  z-index: 3;
+  border: 2px solid #fff;
+  box-shadow:
+    0 0 0 1px #000,
+    0 4px 10px rgb(0 0 0 / 0.6);
+}
+
+.clip[aria-pressed='true'] .clipName {
+  background: #f4f5f6;
+  color: #111;
+}
+
+.clip[aria-pressed='true'] .clipYears {
+  color: #333;
+}
+
+.clip[aria-pressed='true'] .clipTitle::before {
+  content: '▸ ';
+}
+
+/* The playhead marks the start of the selected clip. */
 .playhead {
   position: absolute;
-  top: 0;
+  z-index: 3;
+  top: 20px;
   bottom: 0;
+  left: calc(var(--head) + var(--sel-x) * var(--year));
   width: 2px;
+  translate: -1px 0;
   background: var(--oss-sky);
-  box-shadow: 0 0 12px var(--oss-sky);
   pointer-events: none;
+  transition: left 300ms ease;
 }
 
 .playhead::before {
   content: '';
   position: absolute;
   top: 0;
-  left: -6px;
-  border: 7px solid transparent;
-  border-top: 10px solid var(--oss-sky);
+  left: -5px;
+  border: 6px solid transparent;
+  border-top: 9px solid var(--oss-sky);
 }
 
-/* Phones, and anyone who prefers less motion: a plain list. */
-.list {
-  display: none;
-  list-style: none;
-  margin: 0;
-  padding: 0 0 0 20px;
-  border-left: 2px solid var(--oss-edge);
+/* ---- Inspector below the monitor ---- */
+
+.inspector {
+  max-width: 760px;
+  margin: 36px auto 0;
+  padding: 20px 24px;
+  border-radius: 6px;
+  background: var(--oss-metal-charcoal);
+  box-shadow:
+    var(--oss-bevel),
+    0 0 0 1px #050506,
+    var(--oss-shadow-contact);
 }
 
-.list li {
-  position: relative;
-  padding: 0 0 32px 4px;
+.inspectorHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.list li::before {
-  content: '';
-  position: absolute;
-  left: -28px;
-  top: 4px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--oss-crimson);
-  box-shadow: 0 0 10px rgb(200 16 46 / 0.7);
+.inspectorLane {
+  --tint: var(--oss-crimson);
+  padding: 2px 8px 2px 10px;
+  border-left: 4px solid var(--tint);
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.05);
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #d5d9dc;
 }
 
-.list h3 {
-  margin: 4px 0;
+.inspectorLane[data-lane='Stage'] {
+  --tint: #8c4fc4;
+}
+
+.inspectorLane[data-lane='Studio'] {
+  --tint: #2a9bd6;
+}
+
+.inspectorLane[data-lane='Life'] {
+  --tint: #c9962f;
+}
+
+.inspectorTitle {
+  margin: 10px 0 2px;
+  font-family: var(--mantine-font-family-headings);
+  font-size: 1.6rem;
+  font-weight: 600;
   text-transform: uppercase;
 }
 
-@media (max-width: $mantine-breakpoint-md), (prefers-reduced-motion: reduce) {
-  .arrangement {
+.inspectorYears {
+  margin: 0;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.85rem;
+  color: var(--oss-amber);
+}
+
+.inspectorBody {
+  margin: 10px 0 0;
+  color: #c9c9d0;
+  line-height: 1.6;
+}
+
+@media (max-width: $mantine-breakpoint-md) {
+  .modes {
+    display: none;
+  }
+}
+
+@media (max-width: $mantine-breakpoint-sm) {
+  .window {
+    --year: 36px;
+    --head: 84px;
+    --row-h: 60px;
+  }
+
+  .titleMeta {
     display: none;
   }
 
-  .list {
-    display: block;
+  .toolbar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .counter {
+    margin-left: auto;
+  }
+
+  .trackHead {
+    grid-template-columns: 5px 1fr;
+    column-gap: 6px;
+  }
+
+  .trackNum {
+    display: none;
+  }
+
+  .trackName {
+    grid-column: 2;
+    font-size: 0.8rem;
+  }
+
+  .trackState {
+    grid-column: 2;
+    font-size: 0.55rem;
+  }
+
+  .inspector {
+    padding: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selectionBand,
+  .playhead {
+    transition: none;
   }
 }

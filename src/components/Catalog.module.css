@@ -1,96 +1,207 @@
 .catalog {
-  padding: 96px 0;
+  padding: var(--oss-section-space) 0;
 }
 
-.heading {
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  text-transform: uppercase;
+.display {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(32px, 5vw, 64px);
 }
 
-.release {
+/* ---- The wall and its ledge ---- */
+
+.wall {
+  min-width: 0;
+}
+
+.ledge {
+  --sleeve: 300px;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 48px;
+  gap: 0;
+  margin: 0;
+  /* Room for the selected record to slide out past the last sleeve. */
+  padding: 8px calc(var(--sleeve) * 0.42) 0 4px;
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
 }
 
-/* The record slides out of its sleeve while the album plays. */
-.sleeve {
+.item {
   position: relative;
-  width: min(340px, 70vw);
-  aspect-ratio: 1;
   flex: none;
-  /* Room for the record to slide into. */
-  margin-right: calc(min(340px, 70vw) * 0.36);
+  display: flex;
+  flex-direction: column;
+  scroll-snap-align: start;
 }
 
-.cover {
+/* Neighbouring sleeves overlap a touch, never enough to hide the art. */
+.item + .item {
+  margin-left: -14px;
+}
+
+/* A shallow walnut ledge: lit top surface, front lip, and its shadow on the wall. */
+.shelf {
   position: relative;
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 4px;
-  border: 1px solid var(--oss-edge);
-  background: #0b0b0d;
-  box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.9);
+  z-index: 2;
+  height: 16px;
+  margin: -6px -10px 0;
+  border-radius: 1px 1px 3px 3px;
+  background: linear-gradient(180deg, #a7754c 0 3px, transparent 3px), var(--oss-wood);
+  box-shadow:
+    inset 0 -2px 0 rgb(0 0 0 / 0.35),
+    4px 14px 16px -8px rgb(0 0 0 / 0.9);
 }
 
-.vinyl {
-  position: absolute;
-  inset: 4%;
+.item:last-child .shelf {
+  margin-right: calc(var(--sleeve) * -0.42);
+}
+
+.caption {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 18px 0 0;
+  padding-right: 12px;
+  font-size: 0.9rem;
+  color: var(--oss-muted);
+}
+
+.captionTitle {
+  font-family: var(--mantine-font-family-headings);
+  font-size: 1.15rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--oss-text);
+}
+
+.shelfNav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.shelfNav button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
   border-radius: 50%;
-  background:
-    radial-gradient(circle, var(--oss-crimson) 0 14%, #050506 14.5% 16%, transparent 16.5%),
-    repeating-radial-gradient(circle, #121215 0 2px, #0a0a0b 2px 4px);
-  transition: translate 900ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  color: var(--oss-text);
+  cursor: pointer;
+  background: var(--oss-metal-charcoal);
+  box-shadow: var(--oss-bevel), var(--oss-raised);
 }
 
-.sleeve[data-playing] .vinyl {
-  translate: 42% 0;
-  animation: spin 1.8s linear infinite;
-}
+/* ---- Liner notes ---- */
 
-@keyframes spin {
-  from {
-    rotate: 0deg;
-  }
-  to {
-    rotate: 360deg;
-  }
-}
-
-.info {
+.notes {
   position: relative;
-  flex: 1;
-  min-width: 260px;
+  padding: clamp(20px, 3vw, 32px);
+  border-radius: 2px;
+  color: #1d1a17;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.25 0 0 0 0 0.2 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #f3eee4, #e7e0d2);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.8),
+    6px 18px 30px -14px rgb(0 0 0 / 0.9);
+  rotate: 0.3deg;
+}
+
+.notesKicker {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6a5f55;
 }
 
 .album {
-  font-size: clamp(2rem, 4vw, 3rem);
-  text-transform: uppercase;
+  margin: 6px 0 14px;
+  font-family: var(--mantine-font-family-headings);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 700;
   line-height: 1;
+  text-transform: uppercase;
+  color: #121110;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px 20px;
+  margin: 0 0 18px;
+}
+
+.facts dt {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #6a5f55;
+}
+
+.facts dd {
+  margin: 2px 0 0;
+  font-size: 0.95rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.scButton {
+  color: #1d1a17;
+  border-color: rgb(29 26 23 / 0.6);
+}
+
+.tracklist {
+  max-height: 300px;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 
 .more {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-top: 48px;
+  margin-top: 28px;
+  color: var(--oss-crimson-bright);
+  text-decoration: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .sleeve[data-playing] .vinyl {
-    animation: none;
+.more:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: $mantine-breakpoint-md) {
+  .ledge {
+    --sleeve: 240px;
+  }
+
+  .notes {
+    rotate: none;
   }
 }
 
 @media (max-width: $mantine-breakpoint-sm) {
-  .sleeve {
-    margin-right: 0;
+  .display {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .sleeve[data-playing] .vinyl {
-    translate: 22% 0;
+  .ledge {
+    --sleeve: min(62vw, 250px);
+    padding-right: calc(var(--sleeve) * 0.3);
+  }
+
+  .item:last-child .shelf {
+    margin-right: calc(var(--sleeve) * -0.3);
   }
 }

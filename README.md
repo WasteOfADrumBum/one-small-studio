@@ -39,7 +39,9 @@ npm run dev      # site on http://localhost:5173, API on http://localhost:3001
 ## Layout
 
 - `src/` the site. `src/lib/site.ts` holds names, years, links and the SoundCloud profile;
-  `src/content/` holds the timeline and the gear rack.
+  `src/content/` holds the timeline, the gear racks and the catalog releases.
+- `src/components/hardware/` holds the shared equipment parts (knobs, fader, meters, lamps,
+  screws); `src/styles/global.css` holds the material, lighting and spacing tokens.
 - `server/app.ts` the Express app. `server/dev.ts` runs it locally.
 - `api/index.ts` hands the same app to Vercel; `vercel.json` routes `/api/*` to it.
 

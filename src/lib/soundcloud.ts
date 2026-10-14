@@ -23,6 +23,9 @@ export type ScWidget = {
   next(): void;
   prev(): void;
   skip(index: number): void;
+  /** 0 to 100. */
+  setVolume(volume: number): void;
+  getVolume(cb: Callback<number>): void;
   getSounds(cb: Callback<ScSound[]>): void;
   getCurrentSoundIndex(cb: Callback<number>): void;
 };
