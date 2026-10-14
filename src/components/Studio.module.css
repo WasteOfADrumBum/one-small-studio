@@ -1,14 +1,56 @@
 .studio {
   padding: var(--oss-section-space) 0;
+  /* A faint violet spill on the wall behind the racks. */
+  background: radial-gradient(
+    ellipse 50% 40% at 50% 62%,
+    rgb(var(--oss-neon-violet) / 0.06),
+    transparent 70%
+  );
 }
 
 /* Three cabinets side by side on desktop; two over one on tablets; stacked on phones. */
 .row {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch;
   /* Room between cases for the side panels the viewer can see. */
   gap: 24px;
+}
+
+/* An overhead light bar above the cases... */
+.row::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  left: 12%;
+  right: 12%;
+  height: 5px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #2a2c31, #e6f7ff 20% 80%, #2a2c31);
+  box-shadow:
+    0 0 14px rgb(var(--oss-neon-cyan) / 0.55),
+    0 0 40px rgb(var(--oss-neon-cyan) / 0.25);
+  pointer-events: none;
+}
+
+/* ...washing down across the lids and faceplates: brightest at the top, gone by the base. */
+.row::after {
+  content: '';
+  position: absolute;
+  z-index: 3;
+  top: -36px;
+  left: 0;
+  right: 0;
+  height: 70%;
+  background: radial-gradient(
+    ellipse 70% 100% at 50% 0%,
+    rgb(var(--oss-neon-cyan) / 0.09),
+    rgb(var(--oss-neon-violet) / 0.04) 45%,
+    transparent 75%
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
 }
 
 @media (max-width: $mantine-breakpoint-md) {

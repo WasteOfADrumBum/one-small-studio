@@ -1,5 +1,6 @@
 .monitor {
   position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -20,6 +21,27 @@
     inset -1px 0 0 rgb(0 0 0 / 0.5),
     0 0 0 1px #050506,
     0 24px 40px -24px rgb(0 0 0 / 0.95);
+}
+
+/* A bias light behind the monitor, cast onto the wall: broad and soft, never an outline. */
+.monitor::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: -90px -4% 30%;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse 55% 60% at 35% 50%, rgb(var(--oss-neon-cyan) / 0.36), transparent 70%),
+    radial-gradient(ellipse 45% 55% at 70% 55%, rgb(var(--oss-neon-violet) / 0.3), transparent 70%);
+  filter: blur(36px);
+  pointer-events: none;
+}
+
+/* With room beside the section, the light spreads wider round the monitor. */
+@media (min-width: 80em) {
+  .monitor::before {
+    inset: -110px -12% 26%;
+  }
 }
 
 /* Modest depth: the back of the shell shows as a darker band behind the lower edge. */

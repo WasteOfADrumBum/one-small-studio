@@ -28,6 +28,10 @@
   --oss-glow-green: 0 0 6px rgb(95 224 138 / 0.7);
   --oss-glow-red: 0 0 6px rgb(255 77 100 / 0.75);
 
+  /* Studio accent lighting: restrained cyan with a little violet, for atmosphere only. */
+  --oss-neon-cyan: 94 200 242;
+  --oss-neon-violet: 139 92 246;
+
   /* Materials */
   --oss-metal-charcoal: linear-gradient(180deg, #2a2a30 0%, #1d1d22 55%, #18181c 100%);
   --oss-metal-black: linear-gradient(180deg, #19191d 0%, #111114 100%);

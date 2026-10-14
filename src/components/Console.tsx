@@ -30,7 +30,7 @@ import classes from './Console.module.css';
 
 gsap.registerPlugin(useGSAP);
 
-// Where each knob in the two banks settles when the console powers on, in degrees from twelve
+// Where each knob in the two towers settles when the console powers on, in degrees from twelve
 // o'clock: left bank first, then right.
 const SETTLE = [95, 20, 60, -10, 35, -40, 80, 5];
 
@@ -38,10 +38,12 @@ const SETTLE = [95, 20, 60, -10, 35, -40, 80, 5];
 const DETENT = 36;
 
 /**
- * The One Small controller, shaped like a compact dock: an angled tablet display between two knob
- * banks, one long fader for the master volume, a jog wheel that picks the track, and grouped
- * function and transport keys. Nothing plays until the visitor presses Play, Power, a track or
- * turns the wheel.
+ * The One Small controller, laid out like a Pro Tools Dock: a tablet standing upright in its cradle
+ * between two columns of four knobs; a soft-key band under it; the fader on the left, a big jog
+ * wheel in the middle with key blocks either side and a touch strip to the right; a strip under the
+ * wheel; and the transport row along the front. Only the fader, the wheel, the transport keys, Power
+ * (where the monitor knob sits) and the SoundCloud key do anything; the rest is hardware dressing,
+ * hidden from keyboard and screen readers. Nothing plays until the visitor asks.
  */
 export function Console() {
   const root = useRef<HTMLDivElement>(null);
@@ -87,144 +89,176 @@ export function Console() {
         role="group"
         aria-label="Console"
       >
+        {/* Upper deck: knob towers either side of the docked tablet. */}
+        <div className={classes.upper}>
+          <KnobTower />
+          <div className={classes.stand}>
+            <span className={classes.bracket} aria-hidden="true" />
+            <Screen powered={powered} />
+            <span className={classes.cradle} aria-hidden="true">
+              <span className={classes.cradleNotch} />
+              <span className={classes.cradleBadge}>
+                One <b>Small</b> | Dock
+              </span>
+            </span>
+          </div>
+          <KnobTower />
+        </div>
+
         <div className={classes.chassis}>
-          <div className={classes.deck}>
-            <div className={classes.rear}>
-              <KnobBank />
-              <div className={classes.stand}>
-                <Screen powered={powered} />
-              </div>
-              <KnobBank />
-            </div>
-
-            <div className={classes.surface}>
-              <div className={classes.faderBay}>
-                <Fader
-                  label="Master volume"
-                  caption="Master"
-                  value={player.volume}
-                  onChange={player.setVolume}
-                  disabled={!ready}
-                />
-                <LedMeter
-                  active={player.playing}
-                  speed={1.2}
-                  scale={player.volume / 100}
-                  segments={18}
-                  className={classes.meter}
-                />
-              </div>
-
-              <div className={classes.groups}>
-                <div className={classes.group} data-group="function">
-                  <span className={classes.groupLabel} aria-hidden="true">
-                    Function
-                  </span>
-                  <div className={classes.groupKeys}>
-                    <span className={classes.keyWrap}>
-                      <span className={classes.keyCaption} aria-hidden="true">
-                        <Led on={powered} color="amber" />
-                        {powered ? 'On' : 'Power'}
-                      </span>
-                      <button
-                        type="button"
-                        className={classes.key}
-                        data-power
-                        onClick={onPower}
-                        aria-pressed={powered}
-                        aria-label="Console power"
-                      >
-                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                          <path d="M12 3v9" />
-                          <path d="M6.3 7.2a8 8 0 1 0 11.4 0" />
-                        </svg>
-                      </button>
-                    </span>
-                    <span className={classes.keyWrap}>
-                      <span className={classes.keyCaption} aria-hidden="true">
-                        SoundCloud
-                      </span>
-                      <a
-                        className={classes.key}
-                        data-wide
-                        href={featuredAlbum.pageUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <IconBrandSoundcloud size={18} aria-hidden="true" />
-                        Open on SoundCloud
-                      </a>
-                    </span>
-                  </div>
-                </div>
-
-                <div className={classes.group} data-group="transport">
-                  <span className={classes.groupLabel} aria-hidden="true">
-                    Transport
-                  </span>
-                  <div className={classes.groupKeys}>
-                    <TransportKey
-                      label="Previous track"
-                      caption="Prev"
-                      onClick={player.prev}
-                      disabled={!ready}
-                    >
-                      <IconPlayerSkipBackFilled size={18} />
-                    </TransportKey>
-                    <TransportKey
-                      label={player.playing ? 'Pause' : 'Play'}
-                      caption={player.playing ? 'Pause' : 'Play'}
-                      onClick={onPlay}
-                      disabled={!ready}
-                      primary
-                      lit={player.playing}
-                    >
-                      {player.playing ? (
-                        <IconPlayerPauseFilled size={26} />
-                      ) : (
-                        <IconPlayerPlayFilled size={26} />
-                      )}
-                    </TransportKey>
-                    <TransportKey
-                      label="Next track"
-                      caption="Next"
-                      onClick={player.next}
-                      disabled={!ready}
-                    >
-                      <IconPlayerSkipForwardFilled size={18} />
-                    </TransportKey>
-                  </div>
-                </div>
-              </div>
-
-              <JogWheel ready={ready} />
-            </div>
+          {/* Soft-key band; Power sits where the monitor knob does. */}
+          <div className={classes.softBand}>
+            <span className={classes.pairKeys} aria-hidden="true">
+              <i />
+              <i />
+            </span>
+            <span className={classes.softKeys} aria-hidden="true">
+              {Array.from({ length: 16 }, (_, i) => (
+                // The top row lights under the track that is loaded, like a selected channel.
+                <i key={i} data-lit={(powered && i === player.current) || undefined} />
+              ))}
+            </span>
+            <span className={classes.powerSpot}>
+              <button
+                type="button"
+                className={classes.power}
+                onClick={onPower}
+                aria-pressed={powered}
+                aria-label="Console power"
+              >
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                  <path d="M12 3v9" />
+                  <path d="M6.3 7.2a8 8 0 1 0 11.4 0" />
+                </svg>
+              </button>
+              <span className={classes.powerCaption} aria-hidden="true">
+                <Led on={powered} color="amber" />
+                {powered ? 'On' : 'Power'}
+              </span>
+            </span>
           </div>
 
-          <div className={classes.front} aria-hidden="true">
-            <Screw size={9} turn={20} />
+          {/* Centre section: fader, key block, jog wheel, key block, touch strip. */}
+          <div className={classes.centre}>
+            <div className={classes.faderBay}>
+              <LedMeter
+                active={player.playing}
+                speed={1.2}
+                scale={player.volume / 100}
+                segments={14}
+                className={classes.meter}
+              />
+              <Fader
+                label="Master volume"
+                caption="Master"
+                value={player.volume}
+                onChange={player.setVolume}
+                disabled={!ready}
+              />
+            </div>
+            <KeyBlock />
+            <div className={classes.jogArea}>
+              <JogWheel ready={ready} />
+            </div>
+            <KeyBlock />
+            <span className={classes.vStrip} aria-hidden="true">
+              <i />
+              <i />
+              <i />
+              <i />
+            </span>
+          </div>
+
+          {/* The strip under the wheel shows how far into the track playback is. */}
+          <span className={classes.hStrip} aria-hidden="true">
+            <span style={{ transform: `scaleX(${player.progress})` }} />
+            <i />
+            <i />
+            <i />
+          </span>
+
+          {/* Transport row along the front edge. */}
+          <div className={classes.transport}>
+            <TransportKey
+              label="Previous track"
+              caption="Prev"
+              onClick={player.prev}
+              disabled={!ready}
+            >
+              <IconPlayerSkipBackFilled size={16} />
+            </TransportKey>
+            <TransportKey
+              label={player.playing ? 'Pause' : 'Play'}
+              caption={player.playing ? 'Pause' : 'Play'}
+              onClick={onPlay}
+              disabled={!ready}
+              primary
+              lit={player.playing}
+            >
+              {player.playing ? (
+                <IconPlayerPauseFilled size={22} />
+              ) : (
+                <IconPlayerPlayFilled size={22} />
+              )}
+            </TransportKey>
+            <TransportKey label="Next track" caption="Next" onClick={player.next} disabled={!ready}>
+              <IconPlayerSkipForwardFilled size={16} />
+            </TransportKey>
+            <span className={classes.keyWrap}>
+              <span className={classes.keyCaption} aria-hidden="true">
+                Listen
+              </span>
+              <a
+                className={classes.key}
+                data-wide
+                href={featuredAlbum.pageUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <IconBrandSoundcloud size={16} aria-hidden="true" />
+                Open on SoundCloud
+              </a>
+            </span>
+          </div>
+
+          <div className={classes.footer} aria-hidden="true">
+            <span className={classes.shift} />
             <span className={classes.nameplate}>
               One <b>Small</b> Studio
             </span>
-            <Screw size={9} turn={-35} />
+            <span className={classes.shift} />
           </div>
+        </div>
+
+        {/* The palm rest along the front, with its own thickness and shadow. */}
+        <div className={classes.front} aria-hidden="true">
+          <Screw size={8} turn={20} />
+          <Screw size={8} turn={-35} />
         </div>
       </div>
     </div>
   );
 }
 
-/** Four display knobs beside the tablet. They only move with the power sweep. */
-function KnobBank() {
+/** Four display knobs in a raised column beside the tablet. They only move with the power sweep. */
+function KnobTower() {
   return (
-    <div className={classes.knobBank} aria-hidden="true">
+    <div className={classes.tower} aria-hidden="true">
       {[0, 1, 2, 3].map((i) => (
-        <span key={i} className={classes.bankKnob}>
-          <Knob size={40} />
-          <i />
-        </span>
+        <Knob key={i} size={34} />
       ))}
     </div>
+  );
+}
+
+/** Two columns of six keys with indicator strips: Dock dressing, not controls. */
+function KeyBlock() {
+  return (
+    <span className={classes.keyBlock} aria-hidden="true">
+      {Array.from({ length: 12 }, (_, i) => (
+        <i key={i} />
+      ))}
+    </span>
   );
 }
 

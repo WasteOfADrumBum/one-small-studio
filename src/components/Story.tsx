@@ -43,6 +43,9 @@ function layout() {
 
 const { rowOf, laneRows, laneTop, totalRows } = layout();
 
+/** Years from the last event's start to the end of the timeline: the post-roll it needs. */
+const tail = timelineEnd - clips[clips.length - 1].start;
+
 const clipLabel = (era: Era) => `${era.title}, ${era.lane} track, ${yearLabel(era)}`;
 
 /**
@@ -58,16 +61,26 @@ export function Story() {
   const drag = useDragScroll(viewport);
   const era = clips[selected];
 
-  const headWidth = useCallback(
-    () => viewport.current?.querySelector<HTMLElement>('[data-track-head]')?.offsetWidth ?? 0,
-    [],
-  );
-  const timeline = useTimelineScroll(viewport, headWidth, !!reduceMotion);
-  const firstYear = timelineStart + Math.floor(timeline.from * years.length);
-  const lastYear = Math.min(
+  const playhead = useRef<HTMLSpanElement>(null);
+  const ruler = useRef<HTMLDivElement>(null);
+  const eventEls = useCallback(() => clipRefs.current, []);
+  const timeline = useTimelineScroll(viewport, {
+    playhead,
+    events: eventEls,
+    ruler,
+    startYear: timelineStart,
+    reduceMotion: !!reduceMotion,
+  });
+  const playheadYear = Math.min(
     timelineEnd - 1,
-    timelineStart + Math.ceil(timeline.to * years.length) - 1,
+    Math.max(timelineStart, Math.floor(timeline.year)),
   );
+
+  // Earlier/Later move to the previous or next event and select it.
+  const step = (direction: -1 | 1) => {
+    const index = timeline.go(direction);
+    if (index !== null) setSelected(index);
+  };
 
   // Selection never scrolls the timeline by itself; keyboard focus brings a clip into view.
   const select = (index: number, focus = false) => {
@@ -139,7 +152,7 @@ export function Story() {
                 <button
                   type="button"
                   className={classes.navButton}
-                  onClick={() => timeline.page(-1)}
+                  onClick={() => step(-1)}
                   disabled={!timeline.canEarlier}
                   aria-controls="story-timeline"
                 >
@@ -149,13 +162,18 @@ export function Story() {
                 <button
                   type="button"
                   className={classes.navButton}
-                  onClick={() => timeline.page(1)}
+                  onClick={() => step(1)}
                   disabled={!timeline.canLater}
                   aria-controls="story-timeline"
                 >
                   Later
                   <IconChevronRight size={16} aria-hidden="true" />
                 </button>
+              </div>
+              {/* The main clock: the year under the playhead, following every scroll. */}
+              <div className={classes.counter} data-kind="position">
+                <span className={classes.counterLabel}>Playhead</span>
+                <span className={classes.counterValue}>{playheadYear}</span>
               </div>
               <div className={classes.counter} aria-hidden="true">
                 <span className={classes.counterLabel}>Selection</span>
@@ -164,117 +182,119 @@ export function Story() {
               <div className={classes.modes} aria-hidden="true">
                 <span>Grid · 1 year</span>
                 <span>
-                  View {firstYear} to {lastYear}
+                  View {Math.max(timelineStart, timeline.from)} to{' '}
+                  {Math.min(timelineEnd - 1, timeline.to)}
                 </span>
               </div>
             </div>
 
-            <div
-              ref={viewport}
-              id="story-timeline"
-              className={classes.viewport}
-              data-dragging={drag.dragging || undefined}
-              {...drag.handlers}
-            >
-              <div className={classes.session} style={sessionStyle}>
-                {/* Ruler: decades over years. */}
-                <div className={classes.rulerRow} aria-hidden="true">
-                  <div className={classes.corner}>
-                    <span>Era</span>
-                    <span>Year</span>
-                  </div>
-                  <div className={classes.ruler}>
-                    <div className={classes.decades}>
-                      {decades.map((d) => (
-                        <span
-                          key={d.label}
-                          style={
-                            {
-                              '--x': d.from - timelineStart,
-                              '--w': d.to - d.from,
-                            } as CSSProperties
-                          }
-                        >
-                          {d.label}
-                        </span>
-                      ))}
+            <div className={classes.stage} style={{ '--tail': tail } as CSSProperties}>
+              <div
+                ref={viewport}
+                id="story-timeline"
+                className={classes.viewport}
+                data-dragging={drag.dragging || undefined}
+                {...drag.handlers}
+              >
+                <div className={classes.session} style={sessionStyle}>
+                  {/* Ruler: decades over years. */}
+                  <div className={classes.rulerRow} aria-hidden="true">
+                    <div className={classes.corner}>
+                      <span>Era</span>
+                      <span>Year</span>
                     </div>
-                    <div className={classes.years}>
-                      {years.map((y) => (
-                        <span key={y} data-major={y % 5 === 0 || undefined}>
-                          {y}
-                        </span>
-                      ))}
-                    </div>
-                    <span className={classes.selectionBand} />
-                  </div>
-                </div>
-
-                {/* Tracks: fixed headers and the lanes behind the clips. */}
-                {lanes.map((lane, i) => {
-                  const ongoing = eras.some((e) => e.lane === lane && e.end === null);
-                  return (
-                    <div
-                      key={lane}
-                      className={classes.trackRow}
-                      data-lane={lane}
-                      style={{ '--lane-rows': laneRows[i] } as CSSProperties}
-                      aria-hidden="true"
-                    >
-                      <div className={classes.trackHead} data-track-head>
-                        <span className={classes.trackChip} />
-                        <span className={classes.trackNum}>{i + 1}</span>
-                        <span className={classes.trackName}>{lane}</span>
-                        <span className={classes.trackState} data-on={ongoing || undefined}>
-                          <span className={classes.trackLed} />
-                          {ongoing ? 'Ongoing' : 'Closed'}
-                        </span>
+                    <div className={classes.ruler}>
+                      <div className={classes.decades}>
+                        {decades.map((d) => (
+                          <span
+                            key={d.label}
+                            style={
+                              {
+                                '--x': d.from - timelineStart,
+                                '--w': d.to - d.from,
+                              } as CSSProperties
+                            }
+                          >
+                            {d.label}
+                          </span>
+                        ))}
                       </div>
-                      <div className={classes.lane} />
+                      <div ref={ruler} className={classes.years}>
+                        {years.map((y) => (
+                          <span key={y} data-major={y % 5 === 0 || undefined}>
+                            {y}
+                          </span>
+                        ))}
+                      </div>
+                      <span className={classes.selectionBand} />
                     </div>
-                  );
-                })}
+                  </div>
 
-                <div
-                  className={classes.clips}
-                  role="group"
-                  aria-label="Timeline clips, earliest first"
-                >
-                  {clips.map((c, i) => (
-                    <button
-                      key={c.title}
-                      ref={(el) => {
-                        clipRefs.current[i] = el;
-                      }}
-                      type="button"
-                      className={classes.clip}
-                      data-lane={c.lane}
-                      aria-pressed={i === selected}
-                      aria-label={clipLabel(c)}
-                      title={c.title}
-                      onClick={() => !drag.moved() && select(i)}
-                      onKeyDown={(e) => onClipKey(e, i)}
-                      style={
-                        {
-                          '--x': c.start - timelineStart,
-                          '--w': (c.end ?? timelineEnd) - c.start,
-                          '--r': laneTop[lanes.indexOf(c.lane)] + (rowOf.get(c) ?? 0),
-                        } as CSSProperties
-                      }
-                    >
-                      <span className={classes.clipName}>
-                        <span className={classes.clipText}>
-                          <span className={classes.clipTitle}>{c.title}</span>
-                          <span className={classes.clipYears}>{yearLabel(c)}</span>
+                  {/* Tracks: fixed headers and the lanes behind the clips. */}
+                  {lanes.map((lane, i) => {
+                    const ongoing = eras.some((e) => e.lane === lane && e.end === null);
+                    return (
+                      <div
+                        key={lane}
+                        className={classes.trackRow}
+                        data-lane={lane}
+                        style={{ '--lane-rows': laneRows[i] } as CSSProperties}
+                        aria-hidden="true"
+                      >
+                        <div className={classes.trackHead} data-track-head>
+                          <span className={classes.trackChip} />
+                          <span className={classes.trackNum}>{i + 1}</span>
+                          <span className={classes.trackName}>{lane}</span>
+                          <span className={classes.trackState} data-on={ongoing || undefined}>
+                            <span className={classes.trackLed} />
+                            {ongoing ? 'Ongoing' : 'Closed'}
+                          </span>
+                        </div>
+                        <div className={classes.lane} />
+                      </div>
+                    );
+                  })}
+
+                  <div
+                    className={classes.clips}
+                    role="group"
+                    aria-label="Timeline clips, earliest first"
+                  >
+                    {clips.map((c, i) => (
+                      <button
+                        key={c.title}
+                        ref={(el) => {
+                          clipRefs.current[i] = el;
+                        }}
+                        type="button"
+                        className={classes.clip}
+                        data-lane={c.lane}
+                        aria-pressed={i === selected}
+                        aria-label={clipLabel(c)}
+                        title={c.title}
+                        onClick={() => !drag.moved() && select(i)}
+                        onKeyDown={(e) => onClipKey(e, i)}
+                        style={
+                          {
+                            '--x': c.start - timelineStart,
+                            '--w': (c.end ?? timelineEnd) - c.start,
+                            '--r': laneTop[lanes.indexOf(c.lane)] + (rowOf.get(c) ?? 0),
+                          } as CSSProperties
+                        }
+                      >
+                        <span className={classes.clipName}>
+                          <span className={classes.clipText}>
+                            <span className={classes.clipTitle}>{c.title}</span>
+                            <span className={classes.clipYears}>{yearLabel(c)}</span>
+                          </span>
                         </span>
-                      </span>
-                      <Waveform seed={c.title} lane={c.lane} className={classes.wave} />
-                    </button>
-                  ))}
+                        <Waveform seed={c.title} lane={c.lane} className={classes.wave} />
+                      </button>
+                    ))}
+                  </div>
                 </div>
-
-                <span className={classes.playhead} aria-hidden="true" />
               </div>
+              <span ref={playhead} className={classes.playhead} aria-hidden="true" />
             </div>
           </div>
         </StudioMonitor>

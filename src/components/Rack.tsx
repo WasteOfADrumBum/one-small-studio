@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { rackMounted, type GearItem, type RackSize } from '@/content/gear';
+import type { GearItem, RackSize } from '@/content/gear';
 import { Knob } from './hardware/Knob';
 import { Led } from './hardware/Led';
 import { Screw } from './hardware/Screw';
@@ -14,7 +14,8 @@ type CabinetProps = {
 
 /**
  * A carpet-covered rack case: a top and one side visible for depth, a thick front frame the gear
- * sits just behind, recessed metal rails, and a plinth on casters.
+ * sits just behind, recessed metal rails, and a plinth on casters. The rack lights on the power
+ * conditioner at the top wash down over the faceplates below.
  */
 export function RackCabinet({ title, side, children }: CabinetProps) {
   return (
@@ -26,7 +27,11 @@ export function RackCabinet({ title, side, children }: CabinetProps) {
         <div className={classes.bay}>
           <span className={classes.rail} data-side="left" aria-hidden="true" />
           <span className={classes.rail} data-side="right" aria-hidden="true" />
-          <div className={classes.units}>{children}</div>
+          <div className={classes.units}>
+            <PowerConditioner />
+            {children}
+          </div>
+          <span className={classes.wash} aria-hidden="true" />
           <span className={classes.lipShadow} aria-hidden="true" />
         </div>
       </div>
@@ -47,72 +52,116 @@ function Ear({ size }: { size: RackSize }) {
   );
 }
 
-function Label({ item }: { item: GearItem }) {
+/** A mounted module: ears on the rails, a faceplate between them. */
+function Mount({
+  size,
+  kind,
+  finish,
+  hidden,
+  children,
+}: {
+  size: RackSize;
+  kind: string;
+  finish?: string;
+  hidden?: boolean;
+  children: ReactNode;
+}) {
   return (
-    <div className={classes.text}>
-      <h4 className={classes.name}>
-        {item.brand} <span className={classes.model}>{item.model}</span>
-      </h4>
-      <p className={classes.note}>{item.note}</p>
+    <div
+      className={classes.unit}
+      data-kind={kind}
+      data-finish={finish}
+      data-size={size}
+      style={{ '--size': size } as CSSProperties}
+      aria-hidden={hidden || undefined}
+    >
+      <Ear size={size} />
+      <div className={classes.face}>{children}</div>
+      <Ear size={size} />
     </div>
   );
 }
 
 /**
- * One piece of gear. Rack-mount gear is a faceplate on the rails; amps, cabs, drums and the DAW sit
- * on a rack shelf, drawn as themselves. Either way the name and note come first.
+ * The 1U power conditioner every case starts with: rack-light switch and dimmer, two pull-out
+ * lamps, a status window, and the main rocker. Studio framing only, so it carries no brand, no
+ * model and no live readings.
  */
-export function RackUnit({ item }: { item: GearItem }) {
-  const mounted = rackMounted.includes(item.kind);
+function PowerConditioner() {
   return (
-    <article
-      className={classes.unit}
-      data-mount={mounted ? 'rack' : 'shelf'}
-      data-kind={item.kind}
-      data-size={item.size}
-      style={{ '--size': item.size } as CSSProperties}
-    >
-      <Ear size={item.size} />
-      {mounted ? (
-        <div className={classes.face}>
-          <Label item={item} />
-          <Faceplate item={item} />
-        </div>
-      ) : (
-        <div className={classes.shelf}>
-          <div className={classes.shelfBody}>
-            <Gear item={item} />
-            <Label item={item} />
-          </div>
-          <span className={classes.tray} aria-hidden="true" />
-        </div>
-      )}
-      <Ear size={item.size} />
-    </article>
+    <Mount size={1} kind="power" hidden>
+      <span className={classes.pcGroup}>
+        <span className={classes.pcLabel}>Rack lights</span>
+        <span className={classes.toggle} />
+        <Knob size={16} angle={40} />
+      </span>
+      <span className={classes.lamp} />
+      <span className={classes.pcWindow}>
+        <Led on color="green" />
+        <span>Power</span>
+      </span>
+      <span className={classes.lamp} />
+      <span className={classes.pcGroup}>
+        <span className={classes.rocker} />
+        <span className={classes.pcLabel}>On</span>
+      </span>
+    </Mount>
+  );
+}
+
+/** One piece of gear, drawn as a rack faceplate in the style of its category. Name first. */
+export function RackUnit({ item }: { item: GearItem }) {
+  return (
+    <Mount size={item.size} kind={item.kind} finish={item.finish}>
+      <div className={classes.text}>
+        <h4 className={classes.name}>
+          {item.brand} <span className={classes.model}>{item.model}</span>
+        </h4>
+        <p className={classes.note}>{item.note}</p>
+      </div>
+      <Faceplate item={item} />
+    </Mount>
   );
 }
 
 /** A blank or vented panel filling spare rack space. */
 export function RackFiller({ kind }: { kind: 'vent' | 'blank' }) {
   return (
-    <div
-      className={classes.unit}
-      data-mount="rack"
-      data-kind="filler"
-      data-size={1}
-      style={{ '--size': 1 } as CSSProperties}
-      aria-hidden="true"
-    >
-      <Ear size={1} />
-      <div className={classes.face}>{kind === 'vent' && <span className={classes.vent} />}</div>
-      <Ear size={1} />
-    </div>
+    <Mount size={1} kind="filler" hidden>
+      {kind === 'vent' && <span className={classes.vent} />}
+    </Mount>
   );
 }
 
-/** Faceplate hardware for rack-mount gear. Decoration only: none of it is a control. */
+const pads = (n: number) => Array.from({ length: n }, (_, i) => <i key={i} />);
+
+/** Faceplate hardware. Decoration only: none of it is a control. */
 function Faceplate({ item }: { item: GearItem }) {
   switch (item.kind) {
+    // A rack recorder: a wide screen showing an edit window, and a row of transport keys.
+    case 'daw':
+      return (
+        <div className={classes.hw} data-hw="daw" aria-hidden="true">
+          <span className={classes.editScreen}>
+            {[
+              ['#c8102e', 4, 70],
+              ['#8c4fc4', 28, 52],
+              ['#2a9bd6', 10, 84],
+              ['#2a9bd6', 52, 40],
+              ['#c9962f', 66, 30],
+            ].map(([color, left, width], i) => (
+              <i
+                key={i}
+                style={{ background: color as string, left: `${left}%`, width: `${width}%` }}
+              />
+            ))}
+          </span>
+          <span className={classes.keys} data-row>
+            {pads(5)}
+          </span>
+        </div>
+      );
+    // Scarlett-style: dark front panel with combo inputs and haloed gain controls.
     case 'interface':
       return (
         <div className={classes.hw} data-hw="interface" aria-hidden="true">
@@ -127,6 +176,30 @@ function Faceplate({ item }: { item: GearItem }) {
           </span>
         </div>
       );
+    // Amp: a vent grille over a row of chicken-head controls, a jewel lamp and a standby switch.
+    case 'amp-head':
+      return (
+        <div className={classes.hw} data-hw="amp" aria-hidden="true">
+          <span className={classes.ampVent} />
+          <span className={classes.ampRow}>
+            <Led on color="red" />
+            {[-60, 0, 40, -20, 70].map((a, i) => (
+              <Knob key={i} size={20} angle={a} />
+            ))}
+            <span className={classes.toggle} />
+          </span>
+        </div>
+      );
+    // Cabinet: a grille-cloth panel with the speakers ghosting through.
+    case 'speaker-cab':
+      return (
+        <div className={classes.hw} data-hw="cab" aria-hidden="true">
+          <span className={classes.grillePanel}>
+            <i />
+            <i />
+          </span>
+        </div>
+      );
     case 'effects':
       return (
         <div className={classes.hw} data-hw="effects" aria-hidden="true">
@@ -138,10 +211,22 @@ function Faceplate({ item }: { item: GearItem }) {
               <Knob key={a} size={20} angle={a} />
             ))}
           </span>
-          <span className={classes.keys}>
-            {Array.from({ length: 6 }, (_, i) => (
-              <i key={i} />
+          <span className={classes.keys}>{pads(6)}</span>
+        </div>
+      );
+    // Drum-related modules: a level display, a selector dial and grouped pads.
+    case 'drum':
+    case 'cymbals':
+      return (
+        <div className={classes.hw} data-hw="module" data-variant={item.kind} aria-hidden="true">
+          <span className={classes.lcd} data-tone="amber" data-bars>
+            {[0.5, 0.8, 0.35, 0.65, 0.9, 0.45, 0.7, 0.3].map((h, i) => (
+              <i key={i} style={{ '--h': h } as CSSProperties} />
             ))}
+          </span>
+          <Knob size={34} angle={item.kind === 'cymbals' ? -50 : 60} />
+          <span className={classes.keys} data-pads={item.kind === 'cymbals' ? 'round' : ''}>
+            {pads(item.kind === 'cymbals' ? 6 : 8)}
           </span>
         </div>
       );
@@ -152,95 +237,10 @@ function Faceplate({ item }: { item: GearItem }) {
             KIT 01
           </span>
           <Knob size={40} angle={30} />
-          <span className={classes.keys} data-pads>
-            {Array.from({ length: 8 }, (_, i) => (
-              <i key={i} />
-            ))}
+          <span className={classes.keys} data-pads="">
+            {pads(8)}
           </span>
         </div>
-      );
-    default:
-      return null;
-  }
-}
-
-/** The gear itself, standing on the shelf. */
-function Gear({ item }: { item: GearItem }) {
-  switch (item.kind) {
-    case 'daw':
-      return (
-        <span className={classes.laptop} aria-hidden="true">
-          <span className={classes.laptopScreen}>
-            {[
-              ['#c8102e', 10, 70],
-              ['#8c4fc4', 30, 55],
-              ['#2a9bd6', 5, 80],
-              ['#2a9bd6', 45, 40],
-              ['#c9962f', 60, 35],
-            ].map(([color, left, width], i) => (
-              <i
-                key={i}
-                // Clips sit to the right of the track headers, which take the first fifth.
-                style={{
-                  background: color as string,
-                  left: `${20 + (left as number) * 0.78}%`,
-                  width: `${(width as number) * 0.78}%`,
-                }}
-              />
-            ))}
-          </span>
-          <span className={classes.laptopBase} />
-        </span>
-      );
-    case 'amp-head':
-      return (
-        <span className={classes.ampHead} aria-hidden="true">
-          <span className={classes.handle} />
-          <span className={classes.ampCage}>
-            {Array.from({ length: 9 }, (_, i) => (
-              <i key={i} />
-            ))}
-          </span>
-          <span className={classes.ampPanel}>
-            <Led on color="red" />
-            {[-60, 0, 40, -20, 70, 10].map((a, i) => (
-              <Knob key={i} size={14} angle={a} />
-            ))}
-          </span>
-        </span>
-      );
-    case 'speaker-cab':
-      return (
-        <span className={classes.cab} aria-hidden="true">
-          <span className={classes.grille}>
-            <i />
-            <i />
-          </span>
-          <span className={classes.corner} data-c="tl" />
-          <span className={classes.corner} data-c="tr" />
-          <span className={classes.corner} data-c="bl" />
-          <span className={classes.corner} data-c="br" />
-        </span>
-      );
-    case 'drum':
-      return (
-        <span className={classes.drum} data-shell={item.shell} aria-hidden="true">
-          <span className={classes.hoop} />
-          <span className={classes.shellBody}>
-            {Array.from({ length: 5 }, (_, i) => (
-              <i key={i} />
-            ))}
-          </span>
-          <span className={classes.hoop} />
-        </span>
-      );
-    case 'cymbals':
-      return (
-        <span className={classes.cymbals} aria-hidden="true">
-          <i />
-          <i />
-          <i />
-        </span>
       );
     default:
       return null;

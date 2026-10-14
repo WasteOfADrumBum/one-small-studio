@@ -1,9 +1,9 @@
 /**
  * The Studio gear, in three rack cabinets. The admin will take this list over in a later phase.
  *
- * `size` is the space it takes in the rack, in rack units (U). `kind` picks how it is drawn:
- * rack-mount gear gets a faceplate, everything else (amps, cabs, drums, the DAW) sits on a rack
- * shelf. Both are presentation only and say nothing about specs or ownership.
+ * Every item is drawn as a rack-mounted module, whatever it really is. `size` is its height in rack
+ * units (U) and `kind` picks the faceplate style that suggests its category. Both are presentation
+ * only and say nothing about specs, ownership, or whether the real thing is rack gear.
  */
 export type RackSize = 1 | 2 | 3;
 
@@ -16,17 +16,14 @@ export type GearItem = {
   note: string;
   size: RackSize;
   kind: GearKind;
-  /** Shell finish for drums; decorative. */
-  shell?: 'black' | 'silver';
+  /** Faceplate finish; decorative. */
+  finish?: 'black' | 'silver';
 };
 
 export type GearGroup = {
   name: string;
   items: GearItem[];
 };
-
-/** Kinds that bolt to the rails; the rest stand on a shelf. */
-export const rackMounted: GearKind[] = ['interface', 'effects', 'drum-module'];
 
 export const gear: GearGroup[] = [
   {
@@ -83,7 +80,7 @@ export const gear: GearGroup[] = [
         note: 'Live and studio workhorse',
         size: 2,
         kind: 'drum',
-        shell: 'black',
+        finish: 'black',
       },
       {
         brand: 'Ludwig',
@@ -91,7 +88,7 @@ export const gear: GearGroup[] = [
         note: 'The classic rock and punk sound',
         size: 2,
         kind: 'drum',
-        shell: 'silver',
+        finish: 'silver',
       },
       {
         brand: 'Zildjian',

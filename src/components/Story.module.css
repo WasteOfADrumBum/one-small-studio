@@ -1,5 +1,7 @@
 .story {
   padding: var(--oss-section-space) 0;
+  /* The monitor's bias light may spread past the window edge; it never adds sideways scroll. */
+  overflow-x: clip;
 }
 
 /* ---- The edit window on screen ---- */
@@ -132,6 +134,19 @@
 
 /* ---- Scrolling session ---- */
 
+/*
+ * The playhead stands a fixed distance into the lane area. The session gets pre-roll before the
+ * first year and post-roll after the last event, so every event can be lined up on it.
+ */
+.stage {
+  --anchor: 0.2;
+  --lane-vis: calc(100cqw - var(--head));
+  --lead: calc(var(--lane-vis) * var(--anchor));
+  --trail: max(0px, calc(var(--lane-vis) * (1 - var(--anchor)) - var(--tail) * var(--year)));
+  position: relative;
+  container-type: inline-size;
+}
+
 .viewport {
   overflow-x: auto;
   overflow-y: hidden;
@@ -148,7 +163,8 @@
 
 .session {
   position: relative;
-  width: calc(var(--head) + var(--years) * var(--year));
+  width: calc(var(--head) + var(--lead) + var(--years) * var(--year) + var(--trail));
+  background: #0c0d0f;
 }
 
 .rulerRow,
@@ -186,6 +202,7 @@
 .ruler {
   position: relative;
   flex: none;
+  margin-left: var(--lead);
   width: calc(var(--years) * var(--year));
   height: var(--ruler-h);
   background: #121316;
@@ -326,6 +343,7 @@
 
 .lane {
   flex: none;
+  margin-left: var(--lead);
   width: calc(var(--years) * var(--year));
   /* Fine grid: a line per year, stronger every five. */
   background:
@@ -359,7 +377,7 @@
   position: absolute;
   z-index: 2;
   top: calc(var(--ruler-h) + var(--r) * var(--row-h) + 6px);
-  left: calc(var(--head) + var(--x) * var(--year) + 1px);
+  left: calc(var(--head) + var(--lead) + var(--x) * var(--year) + 1px);
   width: calc(var(--w) * var(--year) - 3px);
   height: calc(var(--row-h) - 12px);
   display: flex;
@@ -486,18 +504,18 @@
   content: '▸ ';
 }
 
-/* The playhead marks the start of the selected clip. */
+/* The playhead stays put while the session moves under it, like a DAW's scrolling playback. */
 .playhead {
   position: absolute;
-  z-index: 3;
+  z-index: 5;
   top: 20px;
-  bottom: 0;
-  left: calc(var(--head) + var(--sel-x) * var(--year));
+  bottom: 12px;
+  left: calc(var(--head) + var(--lead));
   width: 2px;
   translate: -1px 0;
   background: var(--oss-sky);
+  box-shadow: 0 0 6px rgb(94 200 242 / 0.45);
   pointer-events: none;
-  transition: left 300ms ease;
 }
 
 .playhead::before {

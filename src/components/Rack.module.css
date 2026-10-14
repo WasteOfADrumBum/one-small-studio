@@ -215,7 +215,7 @@
   right: 12%;
 }
 
-/* ---- A unit: rack-mount faceplate, or gear standing on a rack shelf ---- */
+/* ---- A unit: every item is a faceplate bolted to the rails ---- */
 
 .unit {
   --plate: var(--oss-metal-charcoal);
@@ -240,7 +240,7 @@
   justify-content: center;
 }
 
-.unit[data-mount='rack'] {
+.unit {
   background: var(--plate);
   border-radius: 2px;
   /* Lit along the top edge, a hard seam at the bottom, and a little shadow on the unit below. */
@@ -252,6 +252,31 @@
 
 .unit[data-kind='filler'] {
   --plate: linear-gradient(180deg, #1f1f23 0%, #17171a 100%);
+}
+
+.unit[data-finish='black'] {
+  --plate: var(--oss-metal-black);
+}
+
+/* Brushed aluminium, so the dark ink swaps in. */
+.unit[data-finish='silver'] {
+  --plate: var(--oss-aluminum);
+  --ink: #141518;
+  --ink-soft: #33363c;
+  --accent: #9b111e;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.7),
+    inset 0 -1px 0 rgb(0 0 0 / 0.35),
+    0 2px 2px -1px rgb(0 0 0 / 0.8);
+}
+
+.unit[data-kind='cymbals'] {
+  --plate: var(--oss-brushed-grain), linear-gradient(180deg, #2d2a25 0%, #1e1c19 100%);
+  --accent: #e0b45c;
+}
+
+.unit[data-kind='amp-head'] {
+  --plate: var(--oss-fabric-nap), linear-gradient(180deg, #1d1d21 0%, #141417 100%);
 }
 
 .unit[data-kind='effects'] {
@@ -321,389 +346,6 @@
   font-size: 0.85rem;
   line-height: 1.4;
   color: var(--ink-soft);
-}
-
-/* ---- Rack shelf: a cantilever tray bolted to the rails, the gear standing on it ---- */
-
-.shelf {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.shelfBody {
-  container-type: inline-size;
-  flex: 1;
-  display: flex;
-  align-items: flex-end;
-  gap: 14px;
-  padding: 8px 8px 0;
-}
-
-.shelfBody .text {
-  align-self: center;
-}
-
-.tray {
-  height: 9px;
-  margin: 0 -2px;
-  border-radius: 1px;
-  background: var(--oss-aluminum-dark);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.35),
-    inset 0 -2px 0 rgb(0 0 0 / 0.45),
-    0 3px 4px rgb(0 0 0 / 0.75);
-}
-
-/* The shelf's ears are its folded brackets, so they share the tray's metal. */
-.unit[data-mount='shelf'] .ear {
-  justify-content: flex-end;
-  padding-bottom: 0;
-}
-
-.unit[data-mount='shelf'] .ear::after {
-  content: '';
-  display: block;
-  width: 100%;
-  height: 9px;
-  background: var(--oss-aluminum-dark);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3);
-}
-
-.unit[data-mount='shelf'] .ear > :first-child:not(:last-child) {
-  display: none;
-}
-
-/* Everything drawn on a shelf casts its shadow down onto the tray. */
-.laptop,
-.ampHead,
-.cab,
-.drum,
-.cymbals {
-  position: relative;
-  flex: none;
-  display: block;
-  filter: drop-shadow(3px 4px 3px rgb(0 0 0 / 0.75));
-}
-
-/* Laptop running a DAW edit window. */
-.laptop {
-  width: 118px;
-  margin-bottom: 0;
-}
-
-.laptopScreen {
-  position: relative;
-  display: block;
-  height: 76px;
-  margin: 0 8px;
-  border: 4px solid #0b0b0d;
-  border-bottom-width: 6px;
-  border-radius: 5px 5px 2px 2px;
-  background:
-    linear-gradient(90deg, #262a31 0 16%, transparent 16%),
-    repeating-linear-gradient(180deg, #14171c 0 13px, #181b21 13px 14px);
-  box-shadow: 0 0 0 1px #3b3d43;
-}
-
-.laptopScreen i {
-  position: absolute;
-  height: 8px;
-  border-radius: 1px;
-  opacity: 0.85;
-}
-
-.laptopScreen i:nth-child(1) {
-  top: 3px;
-}
-
-.laptopScreen i:nth-child(2) {
-  top: 17px;
-}
-
-.laptopScreen i:nth-child(3) {
-  top: 31px;
-}
-
-.laptopScreen i:nth-child(4) {
-  top: 45px;
-}
-
-.laptopScreen i:nth-child(5) {
-  top: 59px;
-}
-
-.laptopBase {
-  display: block;
-  height: 7px;
-  background: var(--oss-aluminum);
-  clip-path: polygon(4% 0, 96% 0, 100% 100%, 0 100%);
-  box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.3);
-}
-
-/* Amp head: tolex box, carry strap, grille up top, a silver control strip below. */
-.ampHead {
-  width: 136px;
-  padding-top: 8px;
-}
-
-.handle {
-  position: absolute;
-  top: 0;
-  left: 34%;
-  right: 34%;
-  height: 10px;
-  border: 3px solid #0e0e10;
-  border-bottom: 0;
-  border-radius: 6px 6px 0 0;
-}
-
-.ampCage {
-  position: relative;
-  display: flex;
-  justify-content: space-evenly;
-  align-items: stretch;
-  height: 46px;
-  padding: 6px 10px;
-  box-sizing: border-box;
-  border-radius: 5px 5px 0 0;
-  background: var(--oss-fabric-nap), linear-gradient(180deg, #232327, #19191c);
-  box-shadow:
-    inset 0 2px 0 rgb(255 255 255 / 0.1),
-    inset 0 0 0 1px #0b0b0d;
-}
-
-/* Lid of the head, seen from above. */
-.ampCage::before {
-  content: '';
-  position: absolute;
-  left: 6px;
-  right: 6px;
-  top: -6px;
-  height: 6px;
-  background: #2b2b30;
-  clip-path: polygon(4% 0, 96% 0, 100% 100%, 0 100%);
-}
-
-.ampCage i {
-  width: 3px;
-  border-radius: 1px;
-  background: linear-gradient(180deg, #9a9da3, #55585e);
-}
-
-.ampPanel {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2px;
-  padding: 6px 7px;
-  border-radius: 0 0 4px 4px;
-  background: var(--oss-aluminum);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.6),
-    inset 0 -2px 0 rgb(0 0 0 / 0.35),
-    0 0 0 1px #0b0b0d;
-}
-
-/* Speaker cab: tolex, grille cloth with the speakers ghosting through, metal corners. */
-.cab {
-  width: 110px;
-  height: 124px;
-  padding: 8px;
-  box-sizing: border-box;
-  border-radius: 4px;
-  background: var(--oss-fabric);
-  box-shadow:
-    inset 0 2px 0 rgb(255 255 255 / 0.12),
-    inset 0 0 0 1px #0b0b0d;
-}
-
-.cab::before {
-  content: '';
-  position: absolute;
-  left: 6px;
-  right: 6px;
-  top: -6px;
-  height: 6px;
-  background: #26262b;
-  clip-path: polygon(4% 0, 96% 0, 100% 100%, 0 100%);
-}
-
-.grille {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-evenly;
-  height: 100%;
-  border-radius: 2px;
-  background:
-    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 3px),
-    repeating-linear-gradient(-45deg, rgb(0 0 0 / 0.35) 0 1px, transparent 1px 3px), #2a2a2e;
-  box-shadow:
-    inset 0 0 0 2px #121214,
-    inset 0 2px 4px rgb(0 0 0 / 0.7);
-}
-
-.grille i {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgb(0 0 0 / 0.35) 0 30%,
-    rgb(0 0 0 / 0.15) 31% 64%,
-    transparent 66%
-  );
-}
-
-.corner {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  background: radial-gradient(circle at 35% 30%, #e1e3e6, #6a6d73);
-  box-shadow: 0 1px 1px rgb(0 0 0 / 0.6);
-}
-
-.corner[data-c='tl'] {
-  top: 0;
-  left: 0;
-  border-radius: 4px 0 6px 0;
-}
-
-.corner[data-c='tr'] {
-  top: 0;
-  right: 0;
-  border-radius: 0 4px 0 6px;
-}
-
-.corner[data-c='bl'] {
-  bottom: 0;
-  left: 0;
-  border-radius: 0 6px 0 4px;
-}
-
-.corner[data-c='br'] {
-  bottom: 0;
-  right: 0;
-  border-radius: 6px 0 4px 0;
-}
-
-/* An acoustic drum, side on: chrome hoops, the shell's finish, and its lugs. */
-.drum {
-  --finish: linear-gradient(180deg, #2c2c31 0%, #0c0c0e 45%, #1b1b1f 60%, #050506 100%);
-  width: 108px;
-  margin-bottom: 1px;
-}
-
-.drum[data-shell='silver'] {
-  --finish:
-    radial-gradient(circle, rgb(255 255 255 / 0.55) 0 0.6px, transparent 1px) 0 0 / 5px 4px,
-    linear-gradient(180deg, #d9dce1 0%, #8f939a 45%, #c3c6cc 62%, #6c7077 100%);
-}
-
-.hoop {
-  display: block;
-  height: 6px;
-  margin: 0 -3px;
-  border-radius: 2px;
-  background: linear-gradient(180deg, #f2f3f5 0%, #9a9da3 55%, #55585e 100%);
-  box-shadow: 0 1px 0 rgb(0 0 0 / 0.5);
-}
-
-/* The batter head, just visible over the top hoop. */
-.drum::before {
-  content: '';
-  position: absolute;
-  left: -2px;
-  right: -2px;
-  top: -5px;
-  height: 9px;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at 45% 40%, #f4f1e8, #c9c4b6);
-}
-
-.shellBody {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  height: 50px;
-  background: var(--finish);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.12),
-    inset 6px 0 8px -4px rgb(255 255 255 / 0.1),
-    inset -8px 0 8px -4px rgb(0 0 0 / 0.55);
-}
-
-.shellBody i {
-  width: 6px;
-  height: 18px;
-  border-radius: 3px;
-  background: linear-gradient(90deg, #6d7076 0%, #f0f1f3 45%, #8d9097 100%);
-  box-shadow: 0 1px 1px rgb(0 0 0 / 0.6);
-}
-
-/* Cymbals on a stand: bronze discs, each with a bell. */
-.cymbals {
-  width: 112px;
-  height: 84px;
-}
-
-.cymbals::before {
-  content: '';
-  position: absolute;
-  left: calc(50% - 1.5px);
-  top: 4px;
-  bottom: 0;
-  width: 3px;
-  background: linear-gradient(90deg, #6d7076, #e1e3e6, #6d7076);
-}
-
-.cymbals::after {
-  content: '';
-  position: absolute;
-  left: 30%;
-  right: 30%;
-  bottom: 0;
-  height: 4px;
-  border-radius: 2px;
-  background: #55585e;
-}
-
-.cymbals i {
-  position: absolute;
-  height: 7px;
-  border-radius: 50%;
-  background: linear-gradient(180deg, #e9c46a 0%, #b8862b 50%, #7a5518 100%);
-  box-shadow: inset 0 1px 0 rgb(255 245 210 / 0.6);
-}
-
-.cymbals i::after {
-  content: '';
-  position: absolute;
-  left: calc(50% - 9px);
-  top: -4px;
-  width: 18px;
-  height: 8px;
-  border-radius: 50% 50% 0 0;
-  background: linear-gradient(180deg, #e9c46a, #b8862b);
-}
-
-.cymbals i:nth-child(1) {
-  top: 8px;
-  left: 4px;
-  right: 4px;
-}
-
-.cymbals i:nth-child(2) {
-  top: 34px;
-  left: 12px;
-  right: 12px;
-}
-
-.cymbals i:nth-child(3) {
-  top: 56px;
-  left: 18px;
-  right: 18px;
 }
 
 /* ---- Rack-mount faceplate hardware ---- */
@@ -780,6 +422,27 @@
     0 1px 0 rgb(255 255 255 / 0.1);
 }
 
+.lcd[data-tone='amber'] {
+  background: #0d0904;
+  color: var(--oss-amber);
+}
+
+/* A row of level bars instead of text: no made-up readings. */
+.lcd[data-bars] {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  min-width: 64px;
+  padding: 4px 6px;
+}
+
+.lcd[data-bars] i {
+  flex: 1;
+  height: calc(var(--h) * 100%);
+  background: currentColor;
+  opacity: 0.8;
+}
+
 .lcd[data-tone='green'] {
   background: #04100a;
   color: var(--oss-green);
@@ -813,10 +476,20 @@
   gap: 4px;
 }
 
+.keys[data-pads='round'] {
+  grid-template-columns: repeat(3, 16px);
+}
+
 .keys[data-pads] i {
   height: 14px;
   border-radius: 3px;
   background: linear-gradient(180deg, #3a3d44, #1f2025);
+}
+
+.keys[data-pads='round'] i {
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #6b5a36, #2a2418);
 }
 
 /* Boss: preset display, parameter knobs, and a block of buttons. */
@@ -837,6 +510,227 @@
   grid-area: dial;
 }
 
+/* Recorder: a wide screen with an edit window, transport keys underneath. */
+.hw[data-hw='daw'] {
+  grid-template-columns: auto;
+  justify-items: center;
+}
+
+.editScreen {
+  position: relative;
+  display: block;
+  width: 124px;
+  height: 64px;
+  border-radius: 3px;
+  background:
+    linear-gradient(90deg, #22262d 0 14%, transparent 14%),
+    repeating-linear-gradient(180deg, #11141a 0 12px, #161a20 12px 13px);
+  box-shadow:
+    inset 0 0 0 1px #000,
+    inset 0 2px 4px rgb(0 0 0 / 0.7),
+    0 1px 0 rgb(255 255 255 / 0.1);
+}
+
+.editScreen i {
+  position: absolute;
+  height: 7px;
+  margin-left: 14%;
+  max-width: 86%;
+  border-radius: 1px;
+  opacity: 0.8;
+  scale: 0.86 1;
+  transform-origin: left;
+}
+
+.editScreen i:nth-child(1) {
+  top: 3px;
+}
+
+.editScreen i:nth-child(2) {
+  top: 16px;
+}
+
+.editScreen i:nth-child(3) {
+  top: 29px;
+}
+
+.editScreen i:nth-child(4) {
+  top: 42px;
+}
+
+.editScreen i:nth-child(5) {
+  top: 54px;
+}
+
+.keys[data-row] {
+  grid-area: auto;
+  grid-template-columns: repeat(5, 18px);
+}
+
+/* Amp: a punched vent over the control row. */
+.hw[data-hw='amp'] {
+  grid-template-columns: auto;
+  padding: 8px 10px;
+  border-radius: 3px;
+  background: var(--oss-aluminum);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.6),
+    inset 0 -2px 0 rgb(0 0 0 / 0.3),
+    0 0 0 1px #0b0b0d;
+}
+
+.ampVent {
+  display: block;
+  height: 26px;
+  border-radius: 2px;
+  background:
+    radial-gradient(circle, #0b0b0d 1.6px, transparent 2px) 0 0 / 6px 6px,
+    #6f7277;
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.6);
+}
+
+.ampRow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Cabinet: a grille-cloth panel, the speakers ghosting through. */
+.grillePanel {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 150px;
+  height: calc(var(--size) * var(--u) - 26px);
+  border-radius: 3px;
+  background:
+    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(-45deg, rgb(0 0 0 / 0.35) 0 1px, transparent 1px 3px), #2a2a2e;
+  box-shadow:
+    inset 0 0 0 3px #111113,
+    inset 0 0 0 4px rgb(255 255 255 / 0.06),
+    inset 0 3px 6px rgb(0 0 0 / 0.7);
+}
+
+.grillePanel i {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgb(0 0 0 / 0.3) 0 28%,
+    rgb(0 0 0 / 0.14) 30% 62%,
+    transparent 65%
+  );
+}
+
+/* A switch the size of a fingertip. */
+.toggle {
+  display: inline-block;
+  flex: none;
+  width: 9px;
+  height: 16px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #e1e3e6 0 45%, #55585e 55%);
+  box-shadow:
+    0 0 0 2px #121214,
+    0 1px 2px rgb(0 0 0 / 0.7);
+}
+
+/* ---- Power conditioner ---- */
+
+.unit[data-kind='power'] {
+  --plate: var(--oss-brushed-grain), linear-gradient(180deg, #1c1c20 0%, #121215 100%);
+  z-index: 2;
+}
+
+.unit[data-kind='power'] .face {
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 8px;
+}
+
+.pcGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.pcLabel {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.56rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #9a9aa3;
+  white-space: nowrap;
+}
+
+.pcWindow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 2px;
+  background: #050607;
+  box-shadow: var(--oss-recess);
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--oss-green);
+}
+
+.rocker {
+  display: inline-block;
+  width: 16px;
+  height: 22px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #ff5a5a 0 48%, #b4121c 52%);
+  box-shadow:
+    0 0 0 2px #0b0b0d,
+    inset 0 1px 0 rgb(255 255 255 / 0.4),
+    0 0 6px rgb(255 77 100 / 0.35);
+}
+
+/* The pull-out rack lamps, lit and casting light down over the rack. */
+.lamp {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #3a3a40, #0d0d10 70%);
+  box-shadow:
+    0 0 0 2px #050506,
+    0 3px 4px rgb(0 0 0 / 0.7);
+}
+
+.lamp::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 70px;
+  height: 22px;
+  translate: -50% -6px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(220 240 255 / 0.45), transparent);
+  filter: blur(3px);
+  pointer-events: none;
+}
+
+/* The rack lights' wash: brightest under the conditioner, fading down the faceplates. */
+.wash {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 40% 26% at 28% 10%, rgb(200 230 255 / 0.1), transparent 75%),
+    radial-gradient(ellipse 40% 26% at 72% 10%, rgb(200 230 255 / 0.1), transparent 75%),
+    linear-gradient(180deg, rgb(150 210 255 / 0.06), transparent 45%);
+  mix-blend-mode: screen;
+}
+
 /* Two rows of punched ventilation slots on a filler panel. */
 .vent {
   flex: 1;
@@ -851,8 +745,13 @@
 
 /* Narrow units drop decoration before their text gets cramped. */
 @container (max-width: 270px) {
-  .hw,
-  .shelfBody > [aria-hidden='true'] {
+  .hw {
+    display: none;
+  }
+}
+
+@container (max-width: 300px) {
+  .pcLabel {
     display: none;
   }
 }
