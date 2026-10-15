@@ -15,8 +15,15 @@ export type Release = {
   credit: string;
   format: string;
   pageUrl: string;
-  /** Cover art URL. Leave it out for the featured album: the player supplies its artwork. */
+  /**
+   * Cover art URL. Leave it out for the featured album, whose artwork comes from the player; for
+   * other releases the shelf asks SoundCloud for the cover and shows a plain sleeve until then.
+   */
   artwork?: string;
+  /** Track titles in order, for releases the player doesn't load. */
+  tracks?: string[];
+  /** Running time as SoundCloud shows it, for releases the player doesn't load. */
+  runtime?: string;
   /** True for the album the site's player has loaded, which gets the tracklist and Play. */
   playable?: boolean;
 };
@@ -30,5 +37,29 @@ export const releases: Release[] = [
     format: 'Digital album on SoundCloud',
     pageUrl: featuredAlbum.pageUrl,
     playable: true,
+  },
+  {
+    id: 'when-the-stones-weep',
+    title: 'When the Stones Weep',
+    artist: 'Joshua Small',
+    credit: 'Artist',
+    format: 'Digital album on SoundCloud',
+    // A private set: the secret token at the end of the link is what lets visitors open it.
+    pageUrl:
+      'https://soundcloud.com/joshua-small-325495450/sets/when-the-stones-weep/s-WOZW3XGpQ9J',
+    runtime: '38:39',
+    tracks: [
+      'Erosion of Memory',
+      'As Shadows Breathe',
+      'The Hanged God Dreams',
+      'Scars that Sing',
+      'Banners in the Fog',
+      'Iron in the Blood',
+      'Cairns for the Forgotten',
+      'Twilight Wounds',
+      'Dirge for a Broken Blade',
+      'Grief Upon the Wind',
+      'Where the Stone Remembers',
+    ],
   },
 ];

@@ -21,6 +21,10 @@
   transition: background 150ms ease;
 }
 
+.track[data-static] {
+  cursor: default;
+}
+
 .track:focus-visible {
   outline: 2px solid var(--oss-sky);
   outline-offset: -2px;
@@ -110,7 +114,7 @@
   color: #5a524a;
 }
 
-.list[data-variant='notes'] .track:hover {
+.list[data-variant='notes'] .track:not([data-static]):hover {
   background: rgb(0 0 0 / 0.05);
 }
 
@@ -123,7 +127,11 @@
   color: #8a0b20;
 }
 
-.list[data-variant='notes'] .track:focus-visible {
+.list[data-variant='notes'] .track[data-static] {
+  cursor: default;
+}
+
+.track:focus-visible {
   outline-color: #0b5f86;
 }
 

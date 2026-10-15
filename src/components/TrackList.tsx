@@ -10,6 +10,24 @@ type TrackListProps = {
   label: string;
 };
 
+/** A release's tracks as printed liner notes: titles only, nothing to press. */
+export function StaticTrackList({ titles, label }: { titles: string[]; label: string }) {
+  return (
+    <ol className={classes.list} data-variant="notes" aria-label={label}>
+      {titles.map((title, i) => (
+        <li key={title}>
+          <span className={classes.track} data-static>
+            <span className={classes.num} aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <span className={classes.title}>{title}</span>
+          </span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 /** The featured album's tracks. Picking one starts it; picking the playing one pauses it. */
 export function TrackList({ variant, label }: TrackListProps) {
   const { status, tracks, current, playing, play, toggle } = usePlayer();

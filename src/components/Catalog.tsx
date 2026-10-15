@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@mantine/core';
 import {
   IconBrandSoundcloud,
@@ -14,17 +14,42 @@ import { artwork, formatTime } from '@/lib/soundcloud';
 import { site } from '@/lib/site';
 import { RecordSleeve } from './RecordSleeve';
 import { SectionHeader } from './SectionHeader';
-import { TrackList } from './TrackList';
+import { StaticTrackList, TrackList } from './TrackList';
 import classes from './Catalog.module.css';
 
 // Hand-placed, not random: small turns that repeat in a pattern.
 const TILTS = [-1.2, 0.8, -0.4, 1.1, -0.9];
+
+/**
+ * Cover art for releases the player doesn't load, asked of SoundCloud's oEmbed endpoint by page
+ * URL. Anything that fails leaves that release on its plain sleeve.
+ */
+function useShelfArt() {
+  const [art, setArt] = useState<Record<string, string>>({});
+  useEffect(() => {
+    const controller = new AbortController();
+    for (const r of releases) {
+      if (r.playable || r.artwork) continue;
+      const url = `https://soundcloud.com/oembed?format=json&url=${encodeURIComponent(r.pageUrl)}`;
+      fetch(url, { signal: controller.signal })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data: { thumbnail_url?: string } | null) => {
+          const thumb = data?.thumbnail_url;
+          if (thumb) setArt((a) => ({ ...a, [r.id]: thumb }));
+        })
+        .catch(() => {});
+    }
+    return () => controller.abort();
+  }, []);
+  return art;
+}
 
 /** Section 4, "The Catalog": releases as sleeves on a record shelf, with liner notes for the pick. */
 export function Catalog() {
   const { status, tracks, playing, play, toggle } = usePlayer();
   const { setPowered } = usePower();
   const [selectedId, setSelectedId] = useState(releases[0]?.id);
+  const shelfArt = useShelfArt();
   const index = Math.max(
     0,
     releases.findIndex((r) => r.id === selectedId),
@@ -59,7 +84,7 @@ export function Catalog() {
                 <li key={r.id} className={classes.item}>
                   <RecordSleeve
                     title={r.title}
-                    artwork={r.artwork ?? (r.playable ? playerArt : null)}
+                    artwork={r.artwork ?? (r.playable ? playerArt : (shelfArt[r.id] ?? null))}
                     selected={r.id === release.id}
                     spinning={!!r.playable && playing}
                     tilt={TILTS[i % TILTS.length]}
@@ -125,6 +150,15 @@ export function Catalog() {
                   </dd>
                 </div>
               )}
+              {!isPlayable && release.tracks && (
+                <div>
+                  <dt>Length</dt>
+                  <dd>
+                    {release.tracks.length} tracks
+                    {release.runtime && ` · ${release.runtime}`}
+                  </dd>
+                </div>
+              )}
             </dl>
             <div className={classes.actions}>
               {isPlayable && (
@@ -158,6 +192,11 @@ export function Catalog() {
             {isPlayable && (
               <div className={classes.tracklist}>
                 <TrackList variant="notes" label={`${release.title} tracklist`} />
+              </div>
+            )}
+            {!isPlayable && release.tracks && (
+              <div className={classes.tracklist}>
+                <StaticTrackList titles={release.tracks} label={`${release.title} tracklist`} />
               </div>
             )}
           </article>
