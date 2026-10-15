@@ -17,8 +17,9 @@ export type Release = {
   format: string;
   pageUrl: string;
   /**
-   * What the SoundCloud player loads. For a private set, use the API URL with its secret token from
-   * SoundCloud's embed code when you have it; the set's secret page link also works.
+   * What the SoundCloud player loads. For a private set, this must be the API URL with its secret
+   * token, copied from the `url=` in SoundCloud's embed code (Share, Embed); the player can't open
+   * a secret page link.
    */
   playerUrl: string;
   /**
@@ -48,11 +49,11 @@ export const releases: Release[] = [
     artist: 'Joshua Small',
     credit: 'Artist',
     format: 'Digital album on SoundCloud',
-    // A private set: the secret token at the end of the link is what lets visitors open it.
+    // A private set: the player opens it by API URL with its secret token, from SoundCloud's embed code.
     pageUrl:
       'https://soundcloud.com/joshua-small-325495450/sets/when-the-stones-weep/s-WOZW3XGpQ9J',
     playerUrl:
-      'https://soundcloud.com/joshua-small-325495450/sets/when-the-stones-weep/s-WOZW3XGpQ9J',
+      'https://api.soundcloud.com/playlists/soundcloud:playlists:2064714777?secret_token=s-WOZW3XGpQ9J',
     runtime: '38:39',
     tracks: [
       'Erosion of Memory',
@@ -75,7 +76,8 @@ export const releases: Release[] = [
     credit: 'Artist',
     format: 'Digital album on SoundCloud',
     pageUrl: 'https://soundcloud.com/joshua-small-325495450/sets/untranslated/s-1x98w0lZejR',
-    playerUrl: 'https://soundcloud.com/joshua-small-325495450/sets/untranslated/s-1x98w0lZejR',
+    playerUrl:
+      'https://api.soundcloud.com/playlists/soundcloud:playlists:2232969626?secret_token=s-1x98w0lZejR',
     runtime: '30:59',
     tracks: [
       'Wired Different',

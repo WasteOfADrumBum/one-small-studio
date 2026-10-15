@@ -13,7 +13,6 @@ import {
   loadWidgetApi,
   widgetOptions,
   widgetSrc,
-  widgetUrl,
   type ScSound,
   type ScWidget,
 } from './soundcloud';
@@ -180,11 +179,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     setCurrent(0);
     setProgress(0);
     setPlaying(false);
-    // A private set needs its secret-token URL before the widget can open it.
-    widgetUrl(next.playerUrl).then((url) => {
-      if (thisLoad !== loadId.current) return;
-      w.load(url, { ...widgetOptions(autoPlay), callback: () => ready(w, thisLoad) });
-    });
+    w.load(next.playerUrl, { ...widgetOptions(autoPlay), callback: () => ready(w, thisLoad) });
     // If the widget never answers, say so instead of leaving Play greyed out.
     later(() => {
       if (thisLoad === loadId.current && settled.current !== thisLoad) setStatus('error');
