@@ -8,7 +8,7 @@
   container: dock / inline-size;
   position: relative;
   width: 100%;
-  max-width: 800px;
+  max-width: 880px;
   padding-bottom: 22px;
 }
 
@@ -276,9 +276,11 @@
   color: var(--oss-amber);
 }
 
+/* The screen's fixed body height sets the tablet's height; the tracklist scrolls inside it. */
 .screenBody {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  height: 270px;
   min-height: 0;
 }
 
@@ -319,7 +321,6 @@
   line-height: 1.1;
   text-transform: uppercase;
   color: #f2f6f7;
-  overflow-wrap: anywhere;
 }
 
 .npArtist {
@@ -350,7 +351,7 @@
 }
 
 .trackPane {
-  max-height: 168px;
+  min-height: 0;
   overflow-y: auto;
   padding: 6px;
   border-left: 1px solid rgb(255 255 255 / 0.07);
@@ -482,11 +483,36 @@
 }
 
 /* Two rows of round soft keys, each with a round lens in its centre. */
+/*
+ * The soft keys, with an etched seam after the first column and before the last, as on the Dock.
+ * Each seam sits on the middle of the gap between those columns.
+ */
 .softKeys {
+  --col-gap: 6px;
+  position: relative;
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   justify-items: center;
-  gap: 10px 6px;
+  gap: 10px var(--col-gap);
+}
+
+.softKeys::before,
+.softKeys::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  left: calc((100% - 7 * var(--col-gap)) / 8 + var(--col-gap) / 2 - 1px);
+  width: 2px;
+  border-radius: 1px;
+  /* A dark groove with a lit lower lip, so it reads as cut into the panel. */
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.75) 0 50%, rgb(255 255 255 / 0.16) 50%);
+  pointer-events: none;
+}
+
+.softKeys::after {
+  left: auto;
+  right: calc((100% - 7 * var(--col-gap)) / 8 + var(--col-gap) / 2 - 1px);
 }
 
 .softKeys i {
@@ -568,14 +594,15 @@
  * the same width, so the wheel and its readout sit on the dock's centre line.
  */
 .centre {
-  --bay: 96px;
-  --key: 28px;
-  --key-gap: 10px;
-  --legend: 68px;
+  --bay: 92px;
+  --key: 26px;
+  --key-gap: 8px;
+  --legend: 56px;
+  --legend-gap: 0px;
   display: grid;
   grid-template-columns: var(--bay) auto minmax(0, 1fr) auto var(--bay);
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   padding: 18px 4px 6px;
 }
 
@@ -605,17 +632,18 @@
 
 .keyRow {
   display: grid;
-  grid-template-columns: var(--key) var(--key) var(--legend);
+  grid-template-columns: var(--legend) var(--key) var(--key) var(--legend);
   align-items: center;
   column-gap: var(--key-gap);
 }
 
-.keyBlock[data-side='right'] .keyRow {
-  grid-template-columns: var(--legend) var(--key) var(--key);
+/* Legends hug their keys: the outer ones sit against the key, not the bay beside them. */
+.keyRow > :first-child {
+  margin-right: var(--legend-gap);
 }
 
-.keyBlock[data-side='right'] .keyRow > :last-child {
-  order: -1;
+.keyRow > :last-child {
+  margin-left: var(--legend-gap);
 }
 
 .keyBlock i {
@@ -623,17 +651,19 @@
   height: 22px;
 }
 
-/* Printed legends: grey chips on the left block, white on the right, as on the hardware. */
+/*
+ * Printed legends, as on the hardware: grey chips on the left block, white on the right. Long names
+ * wrap onto two lines, like the Dock's, and still fit the key's row.
+ */
 .legend {
   display: block;
-  padding: 2px 0;
+  padding: 2px 2px;
   border-radius: 2px;
   background: #5b5e65;
-  font-size: 0.56rem;
+  font-size: 0.52rem;
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.1;
   text-align: center;
-  white-space: nowrap;
   color: #f3f4f6;
 }
 
@@ -1008,11 +1038,15 @@
   }
 
   .centre {
-    --bay: 80px;
+    --bay: 76px;
     --key: 24px;
-    --key-gap: 8px;
-    --legend: 64px;
+    --key-gap: 6px;
+    --legend: 50px;
     gap: 10px;
+  }
+
+  .legend {
+    font-size: 0.5rem;
   }
 
   .vStrip {
@@ -1025,20 +1059,12 @@
 }
 
 /* Too narrow for the legends beside the key blocks: they go, the keys stay. */
-@container dock (max-width: 680px) {
-  .centre {
-    --legend: 0px;
-  }
-
+@container dock (max-width: 740px) {
   .keyRow {
     grid-template-columns: var(--key) var(--key);
   }
 
-  .keyBlock[data-side='right'] .keyRow {
-    grid-template-columns: var(--key) var(--key);
-  }
-
-  .legend {
+  .keyRow > span {
     display: none;
   }
 }
@@ -1093,11 +1119,12 @@
   }
 
   .softKeys {
-    gap: 8px 4px;
+    row-gap: 8px;
   }
 
   .screenBody {
     grid-template-columns: 1fr;
+    height: auto;
   }
 
   .cover {

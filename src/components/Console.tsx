@@ -37,10 +37,16 @@ const SETTLE = [95, 20, 60, -10, 35, -40, 80, 5];
 /** Degrees of jog-wheel travel per track. */
 const DETENT = 36;
 
-// Legends printed beside the two key blocks, on the side facing the wheel, as on the Dock. One per
-// row, top to bottom; the left block's bottom row (ALT on the Dock) has none.
-const LEFT_LEGENDS = ['All/Sel', 'Start', 'End', 'Punch', 'Next', ''];
-const RIGHT_LEGENDS = ['◀ Nudge', 'Scroll H', 'Mark In', 'User 1', 'Workstation', 'User 2'];
+// Legends printed either side of the two key blocks, as on the Dock: one per row, top to bottom,
+// outside edge first, then the side facing the wheel. Blank where the Dock prints none.
+const LEFT_LEGENDS = {
+  outer: ['Preview', 'Punch Preview', 'Suspend Preview', 'Capture', 'Punch Capture', 'Auto Match'],
+  inner: ['All/Sel', 'Start', 'End', 'Punch', 'Next', ''],
+};
+const RIGHT_LEGENDS = {
+  outer: ['Nudge ▶', 'Scroll V', 'Mark Out', 'Do to All', '', ''],
+  inner: ['◀ Nudge', 'Scroll H', 'Mark In', 'User 1', 'Workstation', 'User 2'],
+};
 
 /**
  * The One Small controller, laid out like a Pro Tools Dock: a tablet standing upright in its cradle
@@ -276,20 +282,32 @@ function KnobTower() {
 }
 
 /**
- * Two columns of six keys with indicator strips, and their printed legends on the side facing the
- * wheel. One grid holds both, so each legend shares its key's row and centre line. Dock dressing,
- * not controls.
+ * Two columns of six keys with indicator strips, and their printed legends on both sides. Every row
+ * uses the same columns (legend, key, key, legend), so each legend shares its key's centre line
+ * and both legend columns keep their width even where a row has none. Dock dressing, not controls.
  */
-function KeyBlock({ legends, side }: { legends: string[]; side: 'left' | 'right' }) {
+function KeyBlock({
+  legends,
+  side,
+}: {
+  legends: { outer: string[]; inner: string[] };
+  side: 'left' | 'right';
+}) {
+  const legend = (text: string) =>
+    text ? <span className={classes.legend}>{text}</span> : <span />;
   return (
     <span className={classes.keyBlock} data-side={side} aria-hidden="true">
-      {legends.map((legend, row) => (
-        <span key={row} className={classes.keyRow}>
-          <i />
-          <i />
-          {legend ? <span className={classes.legend}>{legend}</span> : <span />}
-        </span>
-      ))}
+      {legends.inner.map((inner, row) => {
+        const outer = legends.outer[row];
+        return (
+          <span key={row} className={classes.keyRow}>
+            {side === 'left' ? legend(outer) : legend(inner)}
+            <i />
+            <i />
+            {side === 'left' ? legend(inner) : legend(outer)}
+          </span>
+        );
+      })}
     </span>
   );
 }
