@@ -4,7 +4,8 @@
 
 .display {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  /* The notes keep a readable width; the shelf takes the rest and scrolls once it has more sleeves. */
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
   align-items: start;
   gap: clamp(32px, 5vw, 64px);
 }

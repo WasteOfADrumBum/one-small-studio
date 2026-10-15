@@ -62,4 +62,23 @@ export const releases: Release[] = [
       'Where the Stone Remembers',
     ],
   },
+  {
+    id: 'untranslated',
+    title: 'untranslated',
+    artist: 'Joshua Small',
+    credit: 'Artist',
+    format: 'Digital album on SoundCloud',
+    pageUrl: 'https://soundcloud.com/joshua-small-325495450/sets/untranslated/s-1x98w0lZejR',
+    runtime: '30:59',
+    tracks: [
+      'Wired Different',
+      "The World's Too Loud",
+      'Under My Skin',
+      'Losing the Thread',
+      'Three Small Worlds',
+      'Same Language, Different Dialect',
+      'After the Mask',
+      'Find Your Tribe',
+    ],
+  },
 ];

@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useReducedMotion } from 'motion/react';
 import { Button } from '@mantine/core';
 import {
   IconBrandSoundcloud,
@@ -50,6 +51,8 @@ export function Catalog() {
   const { setPowered } = usePower();
   const [selectedId, setSelectedId] = useState(releases[0]?.id);
   const shelfArt = useShelfArt();
+  const ledge = useRef<HTMLUListElement>(null);
+  const reduceMotion = useReducedMotion();
   const index = Math.max(
     0,
     releases.findIndex((r) => r.id === selectedId),
@@ -67,8 +70,23 @@ export function Catalog() {
     if (playing) toggle();
     else play();
   };
-  const step = (by: number) =>
-    setSelectedId(releases[(index + by + releases.length) % releases.length].id);
+  // Stepping also slides the shelf so the picked sleeve is in view; nothing else moves the page.
+  const step = (by: number) => {
+    const next = (index + by + releases.length) % releases.length;
+    setSelectedId(releases[next].id);
+    const shelf = ledge.current;
+    const item = shelf?.children[next] as HTMLElement | undefined;
+    if (shelf && item) {
+      shelf.scrollTo({
+        left:
+          shelf.scrollLeft +
+          item.getBoundingClientRect().left -
+          shelf.getBoundingClientRect().left -
+          18,
+        behavior: reduceMotion ? 'auto' : 'smooth',
+      });
+    }
+  };
 
   return (
     <section id="catalog" className={classes.catalog} aria-labelledby="catalog-title">
@@ -79,7 +97,7 @@ export function Catalog() {
 
         <div className={classes.display}>
           <div className={classes.wall}>
-            <ul className={classes.ledge} aria-label="Releases">
+            <ul ref={ledge} className={classes.ledge} aria-label="Releases">
               {releases.map((r, i) => (
                 <li key={r.id} className={classes.item}>
                   <RecordSleeve
