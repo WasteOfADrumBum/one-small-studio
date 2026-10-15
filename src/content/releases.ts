@@ -1,8 +1,9 @@
 import { featuredAlbum } from '@/lib/site';
 
 /**
- * The Catalog: one entry per release on the record ledge. Add releases here and the shelf, its
- * navigation and the liner notes grow with them; the admin will take this list over later.
+ * The Catalog: one entry per release, each on its own shelf. Add releases here and the shelves and
+ * liner notes grow with them, and the site's player can load any of them; the admin will take this
+ * list over later. The first release is the one the player loads with the page.
  *
  * Releases are shown as record sleeves, but that's presentation only: `format` says what the
  * release really is, and the page says so next to it.
@@ -16,16 +17,19 @@ export type Release = {
   format: string;
   pageUrl: string;
   /**
-   * Cover art URL. Leave it out for the featured album, whose artwork comes from the player; for
-   * other releases the shelf asks SoundCloud for the cover and shows a plain sleeve until then.
+   * What the SoundCloud player loads. For a private set, use the API URL with its secret token from
+   * SoundCloud's embed code when you have it; the set's secret page link also works.
+   */
+  playerUrl: string;
+  /**
+   * Cover art URL. Optional: once the player has loaded a release it uses that art, and until then
+   * the shelf asks SoundCloud for the cover and shows a plain sleeve while it waits.
    */
   artwork?: string;
-  /** Track titles in order, for releases the player doesn't load. */
+  /** Track titles in order, shown in the liner notes until the player has loaded the release. */
   tracks?: string[];
-  /** Running time as SoundCloud shows it, for releases the player doesn't load. */
+  /** Running time as SoundCloud shows it, for the same. */
   runtime?: string;
-  /** True for the album the site's player has loaded, which gets the tracklist and Play. */
-  playable?: boolean;
 };
 
 export const releases: Release[] = [
@@ -36,7 +40,7 @@ export const releases: Release[] = [
     credit: 'Artist',
     format: 'Digital album on SoundCloud',
     pageUrl: featuredAlbum.pageUrl,
-    playable: true,
+    playerUrl: featuredAlbum.playerUrl,
   },
   {
     id: 'when-the-stones-weep',
@@ -46,6 +50,8 @@ export const releases: Release[] = [
     format: 'Digital album on SoundCloud',
     // A private set: the secret token at the end of the link is what lets visitors open it.
     pageUrl:
+      'https://soundcloud.com/joshua-small-325495450/sets/when-the-stones-weep/s-WOZW3XGpQ9J',
+    playerUrl:
       'https://soundcloud.com/joshua-small-325495450/sets/when-the-stones-weep/s-WOZW3XGpQ9J',
     runtime: '38:39',
     tracks: [
@@ -69,6 +75,7 @@ export const releases: Release[] = [
     credit: 'Artist',
     format: 'Digital album on SoundCloud',
     pageUrl: 'https://soundcloud.com/joshua-small-325495450/sets/untranslated/s-1x98w0lZejR',
+    playerUrl: 'https://soundcloud.com/joshua-small-325495450/sets/untranslated/s-1x98w0lZejR',
     runtime: '30:59',
     tracks: [
       'Wired Different',

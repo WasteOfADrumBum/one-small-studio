@@ -23,6 +23,8 @@ export type ScWidget = {
   next(): void;
   prev(): void;
   skip(index: number): void;
+  /** Swaps in another sound or set; listeners stay bound, and `callback` runs once it is ready. */
+  load(url: string, options: Record<string, unknown> & { callback?: () => void }): void;
   /** 0 to 100. */
   setVolume(volume: number): void;
   getVolume(cb: Callback<number>): void;
@@ -62,15 +64,20 @@ export function loadWidgetApi(): Promise<ScGlobal> {
   return loading;
 }
 
-export function widgetSrc(profileUrl: string): string {
+export function widgetSrc(url: string): string {
   const params = new URLSearchParams({
-    url: profileUrl,
+    url,
     auto_play: 'false',
     visual: 'false',
     show_comments: 'false',
     show_teaser: 'false',
   });
   return `https://w.soundcloud.com/player/?${params}`;
+}
+
+/** Options for `ScWidget.load`, matching the iframe's own. */
+export function widgetOptions(autoPlay: boolean) {
+  return { auto_play: autoPlay, visual: false, show_comments: false, show_teaser: false };
 }
 
 /** SoundCloud serves 100px art by default; ask for the 500px version. */

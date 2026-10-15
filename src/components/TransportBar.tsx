@@ -9,12 +9,12 @@ import {
 import { usePlayer } from '@/lib/player';
 import { usePower } from '@/lib/power';
 import { artwork } from '@/lib/soundcloud';
-import { featuredAlbum, site } from '@/lib/site';
+import { site } from '@/lib/site';
 import classes from './TransportBar.module.css';
 
 /** The DAW-style transport pinned to the top: it drives the SoundCloud player from anywhere on the page. */
 export function TransportBar() {
-  const { status, tracks, current, playing, progress, toggle, next, prev } = usePlayer();
+  const { album, status, tracks, current, playing, progress, toggle, next, prev } = usePlayer();
   const { setPowered } = usePower();
   const track = tracks[current];
   const ready = status === 'ready' && tracks.length > 0;
@@ -69,10 +69,10 @@ export function TransportBar() {
           <Text size="sm" truncate="end" className={classes.title}>
             {track?.title ??
               (status === 'loading'
-                ? 'Loading SoundCloud…'
+                ? `Loading ${album.title}…`
                 : status === 'error'
                   ? 'SoundCloud is not responding'
-                  : featuredAlbum.title)}
+                  : album.title)}
           </Text>
         </div>
       </div>

@@ -1,17 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
-import { useReducedMotion } from 'motion/react';
+import { useEffect, useState } from 'react';
 import { Button } from '@mantine/core';
 import {
   IconBrandSoundcloud,
-  IconChevronLeft,
-  IconChevronRight,
   IconPlayerPauseFilled,
   IconPlayerPlayFilled,
 } from '@tabler/icons-react';
 import { releases } from '@/content/releases';
 import { usePlayer } from '@/lib/player';
 import { usePower } from '@/lib/power';
-import { artwork, formatTime } from '@/lib/soundcloud';
+import { formatTime } from '@/lib/soundcloud';
 import { site } from '@/lib/site';
 import { RecordSleeve } from './RecordSleeve';
 import { SectionHeader } from './SectionHeader';
@@ -22,15 +19,15 @@ import classes from './Catalog.module.css';
 const TILTS = [-1.2, 0.8, -0.4, 1.1, -0.9];
 
 /**
- * Cover art for releases the player doesn't load, asked of SoundCloud's oEmbed endpoint by page
- * URL. Anything that fails leaves that release on its plain sleeve.
+ * Cover art for releases the player hasn't loaded yet, asked of SoundCloud's oEmbed endpoint by
+ * page URL. Anything that fails leaves that release on its plain sleeve until it is played.
  */
 function useShelfArt() {
   const [art, setArt] = useState<Record<string, string>>({});
   useEffect(() => {
     const controller = new AbortController();
     for (const r of releases) {
-      if (r.playable || r.artwork) continue;
+      if (r.artwork) continue;
       const url = `https://soundcloud.com/oembed?format=json&url=${encodeURIComponent(r.pageUrl)}`;
       fetch(url, { signal: controller.signal })
         .then((res) => (res.ok ? res.json() : null))
@@ -45,47 +42,28 @@ function useShelfArt() {
   return art;
 }
 
-/** Section 4, "The Catalog": releases as sleeves on a record shelf, with liner notes for the pick. */
+/**
+ * Section 4, "The Catalog": one shelf per release, each with its plaque, and liner notes for the
+ * one in the player. Picking a record pulls it from its sleeve and loads that album into the
+ * console and the transport bar, playing it; the liner notes follow.
+ */
 export function Catalog() {
-  const { status, tracks, playing, play, toggle } = usePlayer();
+  const { album, albumArt, loadAlbum, status, tracks, playing, toggle } = usePlayer();
   const { setPowered } = usePower();
-  const [selectedId, setSelectedId] = useState(releases[0]?.id);
   const shelfArt = useShelfArt();
-  const ledge = useRef<HTMLUListElement>(null);
-  const reduceMotion = useReducedMotion();
-  const index = Math.max(
-    0,
-    releases.findIndex((r) => r.id === selectedId),
-  );
-  const release = releases[index];
+  const release = album;
   const ready = status === 'ready' && tracks.length > 0;
-  const playerArt = tracks[0] ? artwork(tracks[0]) : null;
   const runtime = tracks.reduce((sum, t) => sum + t.duration, 0);
 
   if (!release) return null;
-  const isPlayable = !!release.playable;
 
+  const pick = (id: string) => {
+    setPowered(true);
+    loadAlbum(id, true);
+  };
   const onPlay = () => {
     setPowered(true);
-    if (playing) toggle();
-    else play();
-  };
-  // Stepping also slides the shelf so the picked sleeve is in view; nothing else moves the page.
-  const step = (by: number) => {
-    const next = (index + by + releases.length) % releases.length;
-    setSelectedId(releases[next].id);
-    const shelf = ledge.current;
-    const item = shelf?.children[next] as HTMLElement | undefined;
-    if (shelf && item) {
-      shelf.scrollTo({
-        left:
-          shelf.scrollLeft +
-          item.getBoundingClientRect().left -
-          shelf.getBoundingClientRect().left -
-          18,
-        behavior: reduceMotion ? 'auto' : 'smooth',
-      });
-    }
+    toggle();
   };
 
   return (
@@ -97,45 +75,34 @@ export function Catalog() {
 
         <div className={classes.display}>
           <div className={classes.wall}>
-            <ul ref={ledge} className={classes.ledge} aria-label="Releases">
+            <p id="shelf-hint" className="visually-hidden">
+              Plays the album on the console.
+            </p>
+            <ul className={classes.shelves} aria-label="Releases">
               {releases.map((r, i) => (
-                <li key={r.id} className={classes.item}>
+                <li key={r.id} className={classes.row}>
                   <RecordSleeve
                     title={r.title}
-                    artwork={r.artwork ?? (r.playable ? playerArt : (shelfArt[r.id] ?? null))}
+                    artwork={r.artwork ?? albumArt[r.id] ?? shelfArt[r.id] ?? null}
                     selected={r.id === release.id}
-                    spinning={!!r.playable && playing}
+                    spinning={r.id === release.id && playing}
                     tilt={TILTS[i % TILTS.length]}
-                    onSelect={() => setSelectedId(r.id)}
-                    describedBy={`release-${r.id}`}
+                    onSelect={() => pick(r.id)}
+                    describedBy={`plaque-${r.id} shelf-hint`}
                   />
                   <span className={classes.shelf} aria-hidden="true">
                     <span className={classes.lip} />
                     <span className={classes.shelfTop} />
                     <span className={classes.shelfFront} />
                   </span>
-                  <p id={`release-${r.id}`} className={classes.caption}>
-                    <span className={classes.captionTitle}>{r.title}</span>
-                    <span>
-                      {r.artist} · {r.credit}
-                    </span>
+                  {/* The brass plate on the shelf's front edge. */}
+                  <p id={`plaque-${r.id}`} className={classes.plaque}>
+                    <span className={classes.plaqueTitle}>{r.title}</span>
+                    <span className={classes.plaqueArtist}>{r.artist}</span>
                   </p>
                 </li>
               ))}
             </ul>
-            {releases.length > 1 && (
-              <div className={classes.shelfNav}>
-                <button type="button" onClick={() => step(-1)} aria-label="Previous release">
-                  <IconChevronLeft size={18} aria-hidden="true" />
-                </button>
-                <span className="label">
-                  {index + 1} / {releases.length}
-                </span>
-                <button type="button" onClick={() => step(1)} aria-label="Next release">
-                  <IconChevronRight size={18} aria-hidden="true" />
-                </button>
-              </div>
-            )}
             <a href={site.soundcloud} target="_blank" rel="noreferrer" className={classes.more}>
               <IconBrandSoundcloud size={18} aria-hidden="true" /> Everything else is on my
               SoundCloud
@@ -160,40 +127,27 @@ export function Catalog() {
                 <dt>Format</dt>
                 <dd>{release.format}</dd>
               </div>
-              {isPlayable && ready && (
+              {(ready || release.tracks) && (
                 <div>
                   <dt>Length</dt>
                   <dd>
-                    {tracks.length} tracks · {formatTime(runtime)}
-                  </dd>
-                </div>
-              )}
-              {!isPlayable && release.tracks && (
-                <div>
-                  <dt>Length</dt>
-                  <dd>
-                    {release.tracks.length} tracks
-                    {release.runtime && ` · ${release.runtime}`}
+                    {ready
+                      ? `${tracks.length} tracks · ${formatTime(runtime)}`
+                      : `${release.tracks?.length} tracks${release.runtime ? ` · ${release.runtime}` : ''}`}
                   </dd>
                 </div>
               )}
             </dl>
             <div className={classes.actions}>
-              {isPlayable && (
-                <Button
-                  onClick={onPlay}
-                  disabled={!ready}
-                  leftSection={
-                    playing ? (
-                      <IconPlayerPauseFilled size={16} />
-                    ) : (
-                      <IconPlayerPlayFilled size={16} />
-                    )
-                  }
-                >
-                  {playing ? 'Pause' : 'Play the album'}
-                </Button>
-              )}
+              <Button
+                onClick={onPlay}
+                disabled={!ready}
+                leftSection={
+                  playing ? <IconPlayerPauseFilled size={16} /> : <IconPlayerPlayFilled size={16} />
+                }
+              >
+                {playing ? 'Pause' : 'Play the album'}
+              </Button>
               <Button
                 component="a"
                 href={release.pageUrl}
@@ -207,16 +161,14 @@ export function Catalog() {
                 Open on SoundCloud
               </Button>
             </div>
-            {isPlayable && (
-              <div className={classes.tracklist}>
-                <TrackList variant="notes" label={`${release.title} tracklist`} />
-              </div>
-            )}
-            {!isPlayable && release.tracks && (
-              <div className={classes.tracklist}>
+            <div className={classes.tracklist}>
+              {/* The printed titles stand in while the player fetches the album. */}
+              {status === 'loading' && release.tracks ? (
                 <StaticTrackList titles={release.tracks} label={`${release.title} tracklist`} />
-              </div>
-            )}
+              ) : (
+                <TrackList variant="notes" label={`${release.title} tracklist`} />
+              )}
+            </div>
           </article>
         </div>
       </div>

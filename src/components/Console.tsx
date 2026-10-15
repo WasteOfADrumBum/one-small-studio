@@ -16,7 +16,6 @@ import {
   IconPlayerSkipBackFilled,
   IconPlayerSkipForwardFilled,
 } from '@tabler/icons-react';
-import { featuredAlbum } from '@/lib/site';
 import { usePower } from '@/lib/power';
 import { usePlayer } from '@/lib/player';
 import { artwork, formatTime } from '@/lib/soundcloud';
@@ -227,7 +226,7 @@ export function Console() {
               <a
                 className={classes.key}
                 data-wide
-                href={featuredAlbum.pageUrl}
+                href={player.album.pageUrl}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -468,9 +467,9 @@ function TransportKey({
 
 /** The tablet in its cradle: what's loaded, what's playing, and the tracklist. */
 function Screen({ powered }: { powered: boolean }) {
-  const { status, tracks, current, playing, progress } = usePlayer();
+  const { album, albumArt, status, tracks, current, playing, progress } = usePlayer();
   const track = tracks[current];
-  const cover = tracks[0] ? artwork(tracks[0]) : null;
+  const cover = (tracks[0] ? artwork(tracks[0]) : null) ?? albumArt[album.id] ?? album.artwork;
   const ready = status === 'ready' && tracks.length > 0;
 
   const state =
@@ -487,7 +486,7 @@ function Screen({ powered }: { powered: boolean }) {
               : 'Standby';
 
   const hint = !powered
-    ? `Press Play or Power to spin ${featuredAlbum.title}. Nothing plays until you do.`
+    ? `Press Play or Power to spin ${album.title}. Nothing plays until you do.`
     : playing
       ? 'On air. The transport up top follows you down the page.'
       : 'The console is live. Pick a track or press Play.';
@@ -501,7 +500,7 @@ function Screen({ powered }: { powered: boolean }) {
             <span className={classes.stateDot} aria-hidden="true" />
             {state}
           </span>
-          <span className={classes.statusAlbum}>{featuredAlbum.title}</span>
+          <span className={classes.statusAlbum}>{album.title}</span>
           {ready && (
             <span className={classes.statusPos}>
               {String(current + 1).padStart(2, '0')}/{String(tracks.length).padStart(2, '0')}
@@ -512,14 +511,14 @@ function Screen({ powered }: { powered: boolean }) {
         <div className={classes.screenBody}>
           <div className={classes.nowPlaying}>
             {cover ? (
-              <img src={cover} alt={`${featuredAlbum.title} cover art`} className={classes.cover} />
+              <img src={cover} alt={`${album.title} cover art`} className={classes.cover} />
             ) : (
               <span className={classes.cover} aria-hidden="true" />
             )}
             <div className={classes.npText}>
               <span className="label">{playing ? 'Now playing' : 'Loaded'}</span>
-              <span className={classes.npTitle}>{track?.title ?? featuredAlbum.title}</span>
-              <span className={classes.npArtist}>{featuredAlbum.artist}</span>
+              <span className={classes.npTitle}>{track?.title ?? album.title}</span>
+              <span className={classes.npArtist}>{album.artist}</span>
               <div className={classes.timeline} aria-hidden="true">
                 <span style={{ transform: `scaleX(${progress})` }} />
               </div>
@@ -531,7 +530,7 @@ function Screen({ powered }: { powered: boolean }) {
             </div>
           </div>
           <div className={classes.trackPane}>
-            <TrackList variant="screen" label={`${featuredAlbum.title} tracklist`} />
+            <TrackList variant="screen" label={`${album.title} tracklist`} />
           </div>
         </div>
 

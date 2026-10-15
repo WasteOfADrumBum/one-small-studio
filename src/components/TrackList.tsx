@@ -1,6 +1,5 @@
 import { usePlayer } from '@/lib/player';
 import { usePower } from '@/lib/power';
-import { featuredAlbum } from '@/lib/site';
 import { formatTime } from '@/lib/soundcloud';
 import classes from './TrackList.module.css';
 
@@ -30,7 +29,7 @@ export function StaticTrackList({ titles, label }: { titles: string[]; label: st
 
 /** The featured album's tracks. Picking one starts it; picking the playing one pauses it. */
 export function TrackList({ variant, label }: TrackListProps) {
-  const { status, tracks, current, playing, play, toggle } = usePlayer();
+  const { album, status, tracks, current, playing, play, toggle } = usePlayer();
   const { setPowered } = usePower();
   const ready = status === 'ready' && tracks.length > 0;
 
@@ -44,7 +43,7 @@ export function TrackList({ variant, label }: TrackListProps) {
     return (
       <p className={classes.message} data-variant={variant}>
         SoundCloud is not answering right now.{' '}
-        <a href={featuredAlbum.pageUrl} target="_blank" rel="noreferrer">
+        <a href={album.pageUrl} target="_blank" rel="noreferrer">
           Listen there instead
         </a>
         .
