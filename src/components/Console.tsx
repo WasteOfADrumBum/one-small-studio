@@ -37,6 +37,11 @@ const SETTLE = [95, 20, 60, -10, 35, -40, 80, 5];
 /** Degrees of jog-wheel travel per track. */
 const DETENT = 36;
 
+// Legends printed beside the two key blocks, on the side facing the wheel, as on the Dock. One per
+// row, top to bottom; the left block's bottom row (ALT on the Dock) has none.
+const LEFT_LEGENDS = ['All/Sel', 'Start', 'End', 'Punch', 'Next', ''];
+const RIGHT_LEGENDS = ['◀ Nudge', 'Scroll H', 'Mark In', 'User 1', 'Workstation', 'User 2'];
+
 /**
  * The One Small controller, laid out like a Pro Tools Dock: a tablet standing upright in its cradle
  * between two columns of four knobs; a soft-key band under it; the fader on the left, a big jog
@@ -97,9 +102,8 @@ export function Console() {
             <Screen powered={powered} />
             <span className={classes.cradle} aria-hidden="true">
               <span className={classes.cradleNotch} />
-              <span className={classes.cradleBadge}>
-                One <b>Small</b> | Dock
-              </span>
+              <Wordmark className={classes.cradleBrand} />
+              <span className={classes.cradleModel}>Dock</span>
             </span>
           </div>
           <KnobTower />
@@ -109,13 +113,17 @@ export function Console() {
           {/* Soft-key band; Power sits where the monitor knob does. */}
           <div className={classes.softBand}>
             <span className={classes.pairKeys} aria-hidden="true">
-              <i />
-              <i />
+              <i data-light={powered ? 'red' : undefined} />
+              <i data-light={powered ? 'violet' : undefined} />
             </span>
             <span className={classes.softKeys} aria-hidden="true">
               {Array.from({ length: 16 }, (_, i) => (
-                // The top row lights under the track that is loaded, like a selected channel.
-                <i key={i} data-lit={(powered && i === player.current) || undefined} />
+                // Every lens glows a steady violet while the console is on; the top-row key over
+                // the loaded track glows red instead, like a selected channel.
+                <i
+                  key={i}
+                  data-light={powered ? (i === player.current ? 'red' : 'violet') : undefined}
+                />
               ))}
             </span>
             <span className={classes.powerSpot}>
@@ -156,16 +164,18 @@ export function Console() {
                 disabled={!ready}
               />
             </div>
-            <KeyBlock />
+            <KeyBlock legends={LEFT_LEGENDS} side="left" />
             <div className={classes.jogArea}>
               <JogWheel ready={ready} />
             </div>
-            <KeyBlock />
-            <span className={classes.vStrip} aria-hidden="true">
-              <i />
-              <i />
-              <i />
-              <i />
+            <KeyBlock legends={RIGHT_LEGENDS} side="right" />
+            <span className={classes.stripBay} aria-hidden="true">
+              <span className={classes.vStrip}>
+                <i />
+                <i />
+                <i />
+                <i />
+              </span>
             </span>
           </div>
 
@@ -181,7 +191,7 @@ export function Console() {
           <div className={classes.transport}>
             <TransportKey
               label="Previous track"
-              caption="Prev"
+              caption="Previous"
               onClick={player.prev}
               disabled={!ready}
             >
@@ -189,7 +199,7 @@ export function Console() {
             </TransportKey>
             <TransportKey
               label={player.playing ? 'Pause' : 'Play'}
-              caption={player.playing ? 'Pause' : 'Play'}
+              caption="Play"
               onClick={onPlay}
               disabled={!ready}
               primary
@@ -215,7 +225,9 @@ export function Console() {
                 target="_blank"
                 rel="noreferrer"
               >
-                <IconBrandSoundcloud size={16} aria-hidden="true" />
+                <span className={classes.glyph} aria-hidden="true">
+                  <IconBrandSoundcloud size={16} />
+                </span>
                 Open on SoundCloud
               </a>
             </span>
@@ -223,9 +235,7 @@ export function Console() {
 
           <div className={classes.footer} aria-hidden="true">
             <span className={classes.shift} />
-            <span className={classes.nameplate}>
-              One <b>Small</b> Studio
-            </span>
+            <Wordmark className={classes.nameplate} />
             <span className={classes.shift} />
           </div>
         </div>
@@ -240,23 +250,45 @@ export function Console() {
   );
 }
 
+/**
+ * The brand as it is printed on the hardware: three words of one face, size and weight on one
+ * baseline, with only the colour of "Small" set apart. Its size comes from where it is used.
+ */
+function Wordmark({ className }: { className: string }) {
+  return (
+    <span className={`${classes.wordmark} ${className}`}>
+      One <span className={classes.wordmarkAccent}>Small</span> Studio
+    </span>
+  );
+}
+
 /** Four display knobs in a raised column beside the tablet. They only move with the power sweep. */
 function KnobTower() {
   return (
     <div className={classes.tower} aria-hidden="true">
       {[0, 1, 2, 3].map((i) => (
-        <Knob key={i} size={34} />
+        <span key={i} className={classes.towerSlot}>
+          <Knob size={34} />
+        </span>
       ))}
     </div>
   );
 }
 
-/** Two columns of six keys with indicator strips: Dock dressing, not controls. */
-function KeyBlock() {
+/**
+ * Two columns of six keys with indicator strips, and their printed legends on the side facing the
+ * wheel. One grid holds both, so each legend shares its key's row and centre line. Dock dressing,
+ * not controls.
+ */
+function KeyBlock({ legends, side }: { legends: string[]; side: 'left' | 'right' }) {
   return (
-    <span className={classes.keyBlock} aria-hidden="true">
-      {Array.from({ length: 12 }, (_, i) => (
-        <i key={i} />
+    <span className={classes.keyBlock} data-side={side} aria-hidden="true">
+      {legends.map((legend, row) => (
+        <span key={row} className={classes.keyRow}>
+          <i />
+          <i />
+          {legend ? <span className={classes.legend}>{legend}</span> : <span />}
+        </span>
       ))}
     </span>
   );
@@ -396,7 +428,6 @@ function TransportKey({
   return (
     <span className={classes.keyWrap} data-primary={primary || undefined}>
       <span className={classes.keyCaption} aria-hidden="true">
-        {primary && <Led on={!!lit} color="green" />}
         {caption}
       </span>
       <button
@@ -408,7 +439,10 @@ function TransportKey({
         disabled={disabled}
         aria-label={label}
       >
-        {children}
+        {/* One fixed box for every icon, so swapping Play for Pause moves nothing. */}
+        <span className={classes.glyph} aria-hidden="true">
+          {children}
+        </span>
       </button>
     </span>
   );

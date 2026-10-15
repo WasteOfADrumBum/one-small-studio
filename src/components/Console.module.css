@@ -66,6 +66,14 @@
     6px 14px 18px -8px rgb(0 0 0 / 0.85);
 }
 
+/* Four equal cells, each knob centred in its own. */
+.towerSlot {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  flex: 1;
+}
+
 /* The tablet, its stand behind it, and the cradle its lower edge drops into. */
 .stand {
   position: relative;
@@ -91,7 +99,8 @@
   z-index: 2;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
+  gap: 12px;
   height: 34px;
   margin: -16px -10px 0;
   padding: 0 16px;
@@ -114,16 +123,39 @@
   background: linear-gradient(180deg, #b7babf, #6c6f75);
 }
 
-.cradleBadge {
+/*
+ * The brand, one style wherever it is printed: same face, weight and tracking for all three words
+ * on one baseline, so only the size changes with the place. The trailing tracking is taken back so
+ * the word sits on its centre.
+ */
+.wordmark {
+  display: inline-block;
+  margin-right: -0.22em;
   font-family: var(--mantine-font-family-headings);
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  color: #8f939a;
+  font-size: var(--wordmark-size, 0.85rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #9a9da4;
 }
 
-.cradleBadge b {
-  font-weight: 600;
+.wordmarkAccent {
   color: var(--oss-crimson-bright);
+}
+
+/* On the cradle: the brand on the left, the product name on the right, as on the hardware. */
+.cradleBrand {
+  --wordmark-size: 0.66rem;
+}
+
+.cradleModel {
+  font-size: 0.85rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: #b9bcc2;
 }
 
 .housing {
@@ -381,11 +413,75 @@
     0 2px 2px rgb(0 0 0 / 0.6);
 }
 
+/*
+ * Key lights, set into the caps like the Dock's: a small lens, dark until the console is on, then a
+ * bright core fading to its colour, a glow that stays on the key, and a faint wash of the colour on
+ * the cap round it. Steady, never flashing.
+ */
+.pairKeys i,
+.softKeys i {
+  --lens: 120 112 132;
+  position: relative;
+}
+
+.pairKeys i[data-light='violet'],
+.softKeys i[data-light='violet'] {
+  --lens: 168 112 255;
+}
+
+.pairKeys i[data-light='red'],
+.softKeys i[data-light='red'] {
+  --lens: 255 56 80;
+}
+
+.pairKeys i::after,
+.softKeys i::after {
+  content: '';
+  position: absolute;
+  border-radius: 999px;
+  background: radial-gradient(circle at 45% 35%, #3a3540, #121014 75%);
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.8);
+  transition:
+    background 300ms ease,
+    box-shadow 300ms ease;
+}
+
+.pairKeys i[data-light]::after,
+.softKeys i[data-light]::after {
+  background: radial-gradient(
+    closest-side,
+    rgb(255 255 255 / 0.95) 0 18%,
+    rgb(var(--lens)) 55%,
+    rgb(var(--lens) / 0.75) 100%
+  );
+  box-shadow:
+    0 0 2px 1px rgb(var(--lens) / 0.6),
+    0 0 6px rgb(var(--lens) / 0.3);
+}
+
+/* The faint reflection of the lens on the cap round it. */
+.pairKeys i[data-light]::before,
+.softKeys i[data-light]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(closest-side, rgb(var(--lens) / 0.16), transparent);
+}
+
+/* A short strip lens across the top of each rectangular key. */
 .pairKeys i {
   height: 22px;
 }
 
-/* Two rows of round soft keys; the one over the loaded track glows amber. */
+.pairKeys i::after {
+  top: 4px;
+  left: calc(50% - 8px);
+  width: 16px;
+  height: 3px;
+}
+
+/* Two rows of round soft keys, each with a round lens in its centre. */
 .softKeys {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
@@ -401,14 +497,13 @@
   box-shadow:
     0 0 0 1px #0b0b0d,
     0 2px 2px rgb(0 0 0 / 0.6);
-  transition: box-shadow 300ms ease;
 }
 
-.softKeys i[data-lit] {
-  box-shadow:
-    0 0 0 1px #0b0b0d,
-    0 0 0 3px rgb(255 181 71 / 0.6),
-    var(--oss-glow-amber);
+.softKeys i::after {
+  top: calc(50% - 3px);
+  left: calc(50% - 3px);
+  width: 6px;
+  height: 6px;
 }
 
 /* Power takes the monitor knob's place. */
@@ -468,12 +563,19 @@
   color: #b4b4bc;
 }
 
-/* Fader, key block, wheel, key block, touch strip. */
+/*
+ * Fader, key block, wheel, key block, touch strip. The two outer bays and the two key blocks are
+ * the same width, so the wheel and its readout sit on the dock's centre line.
+ */
 .centre {
+  --bay: 96px;
+  --key: 28px;
+  --key-gap: 10px;
+  --legend: 68px;
   display: grid;
-  grid-template-columns: 96px 66px minmax(0, 1fr) 66px 30px;
+  grid-template-columns: var(--bay) auto minmax(0, 1fr) auto var(--bay);
   align-items: center;
-  gap: 18px;
+  gap: 14px;
   padding: 18px 4px 6px;
 }
 
@@ -494,15 +596,50 @@
   margin-top: 60px;
 }
 
+/* Six rows on one shared column grid: two keys, then the legend on the side facing the wheel. */
 .keyBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.keyRow {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px 10px;
+  grid-template-columns: var(--key) var(--key) var(--legend);
+  align-items: center;
+  column-gap: var(--key-gap);
+}
+
+.keyBlock[data-side='right'] .keyRow {
+  grid-template-columns: var(--legend) var(--key) var(--key);
+}
+
+.keyBlock[data-side='right'] .keyRow > :last-child {
+  order: -1;
 }
 
 .keyBlock i {
   position: relative;
   height: 22px;
+}
+
+/* Printed legends: grey chips on the left block, white on the right, as on the hardware. */
+.legend {
+  display: block;
+  padding: 2px 0;
+  border-radius: 2px;
+  background: #5b5e65;
+  font-size: 0.56rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+  color: #f3f4f6;
+}
+
+.keyBlock[data-side='right'] .legend {
+  background: #d9dbde;
+  color: #111214;
 }
 
 /* Each key's little indicator strip. */
@@ -522,9 +659,15 @@
   place-items: center;
 }
 
+.stripBay {
+  display: grid;
+  place-items: center;
+}
+
 .vStrip {
   display: flex;
   flex-direction: column;
+  width: 30px;
   height: 220px;
   border-radius: 15px;
   background: #0b0b0d;
@@ -583,17 +726,22 @@
   gap: 10px 12px;
 }
 
+/*
+ * Each legend and its key share one column: the column is as wide as the wider of the two, and both
+ * stretch to fill it, so a legend is always exactly the width of its key.
+ */
 .keyWrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
+  display: grid;
+  grid-template-rows: auto auto;
+  justify-items: stretch;
+  row-gap: 6px;
 }
 
 .keyCaption {
-  display: inline-flex;
+  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 6px;
+  box-sizing: border-box;
   /* Legend chips, like the printed labels over the Dock's transport keys. */
   padding: 1px 8px;
   border-radius: 2px;
@@ -612,8 +760,8 @@
   justify-content: center;
   gap: 8px;
   box-sizing: border-box;
-  min-width: 58px;
-  height: 40px;
+  min-width: 76px;
+  height: var(--key-h, 44px);
   padding: 0;
   border: 0;
   border-radius: 7px;
@@ -637,6 +785,15 @@
 
 .key[data-wide] {
   padding: 0 16px;
+}
+
+/* One fixed box for every key's icon. */
+.glyph {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
 }
 
 .key svg[viewBox='0 0 24 24']:not([class]) {
@@ -673,16 +830,27 @@
   outline-offset: 3px;
 }
 
-/* Play is the one key that matters: bigger, and in the brand red. */
+/* Play is the one key that matters: the same height as the rest, wider, and in the brand red. */
 .key[data-primary] {
-  width: 92px;
-  height: 46px;
+  min-width: 96px;
   color: #fff;
   background: linear-gradient(180deg, #df2340 0%, #a90c26 100%);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.3),
     inset 0 -3px 0 rgb(0 0 0 / 0.3),
     0 0 0 1px #2a0209,
+    3px 6px 8px -2px rgb(0 0 0 / 0.85);
+}
+
+/* While playing, the key lights from inside. Only colour and glow change, never its size. */
+.key[data-primary][data-lit] {
+  background: linear-gradient(180deg, #f2354f 0%, #c0122d 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.4),
+    inset 0 0 10px rgb(255 140 150 / 0.35),
+    inset 0 -3px 0 rgb(0 0 0 / 0.3),
+    0 0 0 1px #2a0209,
+    0 0 12px rgb(255 66 88 / 0.3),
     3px 6px 8px -2px rgb(0 0 0 / 0.85);
 }
 
@@ -693,7 +861,6 @@
 /* ---- Jog wheel ---- */
 
 .jogBay {
-  grid-area: jog;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -787,16 +954,7 @@
 }
 
 .nameplate {
-  font-family: var(--mantine-font-family-headings);
-  font-size: 0.85rem;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: #8a8a93;
-}
-
-.nameplate b {
-  font-weight: 600;
-  color: var(--oss-crimson);
+  --wordmark-size: 0.85rem;
 }
 
 .footer {
@@ -850,12 +1008,38 @@
   }
 
   .centre {
-    grid-template-columns: 88px 54px minmax(0, 1fr) 54px 24px;
-    gap: 12px;
+    --bay: 80px;
+    --key: 24px;
+    --key-gap: 8px;
+    --legend: 64px;
+    gap: 10px;
+  }
+
+  .vStrip {
+    width: 24px;
   }
 
   .jog {
     --jog: 172px;
+  }
+}
+
+/* Too narrow for the legends beside the key blocks: they go, the keys stay. */
+@container dock (max-width: 680px) {
+  .centre {
+    --legend: 0px;
+  }
+
+  .keyRow {
+    grid-template-columns: var(--key) var(--key);
+  }
+
+  .keyBlock[data-side='right'] .keyRow {
+    grid-template-columns: var(--key) var(--key);
+  }
+
+  .legend {
+    display: none;
   }
 }
 
@@ -870,10 +1054,8 @@
   .tower,
   .bracket,
   .pairKeys,
-  .softKeys,
   .keyBlock,
-  .vStrip,
-  .cradleBadge {
+  .stripBay {
     display: none;
   }
 
@@ -886,6 +1068,7 @@
   .cradle {
     height: 24px;
     margin: -10px 4px 0;
+    padding: 0 12px;
   }
 
   .chassis {
@@ -894,10 +1077,23 @@
     border-radius: 18px 18px 10px 10px;
   }
 
+  .cradleBrand {
+    --wordmark-size: 0.6rem;
+  }
+
+  .cradleModel {
+    font-size: 0.75rem;
+  }
+
+  /* The soft keys and their lights stay; Power sits at the end of the band. */
   .softBand {
-    grid-template-columns: 1fr;
-    justify-items: center;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
     padding-top: 4px;
+  }
+
+  .softKeys {
+    gap: 8px 4px;
   }
 
   .screenBody {
@@ -938,14 +1134,12 @@
     width: 70%;
   }
 
-  .key {
-    min-width: 64px;
-    height: 48px;
+  .transport {
+    --key-h: 48px;
   }
 
   .key[data-primary] {
-    width: 104px;
-    height: 54px;
+    min-width: 104px;
   }
 
   .front {
