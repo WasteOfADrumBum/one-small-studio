@@ -13,6 +13,7 @@ import {
   loadWidgetApi,
   widgetOptions,
   widgetSrc,
+  widgetUrl,
   type ScSound,
   type ScWidget,
 } from './soundcloud';
@@ -71,23 +72,67 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   // The album the widget is on, for listeners bound once.
   const albumRef = useRef(album?.id);
 
-  /** Reads the loaded set's sounds into state, remembering its art. */
-  const readSounds = (w: ScWidget, id: number, then?: () => void) =>
+  // The visitor's volume carries over to the next album.
+  const volumeRef = useRef(volume);
+  useEffect(() => {
+    volumeRef.current = volume;
+  }, [volume]);
+
+  // The load the widget has finished, whether by `load`'s callback or a READY event, so only the
+  // first of the two counts; and whether that load should start playing once it has.
+  const settled = useRef(-1);
+  const autoPlayRef = useRef(false);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const clearTimers = () => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+  };
+  const later = (fn: () => void, ms: number) => {
+    timers.current.push(setTimeout(fn, ms));
+  };
+
+  /**
+   * Reads the loaded set's sounds into state, remembering its art. Long sets hand over their later
+   * tracks without details at first, so those borrow the printed titles and get asked for again
+   * until every one has arrived. Every sound stays in the list, keeping indexes in step with the
+   * widget's.
+   */
+  const readSounds = (w: ScWidget, id: number, attempt = 0) =>
     w.getSounds((sounds) => {
       if (id !== loadId.current) return;
-      const list = sounds.filter((s) => s.title);
-      setTracks(list);
-      const art = list[0] ? artwork(list[0]) : null;
+      const printed = releases.find((r) => r.id === albumRef.current)?.tracks ?? [];
+      setTracks(
+        sounds.map((s, i) => (s.title ? s : { ...s, title: printed[i] ?? `Track ${i + 1}` })),
+      );
+      const art = sounds[0]?.title ? artwork(sounds[0]) : null;
       const key = albumRef.current;
       if (art && key) setAlbumArt((a) => (a[key] === art ? a : { ...a, [key]: art }));
-      then?.();
+      if (sounds.some((s) => !s.title || !s.duration) && attempt < 8) {
+        later(() => readSounds(w, id, attempt + 1), 1200);
+      }
     });
+
+  /** The widget has the album for load `id`: read it, open it up, and play it if asked to. */
+  const ready = (w: ScWidget, id: number) => {
+    if (id !== loadId.current || settled.current === id) return;
+    settled.current = id;
+    clearTimers();
+    readSounds(w, id);
+    setStatus('ready');
+    if (id === 0) w.getVolume((v) => typeof v === 'number' && setVolumeState(Math.round(v)));
+    else w.setVolume(volumeRef.current);
+    if (autoPlayRef.current) w.play();
+  };
+  // The READY listener is bound once, so it reaches `ready` through a ref.
+  const readyRef = useRef(ready);
+  useEffect(() => {
+    readyRef.current = ready;
+  });
 
   useEffect(() => {
     if (!first?.playerUrl || !frame.current) return;
     const iframe = frame.current;
     let cancelled = false;
-    let refetch: ReturnType<typeof setTimeout> | undefined;
 
     loadWidgetApi()
       .then((SC) => {
@@ -97,15 +142,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         const { READY, PLAY, PAUSE, FINISH, PLAY_PROGRESS, ERROR } = SC.Widget.Events;
         const syncIndex = () => w.getCurrentSoundIndex((i) => setCurrent(i));
 
-        w.bind(READY, () => {
-          const id = loadId.current;
-          readSounds(w, id);
-          // Long sets fill in their track details lazily, so ask again once they have.
-          clearTimeout(refetch);
-          refetch = setTimeout(() => readSounds(w, id), 2500);
-          w.getVolume((v) => typeof v === 'number' && setVolumeState(Math.round(v)));
-          setStatus('ready');
-        });
+        // Fires for the first album, and again each time `load` swaps another in.
+        w.bind(READY, () => readyRef.current(w, loadId.current));
         w.bind(PLAY, () => {
           setPlaying(true);
           syncIndex();
@@ -119,7 +157,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
     return () => {
       cancelled = true;
-      clearTimeout(refetch);
+      timers.current.forEach(clearTimeout);
     };
   }, []);
 
@@ -128,28 +166,29 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     const next = releases.find((r) => r.id === id);
     if (!w || !next) return;
     if (id === albumRef.current) {
-      if (autoPlay) w.play();
+      if (autoPlay && settled.current === loadId.current) w.play();
+      else autoPlayRef.current ||= autoPlay;
       return;
     }
     const thisLoad = ++loadId.current;
+    clearTimers();
     albumRef.current = id;
+    autoPlayRef.current = autoPlay;
     setAlbumId(id);
     setStatus('loading');
     setTracks([]);
     setCurrent(0);
     setProgress(0);
     setPlaying(false);
-    w.load(next.playerUrl, {
-      ...widgetOptions(autoPlay),
-      callback: () => {
-        if (thisLoad !== loadId.current) return;
-        readSounds(w, thisLoad, () => {
-          setStatus('ready');
-          w.setVolume(volumeRef.current);
-          if (autoPlay) w.play();
-        });
-      },
+    // A private set needs its secret-token URL before the widget can open it.
+    widgetUrl(next.playerUrl).then((url) => {
+      if (thisLoad !== loadId.current) return;
+      w.load(url, { ...widgetOptions(autoPlay), callback: () => ready(w, thisLoad) });
     });
+    // If the widget never answers, say so instead of leaving Play greyed out.
+    later(() => {
+      if (thisLoad === loadId.current && settled.current !== thisLoad) setStatus('error');
+    }, 15000);
   };
 
   const play = useCallback((index?: number) => {
@@ -164,11 +203,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const toggle = useCallback(() => widget.current?.toggle(), []);
   const next = useCallback(() => widget.current?.next(), []);
   const prev = useCallback(() => widget.current?.prev(), []);
-  // The visitor's volume carries over to the next album.
-  const volumeRef = useRef(volume);
-  useEffect(() => {
-    volumeRef.current = volume;
-  }, [volume]);
   const setVolume = useCallback((v: number) => {
     const clamped = Math.max(0, Math.min(100, Math.round(v)));
     setVolumeState(clamped);

@@ -8,7 +8,7 @@ import {
 import { releases } from '@/content/releases';
 import { usePlayer } from '@/lib/player';
 import { usePower } from '@/lib/power';
-import { formatTime } from '@/lib/soundcloud';
+import { formatTime, oembed } from '@/lib/soundcloud';
 import { site } from '@/lib/site';
 import { RecordSleeve } from './RecordSleeve';
 import { SectionHeader } from './SectionHeader';
@@ -25,19 +25,17 @@ const TILTS = [-1.2, 0.8, -0.4, 1.1, -0.9];
 function useShelfArt() {
   const [art, setArt] = useState<Record<string, string>>({});
   useEffect(() => {
-    const controller = new AbortController();
+    let cancelled = false;
     for (const r of releases) {
       if (r.artwork) continue;
-      const url = `https://soundcloud.com/oembed?format=json&url=${encodeURIComponent(r.pageUrl)}`;
-      fetch(url, { signal: controller.signal })
-        .then((res) => (res.ok ? res.json() : null))
-        .then((data: { thumbnail_url?: string } | null) => {
-          const thumb = data?.thumbnail_url;
-          if (thumb) setArt((a) => ({ ...a, [r.id]: thumb }));
-        })
-        .catch(() => {});
+      oembed(r.pageUrl).then((data) => {
+        const thumb = data?.thumbnail_url;
+        if (thumb && !cancelled) setArt((a) => ({ ...a, [r.id]: thumb }));
+      });
     }
-    return () => controller.abort();
+    return () => {
+      cancelled = true;
+    };
   }, []);
   return art;
 }
