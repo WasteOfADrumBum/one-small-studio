@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Button } from '@mantine/core';
 import {
   IconBrandSoundcloud,
@@ -43,6 +43,34 @@ function useShelfArt() {
 }
 
 /**
+ * The height of the first two rows of shelves, so the liner notes beside them hold one fixed size
+ * whichever album is open and however many rows the catalog grows to.
+ */
+function useTwoRowHeight() {
+  const ref = useRef<HTMLUListElement>(null);
+  const [height, setHeight] = useState<number | null>(null);
+  useEffect(() => {
+    const list = ref.current;
+    if (!list) return;
+    const measure = () => {
+      const top = list.getBoundingClientRect().top;
+      const rows = [...list.children].map((li) => li.getBoundingClientRect());
+      const tops = [...new Set(rows.map((r) => Math.round(r.top)))].sort((a, b) => a - b);
+      const cutoff = tops[1] ?? tops[0];
+      const bottom = Math.max(
+        ...rows.filter((r) => Math.round(r.top) <= cutoff).map((r) => r.bottom),
+      );
+      setHeight(rows.length ? Math.round(bottom - top) : null);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(list);
+    return () => observer.disconnect();
+  }, []);
+  return [ref, height] as const;
+}
+
+/**
  * Section 4, "The Catalog": one shelf per release, each with its plaque, and liner notes for the
  * one in the player. Picking a record pulls it from its sleeve and loads that album into the
  * console and the transport bar, playing it; the liner notes follow.
@@ -51,6 +79,7 @@ export function Catalog() {
   const { album, albumArt, loadAlbum, status, tracks, playing, toggle } = usePlayer();
   const { setPowered } = usePower();
   const shelfArt = useShelfArt();
+  const [shelvesRef, twoRows] = useTwoRowHeight();
   const release = album;
   const ready = status === 'ready' && tracks.length > 0;
   const runtime = tracks.reduce((sum, t) => sum + t.duration, 0);
@@ -78,7 +107,7 @@ export function Catalog() {
             <p id="shelf-hint" className="visually-hidden">
               Plays the album on the console.
             </p>
-            <ul className={classes.shelves} aria-label="Releases">
+            <ul ref={shelvesRef} className={classes.shelves} aria-label="Releases">
               {releases.map((r, i) => (
                 <li key={r.id} className={classes.row}>
                   <RecordSleeve
@@ -109,7 +138,11 @@ export function Catalog() {
             </a>
           </div>
 
-          <article className={classes.notes} aria-labelledby="release-title">
+          <article
+            className={classes.notes}
+            aria-labelledby="release-title"
+            style={twoRows ? ({ '--two-rows': `${twoRows}px` } as CSSProperties) : undefined}
+          >
             <span className={classes.notesKicker}>Liner notes</span>
             <h3 id="release-title" className={classes.album}>
               {release.title}
@@ -140,6 +173,7 @@ export function Catalog() {
             </dl>
             <div className={classes.actions}>
               <Button
+                size="sm"
                 onClick={onPlay}
                 disabled={!ready}
                 leftSection={
@@ -149,6 +183,7 @@ export function Catalog() {
                 {playing ? 'Pause' : 'Play the album'}
               </Button>
               <Button
+                size="sm"
                 component="a"
                 href={release.pageUrl}
                 target="_blank"

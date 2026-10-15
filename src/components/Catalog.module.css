@@ -222,6 +222,11 @@
 .notes {
   position: sticky;
   top: 96px;
+  /* A fixed size: as tall as two rows of shelves, the tracklist scrolling inside it. */
+  display: flex;
+  flex-direction: column;
+  height: var(--two-rows, 720px);
+  box-sizing: border-box;
   padding: clamp(20px, 3vw, 32px) clamp(20px, 3vw, 32px) clamp(20px, 3vw, 32px)
     clamp(46px, 5vw, 56px);
   border-radius: 3px 5px 5px 3px;
@@ -281,7 +286,7 @@
 .album {
   margin: 6px 0 14px;
   font-family: var(--mantine-font-family-headings);
-  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-size: clamp(1.7rem, 2.8vw, 2.5rem);
   font-weight: 700;
   line-height: 1;
   text-transform: uppercase;
@@ -290,9 +295,10 @@
 
 .facts {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 10px 20px;
-  margin: 0 0 18px;
+  /* Two columns of facts keep the page short enough to leave the tracklist room. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 16px;
+  margin: 0 0 16px;
 }
 
 .facts dt {
@@ -311,8 +317,8 @@
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 18px;
+  gap: 8px;
+  margin-bottom: 14px;
 }
 
 .scButton {
@@ -321,7 +327,8 @@
 }
 
 .tracklist {
-  max-height: 300px;
+  flex: 1 1 0;
+  min-height: 0;
   overflow-y: auto;
   scrollbar-width: thin;
 }
@@ -350,6 +357,8 @@
     position: relative;
     top: auto;
     max-width: 640px;
+    /* Stacked under the shelves: still a fixed size, sized to the screen rather than the shelves. */
+    height: min(720px, 88svh);
     rotate: none;
   }
 }
