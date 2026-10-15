@@ -531,35 +531,24 @@
     0 1px 0 rgb(255 255 255 / 0.1);
 }
 
-.editScreen i {
+/* The clip lanes to the right of the track headers, scrolling slowly like a session playing. */
+.lanes {
+  position: absolute;
+  inset: 0 0 0 14%;
+  overflow: hidden;
+}
+
+.reel {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 200%;
+}
+
+.reel i {
   position: absolute;
   height: 7px;
-  margin-left: 14%;
-  max-width: 86%;
   border-radius: 1px;
   opacity: 0.8;
-  scale: 0.86 1;
-  transform-origin: left;
-}
-
-.editScreen i:nth-child(1) {
-  top: 3px;
-}
-
-.editScreen i:nth-child(2) {
-  top: 16px;
-}
-
-.editScreen i:nth-child(3) {
-  top: 29px;
-}
-
-.editScreen i:nth-child(4) {
-  top: 42px;
-}
-
-.editScreen i:nth-child(5) {
-  top: 54px;
 }
 
 .keys[data-row] {
@@ -777,5 +766,86 @@
       100% 100%,
       0 100%
     );
+  }
+}
+
+/*
+ * Equipment quietly running: the recorder's clips drift past, the module level bars breathe and the
+ * amp's jewel lamp glows unevenly, as valves do. All slow and small; static when motion is reduced.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .reel {
+    animation: reel-scroll 60s linear infinite;
+  }
+
+  .lcd[data-bars] i {
+    transform-origin: bottom;
+    animation: level 2.8s ease-in-out infinite alternate;
+  }
+
+  .lcd[data-bars] i:nth-child(2n) {
+    animation-duration: 3.4s;
+  }
+
+  .lcd[data-bars] i:nth-child(3n) {
+    animation-duration: 2.3s;
+  }
+
+  .lcd[data-bars] i:nth-child(4n + 1) {
+    animation-delay: -1.2s;
+  }
+
+  .lcd[data-bars] i:nth-child(3n + 2) {
+    animation-delay: -0.5s;
+  }
+
+  .hw[data-hw='module'][data-variant='cymbals'] .lcd[data-bars] i {
+    animation-name: level-soft;
+  }
+
+  .ampRow > :first-child {
+    animation: valve-glow 5.5s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes reel-scroll {
+  to {
+    translate: -50% 0;
+  }
+}
+
+@keyframes level {
+  0% {
+    scale: 1 1;
+  }
+  45% {
+    scale: 1 0.78;
+  }
+  100% {
+    scale: 1 0.9;
+  }
+}
+
+@keyframes level-soft {
+  0% {
+    scale: 1 0.88;
+  }
+  60% {
+    scale: 1 1;
+  }
+  100% {
+    scale: 1 0.8;
+  }
+}
+
+@keyframes valve-glow {
+  0% {
+    filter: brightness(1);
+  }
+  40% {
+    filter: brightness(0.86);
+  }
+  100% {
+    filter: brightness(1.08);
   }
 }

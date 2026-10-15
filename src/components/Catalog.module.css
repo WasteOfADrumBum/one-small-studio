@@ -4,10 +4,10 @@
 
 .display {
   display: grid;
-  /* The notes keep a readable width; the shelves take the rest. */
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
+  /* Two thirds for the shelves, one third for the notes. */
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   align-items: start;
-  gap: clamp(32px, 5vw, 64px);
+  gap: clamp(32px, 4vw, 56px);
 }
 
 /* ---- The wall and its record shelf ---- */
@@ -16,6 +16,7 @@
 .wall {
   position: relative;
   min-width: 0;
+  container: wall / inline-size;
 }
 
 .wall::before {
@@ -27,15 +28,18 @@
   pointer-events: none;
 }
 
-/* One shelf per release, stacked down the wall. */
+/* One shelf per release, two to a row from the left edge of the column, more rows as albums come. */
 .shelves {
-  --sleeve: 230px;
   /* How far a picked record slides out of its sleeve. */
   --slide: 0.4;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 64px;
+  --gap: clamp(28px, 4cqi, 44px);
+  /* Each sleeve fits its half of the wall with room for the record pulled out beside it. */
+  --sleeve: min(230px, calc(((100cqi - var(--gap)) / 2 - 48px) / (1 + var(--slide))));
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  justify-items: start;
+  column-gap: var(--gap);
+  row-gap: 72px;
   margin: 0;
   padding: 8px 0 0;
   list-style: none;
@@ -50,6 +54,16 @@
   max-width: 100%;
   padding: 0 18px;
   box-sizing: border-box;
+}
+
+/* A narrow wall holds one shelf per row. */
+@container wall (max-width: 540px) {
+  .shelves {
+    --slide: 0.3;
+    --sleeve: min(230px, calc((100cqi - 48px) / (1 + var(--slide))));
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 64px;
+  }
 }
 
 /*
@@ -77,14 +91,15 @@
 }
 
 .shelfTop {
-  height: 10px;
+  height: 12px;
   background: var(--oss-matte-top);
   clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 100%, 0 100%);
 }
 
 .shelfFront {
   position: relative;
-  height: 24px;
+  /* Deep enough to carry the plaque on its face. */
+  height: 50px;
   border-radius: 0 0 2px 2px;
   background: var(--oss-matte);
   box-shadow:
@@ -98,7 +113,7 @@
 .shelfFront::after {
   content: '';
   position: absolute;
-  top: -19px;
+  top: -21px;
   bottom: 0;
   width: 8px;
   background: var(--oss-matte);
@@ -143,38 +158,38 @@
 }
 
 /*
- * The plaque: a small brushed-brass plate screwed to the shelf's front edge under the sleeve,
+ * The plaque: a small brushed-silver plate screwed to the shelf's front face under the sleeve,
  * engraved with the title and artist.
  */
 .plaque {
   position: absolute;
   z-index: 3;
-  bottom: -10px;
+  bottom: 7px;
   left: calc(18px + var(--sleeve) / 2);
   translate: -50% 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1px;
-  max-width: calc(var(--sleeve) - 24px);
+  max-width: calc(var(--sleeve) - 16px);
   margin: 0;
-  padding: 5px 18px 6px;
+  padding: 5px 20px 6px;
   border-radius: 2px;
   background:
-    radial-gradient(circle at 7px 50%, #4d3a1c 0 1.5px, #e6cf98 2px 2.5px, transparent 3px),
+    radial-gradient(circle at 8px 50%, #3a3d43 0 1.5px, #f4f6f8 2px 2.5px, transparent 3px),
     radial-gradient(
-      circle at calc(100% - 7px) 50%,
-      #4d3a1c 0 1.5px,
-      #e6cf98 2px 2.5px,
+      circle at calc(100% - 8px) 50%,
+      #3a3d43 0 1.5px,
+      #f4f6f8 2px 2.5px,
       transparent 3px
     ),
-    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 3px),
-    linear-gradient(180deg, #e2c98f 0%, #c8a865 45%, #a8884b 100%);
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.12) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, #eef0f3 0%, #c9cdd3 50%, #a7adb5 100%);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.55),
-    inset 0 -1px 0 rgb(0 0 0 / 0.35),
-    0 3px 5px -1px rgb(0 0 0 / 0.75);
-  color: #2b1e0a;
+    inset 0 1px 0 rgb(255 255 255 / 0.8),
+    inset 0 -1px 0 rgb(0 0 0 / 0.3),
+    0 1px 3px rgb(0 0 0 / 0.7);
+  color: #15171b;
   text-align: center;
 }
 
@@ -195,25 +210,64 @@
   font-size: 0.66rem;
   line-height: 1.15;
   letter-spacing: 0.04em;
-  color: #3d2b10;
+  color: #2b2e34;
 }
 
 /* ---- Liner notes ---- */
 
-/* The notes stay in view beside the shelves on wider screens. */
+/*
+ * A spiral notebook page: white paper with a punched edge and a black twin-wire binding down the
+ * left, a few sheets showing underneath. It stays in view beside the shelves on wider screens.
+ */
 .notes {
   position: sticky;
   top: 96px;
-  padding: clamp(20px, 3vw, 32px);
-  border-radius: 2px;
+  padding: clamp(20px, 3vw, 32px) clamp(20px, 3vw, 32px) clamp(20px, 3vw, 32px)
+    clamp(46px, 5vw, 56px);
+  border-radius: 3px 5px 5px 3px;
   color: #1d1a17;
   background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.25 0 0 0 0 0.2 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E"),
-    linear-gradient(180deg, #f3eee4, #e7e0d2);
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.25 0 0 0 0 0.2 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E"),
+    linear-gradient(90deg, rgb(0 0 0 / 0.07), transparent 34px),
+    linear-gradient(180deg, #fdfcf8, #f3f1ea);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.8),
+    inset 0 1px 0 #fff,
+    2px 2px 0 -1px #e4e1d9,
+    4px 4px 0 -2px #d5d1c7,
     6px 18px 30px -14px rgb(0 0 0 / 0.9);
   rotate: 0.3deg;
+}
+
+/* The punched holes, showing the dark room through the paper. */
+.notes::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  left: 0;
+  width: 30px;
+  background: radial-gradient(
+      ellipse 3.4px 3.8px at 18px 10px,
+      #0c0c0e 0 2.6px,
+      #9a978f 3px,
+      transparent 3.6px
+    )
+    0 0 / 30px 20px repeat-y;
+  pointer-events: none;
+}
+
+/* The twin-wire spiral: pairs of black wire loops wrapping through each hole and over the edge. */
+.notes::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  left: -13px;
+  width: 34px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='20'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M31 8.2C22 3.6 9 3.2 3.2 6.6' stroke='%23101012' stroke-width='2.4'/%3E%3Cpath d='M31 11.8C22 7.2 9 6.8 3.2 10.2' stroke='%23101012' stroke-width='2.4'/%3E%3Cpath d='M26 5.6C18 3.4 10 3.6 5 5.4' stroke='%237d8189' stroke-width='0.7'/%3E%3Cpath d='M26 9.2C18 7 10 7.2 5 9' stroke='%237d8189' stroke-width='0.7'/%3E%3C/g%3E%3C/svg%3E")
+    0 0 / 34px 20px repeat-y;
+  filter: drop-shadow(1px 2px 1.5px rgb(0 0 0 / 0.45));
+  pointer-events: none;
 }
 
 .notesKicker {
@@ -276,7 +330,6 @@
   display: flex;
   align-items: center;
   width: fit-content;
-  margin-inline: auto;
   gap: 6px;
   margin-top: 28px;
   color: var(--oss-crimson-bright);
@@ -287,29 +340,16 @@
   text-decoration: underline;
 }
 
+/* Tablets and phones: the notes move under the shelves. */
 @media (max-width: $mantine-breakpoint-md) {
-  .shelves {
-    --sleeve: 200px;
-  }
-
-  .notes {
-    rotate: none;
-  }
-}
-
-@media (max-width: $mantine-breakpoint-sm) {
   .display {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .shelves {
-    --sleeve: min(56vw, 220px);
-    --slide: 0.26;
-    gap: 56px;
   }
 
   .notes {
     position: relative;
     top: auto;
+    max-width: 640px;
+    rotate: none;
   }
 }

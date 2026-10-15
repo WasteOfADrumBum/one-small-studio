@@ -2,10 +2,6 @@
   padding: var(--oss-section-space) 0;
 }
 
-.inner {
-  max-width: calc(760px + var(--oss-gutter) * 2);
-}
-
 /* The talkback panel: a brushed charcoal faceplate with the form set into it. */
 .panel {
   position: relative;

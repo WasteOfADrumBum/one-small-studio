@@ -51,7 +51,7 @@ export function Contact() {
 
   return (
     <section id="contact" className={classes.contact} aria-labelledby="contact-title">
-      <div className={`oss-container ${classes.inner}`}>
+      <div className="oss-container">
         <SectionHeader label="Track 05 · Talkback" id="contact-title" title="Hit the talkback">
           Not for hire, but always up for talking shop. Musicians, engineers, old bandmates: say
           hello.
@@ -89,7 +89,7 @@ export function Contact() {
             </Alert>
           ) : (
             <form onSubmit={onSubmit} noValidate className={classes.form}>
-              <SimpleGrid cols={{ base: 1, sm: 2 }}>
+              <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
                 <TextInput
                   label="Name"
                   value={values.name}
@@ -107,14 +107,14 @@ export function Contact() {
                   autoComplete="email"
                   required
                 />
+                <Select
+                  label="What's it about?"
+                  data={contactReasons.map((r) => ({ ...r }))}
+                  value={values.reason}
+                  onChange={(v) => v && set('reason', v as ContactInput['reason'])}
+                  allowDeselect={false}
+                />
               </SimpleGrid>
-              <Select
-                label="What's it about?"
-                data={contactReasons.map((r) => ({ ...r }))}
-                value={values.reason}
-                onChange={(v) => v && set('reason', v as ContactInput['reason'])}
-                allowDeselect={false}
-              />
               <Textarea
                 label="Message"
                 value={values.message}

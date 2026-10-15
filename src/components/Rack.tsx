@@ -133,6 +133,15 @@ export function RackFiller({ kind }: { kind: 'vent' | 'blank' }) {
   );
 }
 
+/** Clips on the recorder's edit screen: colour, lane top (px), start and length (% of the lanes). */
+const CLIPS: [string, number, number, number][] = [
+  ['#c8102e', 3, 4, 60],
+  ['#8c4fc4', 16, 28, 45],
+  ['#2a9bd6', 29, 10, 72],
+  ['#2a9bd6', 42, 52, 34],
+  ['#c9962f', 54, 66, 26],
+];
+
 const pads = (n: number) => Array.from({ length: n }, (_, i) => <i key={i} />);
 
 /** Faceplate hardware. Decoration only: none of it is a control. */
@@ -143,18 +152,24 @@ function Faceplate({ item }: { item: GearItem }) {
       return (
         <div className={classes.hw} data-hw="daw" aria-hidden="true">
           <span className={classes.editScreen}>
-            {[
-              ['#c8102e', 4, 70],
-              ['#8c4fc4', 28, 52],
-              ['#2a9bd6', 10, 84],
-              ['#2a9bd6', 52, 40],
-              ['#c9962f', 66, 30],
-            ].map(([color, left, width], i) => (
-              <i
-                key={i}
-                style={{ background: color as string, left: `${left}%`, width: `${width}%` }}
-              />
-            ))}
+            {/* Two copies of the clips on a reel twice the lanes' width, so the slow scroll loops. */}
+            <span className={classes.lanes}>
+              <span className={classes.reel}>
+                {[0, 50].flatMap((offset) =>
+                  CLIPS.map(([color, top, left, width], i) => (
+                    <i
+                      key={`${offset}-${i}`}
+                      style={{
+                        background: color,
+                        top,
+                        left: `${offset + left / 2}%`,
+                        width: `${width / 2}%`,
+                      }}
+                    />
+                  )),
+                )}
+              </span>
+            </span>
           </span>
           <span className={classes.keys} data-row>
             {pads(5)}

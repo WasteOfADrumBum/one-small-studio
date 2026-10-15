@@ -18,23 +18,7 @@
   gap: 24px;
 }
 
-/* An overhead light bar above the cases... */
-.row::before {
-  content: '';
-  position: absolute;
-  top: -40px;
-  left: 12%;
-  right: 12%;
-  height: 5px;
-  border-radius: 3px;
-  background: linear-gradient(90deg, #2a2c31, #e6f7ff 20% 80%, #2a2c31);
-  box-shadow:
-    0 0 14px rgb(var(--oss-neon-cyan) / 0.55),
-    0 0 40px rgb(var(--oss-neon-cyan) / 0.25);
-  pointer-events: none;
-}
-
-/* ...washing down across the lids and faceplates: brightest at the top, gone by the base. */
+/* The room light washing down across the lids and faceplates: brightest at the top, gone by the base. */
 .row::after {
   content: '';
   position: absolute;
