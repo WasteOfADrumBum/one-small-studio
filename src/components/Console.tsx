@@ -24,6 +24,7 @@ import { LedMeter } from './hardware/LedMeter';
 import { Fader } from './hardware/Fader';
 import { Led } from './hardware/Led';
 import { Screw } from './hardware/Screw';
+import { ScarlettSolo } from './ScarlettSolo';
 import { TrackList } from './TrackList';
 import classes from './Console.module.css';
 
@@ -104,7 +105,52 @@ export function Console() {
           <KnobTower />
           <div className={classes.stand}>
             <span className={classes.bracket} aria-hidden="true" />
-            <Screen powered={powered} />
+            <Screen powered={powered}>
+              {/* On phones the tablet stands alone and carries its own transport. */}
+              <div className={classes.tabletBar}>
+                <button
+                  type="button"
+                  className={classes.padKey}
+                  onClick={player.prev}
+                  disabled={!ready}
+                  aria-label="Previous track"
+                >
+                  <IconPlayerSkipBackFilled size={18} aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  className={classes.padKey}
+                  data-primary
+                  onClick={onPlay}
+                  disabled={!ready}
+                  aria-label={player.playing ? 'Pause' : 'Play'}
+                >
+                  {player.playing ? (
+                    <IconPlayerPauseFilled size={22} aria-hidden="true" />
+                  ) : (
+                    <IconPlayerPlayFilled size={22} aria-hidden="true" />
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className={classes.padKey}
+                  onClick={player.next}
+                  disabled={!ready}
+                  aria-label="Next track"
+                >
+                  <IconPlayerSkipForwardFilled size={18} aria-hidden="true" />
+                </button>
+                <a
+                  className={classes.padLink}
+                  href={player.album.pageUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <IconBrandSoundcloud size={18} aria-hidden="true" />
+                  Open on SoundCloud
+                </a>
+              </div>
+            </Screen>
             <span className={classes.cradle} aria-hidden="true">
               <span className={classes.cradleNotch} />
               <Wordmark className={classes.cradleBrand} />
@@ -243,6 +289,16 @@ export function Console() {
             <Wordmark className={classes.nameplate} />
             <span className={classes.shift} />
           </div>
+        </div>
+
+        {/* Phones only: a desktop interface under the free-standing tablet, in place of the Dock. */}
+        <div className={classes.interfaceBay}>
+          <ScarlettSolo
+            powered={powered}
+            ready={ready}
+            volume={player.volume}
+            setVolume={player.setVolume}
+          />
         </div>
 
         {/* The palm rest along the front, with its own thickness and shadow. */}
@@ -466,7 +522,7 @@ function TransportKey({
 }
 
 /** The tablet in its cradle: what's loaded, what's playing, and the tracklist. */
-function Screen({ powered }: { powered: boolean }) {
+function Screen({ powered, children }: { powered: boolean; children: ReactNode }) {
   const { album, albumArt, status, tracks, current, playing, progress } = usePlayer();
   const track = tracks[current];
   const cover = (tracks[0] ? artwork(tracks[0]) : null) ?? albumArt[album.id] ?? album.artwork;
@@ -485,11 +541,21 @@ function Screen({ powered }: { powered: boolean }) {
               ? 'Cued'
               : 'Standby';
 
-  const hint = !powered
-    ? `Press Play or Power to spin ${album.title}. Nothing plays until you do.`
-    : playing
-      ? 'On air. The transport up top follows you down the page.'
-      : 'The console is live. Pick a track or press Play.';
+  const hint = !powered ? (
+    <>
+      {/* Phones have no Power key, so there the hint names only Play. */}
+      <span className={classes.hintDock}>
+        {`Press Play or Power to spin ${album.title}. Nothing plays until you do.`}
+      </span>
+      <span className={classes.hintPhone}>
+        {`Press Play to spin ${album.title}. Nothing plays until you do.`}
+      </span>
+    </>
+  ) : playing ? (
+    'On air. The transport up top follows you down the page.'
+  ) : (
+    'The console is live. Pick a track or press Play.'
+  );
 
   return (
     <div className={classes.housing}>
@@ -534,6 +600,7 @@ function Screen({ powered }: { powered: boolean }) {
           </div>
         </div>
 
+        {children}
         <p className={classes.hint}>{hint}</p>
       </div>
     </div>
