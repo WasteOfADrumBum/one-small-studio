@@ -1,0 +1,160 @@
+.fader {
+  /* Travel of the cap's centre line, and the cap itself: slim across the slot, long along it. */
+  --throw: 168px;
+  --cap-w: 22px;
+  --cap-h: 34px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* The cap's centre runs from half a cap below the top to half a cap above the bottom. */
+.body {
+  position: relative;
+  width: 56px;
+  height: calc(var(--throw) + var(--cap-h));
+}
+
+/* The recessed slot the cap rides in, centred on the body and a little longer than the travel. */
+.slot {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--cap-h) / 2 - 6px);
+  bottom: calc(var(--cap-h) / 2 - 6px);
+  width: 5px;
+  translate: -50% 0;
+  border-radius: 3px;
+  background: #030304;
+  box-shadow:
+    inset 0 2px 3px rgb(0 0 0 / 0.9),
+    0 1px 0 rgb(255 255 255 / 0.07);
+}
+
+/* Ticks on the cap's centre line at 100, 75, 50, 25 and 0. */
+.scale {
+  position: absolute;
+  inset: calc(var(--cap-h) / 2) 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.scale span {
+  display: block;
+  height: 1px;
+  width: 9px;
+  background: #5c5c66;
+}
+
+.scale span[data-major] {
+  width: 13px;
+  background: #8a8a93;
+}
+
+/* The real slider: the full body is its hit area, and its thumb is invisible. */
+.input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+}
+
+.input:active {
+  cursor: grabbing;
+}
+
+.input:disabled {
+  cursor: not-allowed;
+}
+
+.input::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.input::-moz-range-track {
+  background: transparent;
+}
+
+.input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 56px;
+  height: var(--cap-h);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.input::-moz-range-thumb {
+  width: 56px;
+  height: var(--cap-h);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.input:focus-visible {
+  outline: none;
+}
+
+/*
+ * The cap you see, placed from the same value as the thumb: its top moves through exactly the
+ * throw, so its centre sits on the thumb's centre at every value. A brushed-aluminium block with
+ * a finger groove across the middle and its own contact shadow on the panel.
+ */
+.cap {
+  position: absolute;
+  left: 50%;
+  top: calc((100 - var(--v)) / 100 * var(--throw));
+  width: var(--cap-w);
+  height: var(--cap-h);
+  translate: -50% 0;
+  box-sizing: border-box;
+  border-radius: 3px;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      transparent 44%,
+      #5d6067 44% 47%,
+      #f2f3f5 47% 53%,
+      #5d6067 53% 56%,
+      transparent 56%
+    ),
+    linear-gradient(90deg, #9ea1a7 0%, #e7e9ec 22%, #c3c6cb 50%, #9a9da3 78%, #6f7278 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.75),
+    inset 0 -2px 0 rgb(0 0 0 / 0.35),
+    0 0 0 1px rgb(0 0 0 / 0.55),
+    3px 6px 7px -2px rgb(0 0 0 / 0.85);
+}
+
+.input:disabled ~ .cap {
+  filter: brightness(0.6);
+}
+
+.input:focus-visible ~ .cap {
+  box-shadow:
+    0 0 0 2px var(--oss-bg),
+    0 0 0 4px var(--oss-sky),
+    3px 6px 7px -2px rgb(0 0 0 / 0.85);
+}
+
+.readout {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.75rem;
+  color: var(--oss-amber);
+  min-width: 4ch;
+  text-align: center;
+}

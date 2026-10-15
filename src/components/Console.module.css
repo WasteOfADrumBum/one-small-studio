@@ -1,0 +1,1175 @@
+/*
+ * The One Small controller, laid out like a Pro Tools Dock seen from the front and a little above:
+ * a tablet standing upright in a cradle between two raised knob towers, a sloped control surface
+ * below it with the soft-key band, fader, key blocks, jog wheel and touch strips, the transport row
+ * along the front, and a separate palm rest. Layout follows the dock's width, not the window's.
+ */
+.desk {
+  container: dock / inline-size;
+  position: relative;
+  width: 100%;
+  max-width: 880px;
+  padding-bottom: 22px;
+}
+
+/* Contact shadow on the desk. */
+.desk::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 4%;
+  right: 2%;
+  bottom: -4px;
+  height: 56px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.9), transparent);
+  filter: blur(10px);
+  translate: 8px 0;
+}
+
+.dock {
+  --metal-hi: #34363c;
+  --metal: #26272c;
+  --metal-lo: #1b1c20;
+  position: relative;
+  isolation: isolate;
+}
+
+/* ---- Upper deck: towers and the docked tablet ---- */
+
+.upper {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr) 70px;
+  align-items: end;
+  gap: 16px;
+  padding: 0 22px;
+}
+
+/* A raised column of four knobs, the way the Dock's soft knobs flank the tablet. */
+.tower {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  height: 300px;
+  padding: 10px 0 18px;
+  box-sizing: border-box;
+  border-radius: 26px 26px 6px 6px;
+  background: linear-gradient(180deg, var(--metal-hi) 0%, var(--metal) 45%, var(--metal-lo) 100%);
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 0.14),
+    inset 2px 0 0 rgb(255 255 255 / 0.06),
+    inset -3px 0 0 rgb(0 0 0 / 0.35),
+    0 -4px 0 #3e4147,
+    6px 14px 18px -8px rgb(0 0 0 / 0.85);
+}
+
+/* Four equal cells, each knob centred in its own. */
+.towerSlot {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  flex: 1;
+}
+
+/* The tablet, its stand behind it, and the cradle its lower edge drops into. */
+.stand {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.bracket {
+  position: absolute;
+  z-index: 0;
+  left: 8%;
+  right: 8%;
+  top: 34%;
+  bottom: 20px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #18191c, #2b2d32 50%, #18191c);
+  translate: 0 -24px;
+}
+
+.cradle {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 34px;
+  margin: -16px -10px 0;
+  padding: 0 16px;
+  border-radius: 6px 6px 10px 10px;
+  background: linear-gradient(180deg, #3a3c42 0%, #2a2b30 40%, #1e1f23 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.22),
+    inset 0 -2px 0 rgb(0 0 0 / 0.45),
+    0 8px 12px -6px rgb(0 0 0 / 0.85);
+}
+
+/* The latch notch in the middle of the cradle lip. */
+.cradleNotch {
+  position: absolute;
+  top: 0;
+  left: calc(50% - 22px);
+  width: 44px;
+  height: 9px;
+  border-radius: 0 0 6px 6px;
+  background: linear-gradient(180deg, #b7babf, #6c6f75);
+}
+
+/*
+ * The brand, one style wherever it is printed: same face, weight and tracking for all three words
+ * on one baseline, so only the size changes with the place. The trailing tracking is taken back so
+ * the word sits on its centre.
+ */
+.wordmark {
+  display: inline-block;
+  margin-right: -0.22em;
+  font-family: var(--mantine-font-family-headings);
+  font-size: var(--wordmark-size, 0.85rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #9a9da4;
+}
+
+.wordmarkAccent {
+  color: var(--oss-crimson-bright);
+}
+
+/* On the cradle: the brand on the left, the product name on the right, as on the hardware. */
+.cradleBrand {
+  --wordmark-size: 0.66rem;
+}
+
+.cradleModel {
+  font-size: 0.85rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: #b9bcc2;
+}
+
+.housing {
+  position: relative;
+  z-index: 1;
+  padding: 18px 14px 16px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #121215, #070709);
+  /* Bezel, aluminium band round the edge, the top edge seen as it leans back, and its shadow. */
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    0 0 0 2px #3c3f45,
+    0 -5px 0 1px #2a2c31,
+    0 -5px 0 2px #4a4d53,
+    8px 22px 26px -10px rgb(0 0 0 / 0.9);
+  transform: perspective(1200px) rotateX(6deg);
+  transform-origin: 50% 100%;
+}
+
+.camera {
+  position: absolute;
+  top: 7px;
+  left: calc(50% - 2.5px);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #1d2328;
+  box-shadow: inset 0 0 0 1px #000;
+}
+
+.screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 4px;
+  background: radial-gradient(ellipse at 30% 0%, #0f181c 0%, #070a0c 70%);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.9);
+  color: #d9e3e6;
+  filter: brightness(0.86);
+  transition: filter 500ms ease;
+}
+
+.screen[data-on] {
+  filter: none;
+}
+
+/* A restrained reflection on the glass, from the same upper-left light. */
+.screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    155deg,
+    rgb(255 255 255 / 0.06) 0%,
+    rgb(255 255 255 / 0.015) 32%,
+    transparent 33%
+  );
+}
+
+.statusBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 12px;
+  border-bottom: 1px solid rgb(255 255 255 / 0.07);
+  background: rgb(255 255 255 / 0.025);
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #b8c4c8;
+}
+
+.stateDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #56626a;
+}
+
+.state[data-state='Playing'] {
+  color: var(--oss-green);
+}
+
+.state[data-state='Playing'] .stateDot {
+  background: var(--oss-green);
+  box-shadow: var(--oss-glow-green);
+}
+
+.state[data-state='Cued'] .stateDot,
+.state[data-state='Paused'] .stateDot,
+.state[data-state='Loading'] .stateDot {
+  background: var(--oss-amber);
+}
+
+.state[data-state='Offline'] .stateDot {
+  background: var(--oss-crimson-bright);
+}
+
+.statusAlbum {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #8fa0a6;
+}
+
+.statusPos {
+  color: var(--oss-amber);
+}
+
+/* The screen's fixed body height sets the tablet's height; the tracklist scrolls inside it. */
+.screenBody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  height: 270px;
+  min-height: 0;
+}
+
+.nowPlaying {
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+  min-width: 0;
+}
+
+.cover {
+  flex: none;
+  display: block;
+  width: 96px;
+  height: 96px;
+  border-radius: 3px;
+  object-fit: cover;
+  background: #12171a;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08);
+}
+
+.npText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.npText :global(.label) {
+  color: #8fa0a6;
+}
+
+.npTitle {
+  font-family: var(--mantine-font-family-headings);
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: #f2f6f7;
+}
+
+.npArtist {
+  font-size: 0.85rem;
+  color: #a7b5ba;
+}
+
+.timeline {
+  height: 3px;
+  margin-top: auto;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.1);
+  overflow: hidden;
+}
+
+.timeline span {
+  display: block;
+  height: 100%;
+  background: var(--oss-green);
+  transform-origin: left;
+  transition: transform 250ms linear;
+}
+
+.npTime {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.72rem;
+  color: #8fa0a6;
+}
+
+.trackPane {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 6px;
+  border-left: 1px solid rgb(255 255 255 / 0.07);
+  scrollbar-width: thin;
+  scrollbar-color: #33424a transparent;
+}
+
+.hint {
+  margin: 0;
+  padding: 7px 12px;
+  border-top: 1px solid rgb(255 255 255 / 0.07);
+  font-size: 0.8rem;
+  color: #a7b5ba;
+}
+
+/* ---- Chassis: the sloped control surface the tablet and towers stand on ---- */
+
+.chassis {
+  position: relative;
+  z-index: 1;
+  /* Starts behind the lower part of the tablet, so the tablet stands above it. */
+  margin-top: -190px;
+  padding: 206px 28px 14px;
+  border-radius: 30px 30px 12px 12px;
+  background:
+    var(--oss-brushed-grain),
+    linear-gradient(180deg, #2c2d32 0%, #222327 30%, #1d1e22 70%, #19191d 100%);
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 0.12),
+    inset 3px 0 0 rgb(255 255 255 / 0.05),
+    inset -3px 0 0 rgb(0 0 0 / 0.4),
+    /* The chassis' front and side thickness. */ 0 6px 0 -1px #121215,
+    0 7px 0 -1px #2d2f34;
+}
+
+.softBand {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) 64px;
+  align-items: center;
+  gap: 18px;
+  padding: 10px 4px 14px;
+  border-bottom: 1px solid rgb(0 0 0 / 0.5);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.04);
+}
+
+.pairKeys {
+  display: grid;
+  gap: 8px;
+}
+
+.pairKeys i,
+.keyBlock i,
+.shift {
+  display: block;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #34363c, #222328);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.14),
+    0 0 0 1px #0b0b0d,
+    0 2px 2px rgb(0 0 0 / 0.6);
+}
+
+/*
+ * Key lights, set into the caps like the Dock's: a small lens, dark until the console is on, then a
+ * bright core fading to its colour, a glow that stays on the key, and a faint wash of the colour on
+ * the cap round it. Steady, never flashing.
+ */
+.pairKeys i,
+.softKeys i {
+  --lens: 120 112 132;
+  position: relative;
+}
+
+.pairKeys i[data-light='violet'],
+.softKeys i[data-light='violet'] {
+  --lens: 168 112 255;
+}
+
+.pairKeys i[data-light='red'],
+.softKeys i[data-light='red'] {
+  --lens: 255 56 80;
+}
+
+.pairKeys i::after,
+.softKeys i::after {
+  content: '';
+  position: absolute;
+  border-radius: 999px;
+  background: radial-gradient(circle at 45% 35%, #3a3540, #121014 75%);
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.8);
+  transition:
+    background 300ms ease,
+    box-shadow 300ms ease;
+}
+
+.pairKeys i[data-light]::after,
+.softKeys i[data-light]::after {
+  background: radial-gradient(
+    closest-side,
+    rgb(255 255 255 / 0.95) 0 18%,
+    rgb(var(--lens)) 55%,
+    rgb(var(--lens) / 0.75) 100%
+  );
+  box-shadow:
+    0 0 2px 1px rgb(var(--lens) / 0.6),
+    0 0 6px rgb(var(--lens) / 0.3);
+}
+
+/* The faint reflection of the lens on the cap round it. */
+.pairKeys i[data-light]::before,
+.softKeys i[data-light]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(closest-side, rgb(var(--lens) / 0.16), transparent);
+}
+
+/* A short strip lens across the top of each rectangular key. */
+.pairKeys i {
+  height: 22px;
+}
+
+.pairKeys i::after {
+  top: 4px;
+  left: calc(50% - 8px);
+  width: 16px;
+  height: 3px;
+}
+
+/* Two rows of round soft keys, each with a round lens in its centre. */
+/*
+ * The soft keys, with an etched seam after the first column and before the last, as on the Dock.
+ * Each seam sits on the middle of the gap between those columns.
+ */
+.softKeys {
+  --col-gap: 6px;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  justify-items: center;
+  gap: 10px var(--col-gap);
+}
+
+.softKeys::before,
+.softKeys::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  left: calc((100% - 7 * var(--col-gap)) / 8 + var(--col-gap) / 2 - 1px);
+  width: 2px;
+  border-radius: 1px;
+  /* A dark groove with a lit lower lip, so it reads as cut into the panel. */
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.75) 0 50%, rgb(255 255 255 / 0.16) 50%);
+  pointer-events: none;
+}
+
+.softKeys::after {
+  left: auto;
+  right: calc((100% - 7 * var(--col-gap)) / 8 + var(--col-gap) / 2 - 1px);
+}
+
+.softKeys i {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #3e4046, #1c1d21 70%);
+  box-shadow:
+    0 0 0 1px #0b0b0d,
+    0 2px 2px rgb(0 0 0 / 0.6);
+}
+
+.softKeys i::after {
+  top: calc(50% - 3px);
+  left: calc(50% - 3px);
+  width: 6px;
+  height: 6px;
+}
+
+/* Power takes the monitor knob's place. */
+.powerSpot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.power {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #b4b4bc;
+  cursor: pointer;
+  background: radial-gradient(circle at 38% 30%, #44464c 0%, #25262b 60%, #18191c 100%);
+  box-shadow:
+    0 0 0 3px #0c0c0e,
+    inset 0 1px 0 rgb(255 255 255 / 0.18),
+    3px 6px 8px -2px rgb(0 0 0 / 0.8);
+  transition: color 200ms ease;
+}
+
+.power svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.power:hover {
+  color: var(--oss-text);
+}
+
+.power[aria-pressed='true'] {
+  color: var(--oss-amber);
+}
+
+.power:focus-visible {
+  outline: 2px solid var(--oss-sky);
+  outline-offset: 4px;
+}
+
+.powerCaption {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #b4b4bc;
+}
+
+/*
+ * Fader, key block, wheel, key block, touch strip. The two outer bays and the two key blocks are
+ * the same width, so the wheel and its readout sit on the dock's centre line.
+ */
+.centre {
+  --bay: 92px;
+  --key: 26px;
+  --key-gap: 8px;
+  --legend: 56px;
+  --legend-gap: 0px;
+  display: grid;
+  grid-template-columns: var(--bay) auto minmax(0, 1fr) auto var(--bay);
+  align-items: center;
+  gap: 12px;
+  padding: 18px 4px 6px;
+}
+
+.faderBay {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.faderBay > :last-child {
+  --throw: 190px;
+}
+
+.meter {
+  height: 150px;
+  width: 8px;
+  margin-top: 60px;
+}
+
+/* Six rows on one shared column grid: two keys, then the legend on the side facing the wheel. */
+.keyBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.keyRow {
+  display: grid;
+  grid-template-columns: var(--legend) var(--key) var(--key) var(--legend);
+  align-items: center;
+  column-gap: var(--key-gap);
+}
+
+/* Legends hug their keys: the outer ones sit against the key, not the bay beside them. */
+.keyRow > :first-child {
+  margin-right: var(--legend-gap);
+}
+
+.keyRow > :last-child {
+  margin-left: var(--legend-gap);
+}
+
+.keyBlock i {
+  position: relative;
+  height: 22px;
+}
+
+/*
+ * Printed legends, as on the hardware: grey chips on the left block, white on the right. Long names
+ * wrap onto two lines, like the Dock's, and still fit the key's row.
+ */
+.legend {
+  display: block;
+  padding: 2px 2px;
+  border-radius: 2px;
+  background: #5b5e65;
+  font-size: 0.52rem;
+  font-weight: 600;
+  line-height: 1.1;
+  text-align: center;
+  color: #f3f4f6;
+}
+
+.keyBlock[data-side='right'] .legend {
+  background: #d9dbde;
+  color: #111214;
+}
+
+/* Each key's little indicator strip. */
+.keyBlock i::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 30%;
+  right: 30%;
+  height: 2px;
+  border-radius: 1px;
+  background: #0d0d10;
+}
+
+.jogArea {
+  display: grid;
+  place-items: center;
+}
+
+.stripBay {
+  display: grid;
+  place-items: center;
+}
+
+.vStrip {
+  display: flex;
+  flex-direction: column;
+  width: 30px;
+  height: 220px;
+  border-radius: 15px;
+  background: #0b0b0d;
+  box-shadow:
+    inset 0 2px 4px rgb(0 0 0 / 0.8),
+    0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+.vStrip i {
+  flex: 1;
+  border-bottom: 1px solid #2a2b30;
+}
+
+.vStrip i:last-child {
+  border-bottom: 0;
+}
+
+/* The strip under the wheel doubles as the playback position. */
+.hStrip {
+  position: relative;
+  display: flex;
+  width: 46%;
+  height: 16px;
+  margin: 4px auto 18px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #0b0b0d;
+  box-shadow:
+    inset 0 2px 3px rgb(0 0 0 / 0.8),
+    0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+.hStrip span {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(95 224 138 / 0.18), rgb(95 224 138 / 0.4));
+  transform-origin: left;
+  transition: transform 250ms linear;
+}
+
+.hStrip i {
+  flex: 1;
+  border-right: 1px solid #2a2b30;
+}
+
+.hStrip i:last-child {
+  border-right: 0;
+}
+
+/* Transport row along the front. */
+.transport {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 10px 12px;
+}
+
+/*
+ * Each legend and its key share one column: the column is as wide as the wider of the two, and both
+ * stretch to fill it, so a legend is always exactly the width of its key.
+ */
+.keyWrap {
+  display: grid;
+  grid-template-rows: auto auto;
+  justify-items: stretch;
+  row-gap: 6px;
+}
+
+.keyCaption {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  /* Legend chips, like the printed labels over the Dock's transport keys. */
+  padding: 1px 8px;
+  border-radius: 2px;
+  background: #d9dbde;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #111214;
+}
+
+.key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+  min-width: 76px;
+  height: var(--key-h, 44px);
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  color: #e6e6ea;
+  font: inherit;
+  font-size: 0.82rem;
+  text-decoration: none;
+  cursor: pointer;
+  background: linear-gradient(180deg, #3a3a41 0%, #26262c 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.18),
+    inset 0 -3px 0 rgb(0 0 0 / 0.35),
+    0 0 0 1px #0a0a0c,
+    3px 5px 6px -2px rgb(0 0 0 / 0.8);
+  transition:
+    transform 80ms ease,
+    box-shadow 80ms ease,
+    filter 150ms ease,
+    color 200ms ease;
+}
+
+.key[data-wide] {
+  padding: 0 16px;
+}
+
+/* One fixed box for every key's icon. */
+.glyph {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+}
+
+.key svg[viewBox='0 0 24 24']:not([class]) {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.key[data-power][aria-pressed='true'] {
+  color: var(--oss-amber);
+}
+
+.key:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+
+.key:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    inset 0 -1px 0 rgb(0 0 0 / 0.35),
+    0 0 0 1px #0a0a0c,
+    1px 2px 3px -1px rgb(0 0 0 / 0.8);
+}
+
+.key:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.key:focus-visible {
+  outline: 2px solid var(--oss-sky);
+  outline-offset: 3px;
+}
+
+/* Play is the one key that matters: the same height as the rest, wider, and in the brand red. */
+.key[data-primary] {
+  min-width: 96px;
+  color: #fff;
+  background: linear-gradient(180deg, #df2340 0%, #a90c26 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.3),
+    inset 0 -3px 0 rgb(0 0 0 / 0.3),
+    0 0 0 1px #2a0209,
+    3px 6px 8px -2px rgb(0 0 0 / 0.85);
+}
+
+/* While playing, the key lights from inside. Only colour and glow change, never its size. */
+.key[data-primary][data-lit] {
+  background: linear-gradient(180deg, #f2354f 0%, #c0122d 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.4),
+    inset 0 0 10px rgb(255 140 150 / 0.35),
+    inset 0 -3px 0 rgb(0 0 0 / 0.3),
+    0 0 0 1px #2a0209,
+    0 0 12px rgb(255 66 88 / 0.3),
+    3px 6px 8px -2px rgb(0 0 0 / 0.85);
+}
+
+.keyWrap[data-primary] .keyCaption {
+  background: #f1f2f4;
+}
+
+/* ---- Jog wheel ---- */
+
+.jogBay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.jog {
+  --jog: 200px;
+  position: relative;
+  width: var(--jog);
+  height: var(--jog);
+  border-radius: 50%;
+  cursor: grab;
+  touch-action: none;
+  /* The well the wheel sits in, and the wheel's own knurled rim. */
+  /* The recessed well around the wheel. */
+  background: radial-gradient(circle, #0d0d10 0 62%, #18191c 70%, #232428 100%);
+  box-shadow:
+    0 0 0 6px #0a0a0c,
+    0 0 0 7px rgb(255 255 255 / 0.07),
+    inset 0 2px 0 rgb(255 255 255 / 0.14),
+    5px 12px 16px -4px rgb(0 0 0 / 0.85);
+}
+
+.jog:active {
+  cursor: grabbing;
+}
+
+.jog[aria-disabled] {
+  cursor: default;
+}
+
+.jog:focus-visible {
+  outline: 2px solid var(--oss-sky);
+  outline-offset: 10px;
+}
+
+.jogPlatter {
+  position: absolute;
+  inset: 13%;
+  border-radius: 50%;
+  /* Spun aluminium: a conic sheen that turns with the wheel. */
+  background:
+    radial-gradient(circle, transparent 0 60%, rgb(0 0 0 / 0.25) 62% 64%, transparent 66%),
+    conic-gradient(
+      from 20deg,
+      #9da1a8,
+      #e9ebee 12%,
+      #8b8f96 25%,
+      #c9ccd1 38%,
+      #7d8188 50%,
+      #e2e4e7 62%,
+      #8f939a 75%,
+      #d4d6da 88%,
+      #9da1a8
+    );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    inset 0 -2px 4px rgb(0 0 0 / 0.6);
+  transition: rotate 180ms ease-out;
+}
+
+/* The finger dimple, so the wheel's turn is visible. */
+.jogDimple {
+  position: absolute;
+  top: 12%;
+  left: calc(50% - 13px);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 60% 70%, #c3c6cb, #6c7077);
+  box-shadow:
+    inset 0 2px 3px rgb(0 0 0 / 0.8),
+    0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+.jogReadout {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jogNum {
+  padding: 2px 6px;
+  border-radius: 2px;
+  background: #0b0906;
+  box-shadow: var(--oss-recess);
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.8rem;
+  color: var(--oss-amber);
+}
+
+.nameplate {
+  --wordmark-size: 0.85rem;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 4px;
+}
+
+.shift {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+/* ---- Palm rest ---- */
+
+.front {
+  position: relative;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 42px;
+  margin: 10px 6px 0;
+  padding: 0 18px;
+  border-radius: 6px 6px 14px 14px;
+  background: linear-gradient(180deg, #2a2b30 0%, #1d1e22 55%, #141417 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.16),
+    inset 0 -3px 0 rgb(0 0 0 / 0.5),
+    0 8px 14px -6px rgb(0 0 0 / 0.9);
+}
+
+/* ---- Narrower docks: smaller wheel and keys ---- */
+
+@container dock (max-width: 760px) {
+  .upper {
+    grid-template-columns: 58px minmax(0, 1fr) 58px;
+    gap: 12px;
+    padding: 0 14px;
+  }
+
+  .tower svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .chassis {
+    padding-inline: 18px;
+  }
+
+  .centre {
+    --bay: 76px;
+    --key: 24px;
+    --key-gap: 6px;
+    --legend: 50px;
+    gap: 10px;
+  }
+
+  .legend {
+    font-size: 0.5rem;
+  }
+
+  .vStrip {
+    width: 24px;
+  }
+
+  .jog {
+    --jog: 172px;
+  }
+}
+
+/* Too narrow for the legends beside the key blocks: they go, the keys stay. */
+@container dock (max-width: 740px) {
+  .keyRow {
+    grid-template-columns: var(--key) var(--key);
+  }
+
+  .keyRow > span {
+    display: none;
+  }
+}
+
+/* ---- Phone: straight on, the dressing goes and the controls stack ---- */
+
+@container dock (max-width: 600px) {
+  .upper {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0;
+  }
+
+  .tower,
+  .bracket,
+  .pairKeys,
+  .keyBlock,
+  .stripBay {
+    display: none;
+  }
+
+  .housing {
+    padding: 12px 6px 8px;
+    border-radius: 12px;
+    transform: none;
+  }
+
+  .cradle {
+    height: 24px;
+    margin: -10px 4px 0;
+    padding: 0 12px;
+  }
+
+  .chassis {
+    margin-top: -40px;
+    padding: 52px 12px 12px;
+    border-radius: 18px 18px 10px 10px;
+  }
+
+  .cradleBrand {
+    --wordmark-size: 0.6rem;
+  }
+
+  .cradleModel {
+    font-size: 0.75rem;
+  }
+
+  /* The soft keys and their lights stay; Power sits at the end of the band. */
+  .softBand {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    padding-top: 4px;
+  }
+
+  .softKeys {
+    row-gap: 8px;
+  }
+
+  .screenBody {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .cover {
+    width: 72px;
+    height: 72px;
+  }
+
+  .trackPane {
+    max-height: 220px;
+    border-left: 0;
+    border-top: 1px solid rgb(255 255 255 / 0.07);
+  }
+
+  .centre {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+    padding-top: 14px;
+  }
+
+  .faderBay > :last-child {
+    --throw: 140px;
+  }
+
+  .meter {
+    height: 110px;
+    margin-top: 44px;
+  }
+
+  .jog {
+    --jog: 150px;
+  }
+
+  .hStrip {
+    width: 70%;
+  }
+
+  .transport {
+    --key-h: 48px;
+  }
+
+  .key[data-primary] {
+    min-width: 104px;
+  }
+
+  .front {
+    height: 30px;
+  }
+}

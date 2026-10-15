@@ -1,0 +1,73 @@
+/* Small shared hardware: screws and indicator lamps. All of it is decoration, hidden from assistive tech. */
+
+.screw {
+  --size: 10px;
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  /* Domed head lit from the upper left. */
+  background: radial-gradient(circle at 35% 30%, #e1e3e6 0%, #9a9da3 38%, #4a4c52 100%);
+  box-shadow:
+    0 1px 1px rgb(0 0 0 / 0.7),
+    0 0 0 1px rgb(0 0 0 / 0.35);
+}
+
+.screw::after {
+  content: '';
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: calc(50% - 0.75px);
+  height: 1.5px;
+  background: rgb(30 30 34 / 0.85);
+  rotate: var(--turn, 30deg);
+}
+
+.led {
+  --on: var(--oss-amber);
+  --glow: var(--oss-glow-amber);
+  display: inline-block;
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #4a4a52, var(--oss-led-off));
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.6);
+  transition:
+    background 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.led[data-color='green'] {
+  --on: var(--oss-green);
+  --glow: var(--oss-glow-green);
+}
+
+.led[data-color='red'] {
+  --on: var(--oss-crimson-bright);
+  --glow: var(--oss-glow-red);
+}
+
+.led[data-on] {
+  background: radial-gradient(circle at 35% 30%, #fff 0%, var(--on) 45%);
+  box-shadow: var(--glow);
+}
+
+.led[data-blink] {
+  animation: blink 1.2s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .led[data-blink] {
+    animation: none;
+  }
+}

@@ -1,85 +1,62 @@
 .studio {
-  padding: 96px 0;
+  padding: var(--oss-section-space) 0;
+  /* A faint violet spill on the wall behind the racks. */
+  background: radial-gradient(
+    ellipse 50% 40% at 50% 62%,
+    rgb(var(--oss-neon-violet) / 0.06),
+    transparent 70%
+  );
 }
 
-.heading {
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  text-transform: uppercase;
+/* Three cabinets side by side on desktop; two over one on tablets; stacked on phones. */
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  /* Room between cases for the side panels the viewer can see. */
+  gap: 24px;
 }
 
-.rack {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 0 14px 14px;
-  border-radius: 6px;
-  /* Rack rails with their mounting holes. */
-  background:
-    repeating-linear-gradient(180deg, transparent 0 14px, #050506 14px 18px) left 4px top 0 / 6px
-      100% no-repeat,
-    repeating-linear-gradient(180deg, transparent 0 14px, #050506 14px 18px) right 4px top 0 / 6px
-      100% no-repeat,
-    #0e0e11;
-  border: 1px solid var(--oss-edge);
+/* The room light washing down across the lids and faceplates: brightest at the top, gone by the base. */
+.row::after {
+  content: '';
+  position: absolute;
+  z-index: 3;
+  top: -36px;
+  left: 0;
+  right: 0;
+  height: 70%;
+  background: radial-gradient(
+    ellipse 70% 100% at 50% 0%,
+    rgb(var(--oss-neon-cyan) / 0.09),
+    rgb(var(--oss-neon-violet) / 0.04) 45%,
+    transparent 75%
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
 }
 
-.rackHead {
-  padding: 12px 4px 6px;
+@media (max-width: $mantine-breakpoint-md) {
+  .row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 48px;
+  }
+
+  .row > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc(50% - 12px);
+  }
 }
 
-.unit {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 3px;
-  background: linear-gradient(180deg, #23232a, #18181d);
-  border: 1px solid #2e2e36;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
-}
+@media (max-width: 40em) {
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 40px;
+  }
 
-.unitBody {
-  flex: 1;
-  min-width: 0;
-}
-
-.unitTitle {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  font-family: var(--mantine-font-family-headings);
-  text-transform: uppercase;
-}
-
-.unitTitle strong {
-  font-size: 1.15rem;
-  letter-spacing: 0.04em;
-}
-
-.unitTitle span {
-  color: var(--oss-crimson);
-  font-size: 0.9rem;
-}
-
-.unit p {
-  margin: 2px 0 0;
-  font-size: 0.85rem;
-  color: var(--oss-muted);
-}
-
-.screw {
-  flex: none;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #8a8a93, #3a3a42);
-}
-
-.led {
-  flex: none;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--oss-crimson);
-  box-shadow: 0 0 8px var(--oss-crimson);
+  .row > :last-child:nth-child(odd) {
+    width: 100%;
+  }
 }

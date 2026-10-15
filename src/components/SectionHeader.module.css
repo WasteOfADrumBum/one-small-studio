@@ -1,0 +1,24 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: clamp(28px, 4vw, 44px);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--mantine-font-family-headings);
+  font-weight: 600;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.intro {
+  margin: 6px 0 0;
+  max-width: 620px;
+  color: var(--oss-muted);
+  font-size: 1.05rem;
+  line-height: 1.55;
+}

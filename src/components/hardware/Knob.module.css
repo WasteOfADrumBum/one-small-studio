@@ -1,0 +1,37 @@
+.knob {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.knob svg {
+  overflow: visible;
+}
+
+.tick {
+  stroke: #6d6d76;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.shadow {
+  fill: rgb(0 0 0 / 0.55);
+  filter: blur(3px);
+}
+
+.knurl {
+  stroke: rgb(255 255 255 / 0.08);
+  stroke-width: 2.2;
+}
+
+.cap {
+  stroke: rgb(255 255 255 / 0.12);
+  stroke-width: 1;
+}
+
+.pointer {
+  stroke: #f2f2f2;
+  stroke-width: 4.5;
+  stroke-linecap: round;
+}
