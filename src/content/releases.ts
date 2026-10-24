@@ -1,4 +1,5 @@
 import { featuredAlbum } from '@/lib/site';
+import theManBehindTheMaskCover from '@/assets/covers/the-man-behind-the-mask.jpg';
 
 /**
  * The Catalog: one entry per release, each on its own shelf. Add releases here and the shelves and
@@ -89,5 +90,18 @@ export const releases: Release[] = [
       'After the Mask',
       'Find Your Tribe',
     ],
+  },
+  {
+    id: 'the-man-behind-the-mask',
+    title: 'The Man Behind the Mask',
+    artist: 'Joshua Small',
+    credit: 'Artist',
+    format: 'Digital EP on SoundCloud',
+    pageUrl:
+      'https://soundcloud.com/joshua-small-325495450/sets/the-man-behind-the-mask/s-duy6W5y03yk',
+    playerUrl:
+      'https://api.soundcloud.com/playlists/soundcloud:playlists:2318834286?secret_token=s-duy6W5y03yk',
+    // Josh's own cover, so the shelf shows it without asking SoundCloud.
+    artwork: theManBehindTheMaskCover,
   },
 ];
