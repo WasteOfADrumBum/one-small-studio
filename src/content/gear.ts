@@ -40,7 +40,7 @@ export const gear: GearGroup[] = [
         brand: 'Focusrite',
         model: 'Preamps',
         note: 'Clean, quiet front end for drums and vocals',
-        size: 2,
+        size: 3,
         kind: 'interface',
       },
     ],

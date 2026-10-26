@@ -1,0 +1,237 @@
+/* The Scarlett 18i20 stacked on the OctoPre MkII, each as wide as the faceplate allows. */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.75));
+}
+
+.defs {
+  position: absolute;
+}
+
+.unit {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.unit text {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+/* Silkscreen. A text's own fill attribute (the lit labels) wins over the default ink. */
+.s {
+  font-size: 9px;
+}
+
+.s:not([fill]) {
+  fill: #e8e8e8;
+}
+
+.xs {
+  font-size: 7.5px;
+  fill: #bdbdbd;
+}
+
+.o {
+  font-size: 5.2px;
+  font-weight: 400 !important;
+  fill: #d4d6da;
+}
+
+.dial {
+  stroke: #050506;
+  stroke-width: 1.5;
+}
+
+.index {
+  stroke: #f2f2f2;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.scaleDot {
+  fill: #cfcfcf;
+}
+
+.button {
+  fill: #3a3b40;
+  stroke: #0a0a0c;
+  stroke-width: 2;
+}
+
+.rule {
+  stroke: #2e2f33;
+  stroke-width: 1.5;
+}
+
+.comboRing {
+  fill: #2a2b2f;
+  stroke: #7d8086;
+  stroke-width: 2;
+}
+
+.comboFace {
+  fill: #121214;
+}
+
+.comboHole {
+  fill: #000;
+}
+
+.jack {
+  fill: #050506;
+  stroke: #55585e;
+  stroke-width: 2;
+}
+
+.rocker {
+  fill: #050506;
+  stroke: #45474c;
+  stroke-width: 2;
+}
+
+.rockerFace {
+  fill: #1f2024;
+  stroke: #f2f2f2;
+  stroke-width: 0.6;
+}
+
+.usb {
+  fill: none;
+  stroke: #3bff6a;
+  stroke-width: 2;
+}
+
+/* ---- Scarlett 18i20: red anodised edge round a black panel ---- */
+
+.scarlettEdge {
+  fill: #d8202c;
+}
+
+.scarlettFace {
+  fill: #0b0b0c;
+}
+
+.scarlettLogo {
+  font-size: 14px;
+  text-anchor: start !important;
+  fill: #f2f2f2;
+}
+
+.modelBox {
+  fill: none;
+  stroke: #f2f2f2;
+  stroke-width: 1.2;
+}
+
+.modelText {
+  font-size: 12px;
+  font-weight: 400 !important;
+  fill: #f2f2f2;
+}
+
+.focusriteLogo {
+  font-family: 'Times New Roman', Times, serif !important;
+  font-size: 17px;
+  font-weight: 400 !important;
+  fill: #f2f2f2;
+}
+
+/* Meter segments: dark until lit. */
+.seg {
+  fill: #232427;
+}
+
+.seg[data-lit] {
+  fill: #3bff6a;
+}
+
+.green {
+  fill: #3bff6a;
+}
+
+.greenOff {
+  fill: #12301c;
+}
+
+.red {
+  fill: #ff3030;
+}
+
+.redOff {
+  fill: #3a1214;
+}
+
+/* ---- OctoPre MkII: charcoal panel, outlined sections, blue-ringed gains ---- */
+
+.octoFace {
+  fill: #2b2c30;
+  stroke: #151518;
+  stroke-width: 1.5;
+}
+
+.box {
+  fill: none;
+  stroke: #6a6c72;
+  stroke-width: 0.8;
+}
+
+.chip {
+  fill: #2e8fd6;
+}
+
+.blueDot {
+  fill: #59b6ff;
+}
+
+.blueRing {
+  fill: #0e1014;
+  stroke: #2e8fd6;
+  stroke-width: 1.2;
+}
+
+.key {
+  fill: #e6e7ea;
+  stroke: #0e0e10;
+  stroke-width: 0.8;
+}
+
+.meterWindow {
+  fill: #08090a;
+  stroke: #4a4c52;
+  stroke-width: 0.8;
+}
+
+.badgeDisc {
+  fill: #121316;
+  stroke: #6a6c72;
+  stroke-width: 0.8;
+}
+
+.badgeMark {
+  font-family: 'Times New Roman', Times, serif !important;
+  font-size: 11px;
+  font-style: italic;
+  fill: #f2f2f2;
+}
+
+.octoLogo {
+  font-family: 'Times New Roman', Times, serif !important;
+  font-size: 9px;
+  font-weight: 400 !important;
+  fill: #f2f2f2;
+}
+
+.octoBadge {
+  fill: #6fc3ea;
+}
+
+.octoBadgeText {
+  font-size: 6px;
+  font-weight: 400 !important;
+  fill: #10324a;
+}

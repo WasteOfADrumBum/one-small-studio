@@ -1,0 +1,173 @@
+/* The Carvin V3M head: grey shell, black front panel, Arial-style silkscreen. */
+.amp {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 3px 3px rgb(0 0 0 / 0.75));
+}
+
+.amp text {
+  font-family: Arial, Helvetica, sans-serif;
+  text-anchor: middle;
+}
+
+.shellEdge {
+  fill: none;
+  stroke: #6d7076;
+  stroke-width: 3;
+}
+
+.slot {
+  fill: #0b0b0d;
+}
+
+.badge {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 196px;
+  font-weight: 900;
+  fill: #0b0b0d;
+}
+
+.panelEdge {
+  fill: none;
+  stroke: #000;
+  stroke-width: 3;
+}
+
+.foot {
+  fill: #050506;
+}
+
+.label {
+  font-size: 18px;
+  letter-spacing: -0.6px;
+  font-weight: 700;
+  fill: #ececec;
+}
+
+.small {
+  font-size: 10.5px;
+  font-weight: 700;
+  fill: #d8d8d8;
+}
+
+.channel {
+  font-size: 28px;
+  font-weight: 700;
+  fill: #ececec;
+}
+
+.bracket {
+  fill: none;
+  stroke: #d8d8d8;
+  stroke-width: 2.5;
+}
+
+.digit {
+  font-size: 11px;
+  font-weight: 700;
+  fill: #d0d0d0;
+}
+
+.knobShadow {
+  fill: rgb(0 0 0 / 0.7);
+}
+
+/* Knurled skirt: a dashed rim around the cap. */
+.knurl {
+  stroke: #050506;
+  stroke-width: 3;
+  stroke-dasharray: 2.5 2.5;
+}
+
+.pointer {
+  stroke: #f4f4f4;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.nut {
+  fill: #9a9ca1;
+  stroke: #2a2a2e;
+  stroke-width: 3;
+}
+
+.lever {
+  fill: #e4e6e9;
+  stroke: #1a1a1d;
+  stroke-width: 1.5;
+}
+
+.rocker {
+  fill: #050506;
+  stroke: #3a3a40;
+  stroke-width: 2;
+}
+
+.rockerFace {
+  fill: #1f1f23;
+}
+
+.ledLens {
+  stroke: rgb(255 255 255 / 0.55);
+  stroke-width: 2;
+}
+
+.logo {
+  font-family: 'Times New Roman', Times, serif !important;
+  font-size: 44px;
+  letter-spacing: 0.5px;
+  fill: #f2f2f2;
+}
+
+.model {
+  font-size: 46px;
+  font-weight: 900;
+  fill: #f2f2f2;
+}
+
+.jackNut {
+  fill: #b8bbc0;
+  stroke: #2a2a2e;
+  stroke-width: 3;
+}
+
+.jackHole {
+  fill: #050506;
+}
+
+/* Valves warming unevenly, and the drive LEDs breathing with them. Static when motion is reduced. */
+@media (prefers-reduced-motion: no-preference) {
+  .tube {
+    animation: valve 5.5s ease-in-out infinite alternate;
+  }
+
+  .led {
+    animation: led 6.5s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes valve {
+  0% {
+    filter: brightness(1);
+  }
+  40% {
+    filter: brightness(0.8);
+  }
+  100% {
+    filter: brightness(1.15);
+  }
+}
+
+@keyframes led {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 1;
+  }
+}
