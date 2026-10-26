@@ -5,7 +5,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 
 export default defineConfig(
-  { ignores: ['dist/', '.vercel/', 'node_modules/'] },
+  { ignores: ['dist/', '.vercel/', 'node_modules/', 'test-results/', 'playwright-report/'] },
   js.configs.recommended,
   tseslint.configs.recommended,
   {
@@ -15,7 +15,7 @@ export default defineConfig(
     languageOptions: { globals: globals.browser },
   },
   {
-    files: ['server/**', 'api/**', '*.config.*'],
+    files: ['server/**', 'api/**', 'e2e/**', '*.config.*'],
     languageOptions: { globals: globals.node },
   },
 );

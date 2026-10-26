@@ -17,5 +17,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "server", "api", "*.config.ts"]
+  "include": ["src", "server", "api", "e2e", "*.config.ts"]
 }

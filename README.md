@@ -17,7 +17,7 @@ This is a personal, non-commercial showcase: no rates, booking or sales. It runs
 | Database | MongoDB Atlas with Mongoose (contact inbox)               |
 | Music    | SoundCloud Widget API, driven by the profile in `site.ts` |
 | Hosting  | Vercel Hobby                                              |
-| CI       | GitHub Actions: format, lint, type check and build        |
+| CI       | GitHub Actions: format, lint, type check, tests and build |
 
 ## Develop
 
@@ -28,13 +28,15 @@ npm install
 npm run dev      # site on http://localhost:5173, API on http://localhost:3001
 ```
 
-| Command          | What it does                  |
-| ---------------- | ----------------------------- |
-| `npm run dev`    | Start the site and the API    |
-| `npm run build`  | Build the site for production |
-| `npm run check`  | Type check                    |
-| `npm run lint`   | Lint with ESLint              |
-| `npm run format` | Format with Prettier          |
+| Command            | What it does                                       |
+| ------------------ | -------------------------------------------------- |
+| `npm run dev`      | Start the site and the API                         |
+| `npm run build`    | Build the site for production                      |
+| `npm run check`    | Type check                                         |
+| `npm run lint`     | Lint with ESLint                                   |
+| `npm test`         | Unit and API tests (Vitest)                        |
+| `npm run test:e2e` | Browser and accessibility tests (Playwright + axe) |
+| `npm run format`   | Format with Prettier                               |
 
 ## Layout
 
