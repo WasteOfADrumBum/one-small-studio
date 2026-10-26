@@ -1,10 +1,11 @@
 import { useId } from 'react';
-import classes from './FocusriteStack.module.css';
+import classes from './Focusrite.module.css';
 
 /*
  * The Focusrite pair as it sits in the rack: a Scarlett 18i20 (3rd gen) above an OctoPre MkII,
- * each laid out from photos of the real front panel and drawn in that photo's pixel space. The
- * meters show a quiet ready state, not levels.
+ * each laid out from photos of the real front panel and drawn in that photo's pixel space. Each
+ * fills its own 1U faceplate, whose plate is the panel colour. The meters show a quiet ready
+ * state, not levels.
  */
 
 const SCARLETT_GAINS = [557, 638, 718, 799, 879, 959, 1040, 1120];
@@ -78,7 +79,8 @@ function Combo({ x, y, r }: { x: number; y: number; r: number }) {
   );
 }
 
-function Scarlett({ cap }: { cap: string }) {
+export function Scarlett18i20() {
+  const cap = `${useId()}cap`;
   return (
     <svg
       className={classes.unit}
@@ -86,8 +88,7 @@ function Scarlett({ cap }: { cap: string }) {
       role="img"
       aria-label="Focusrite Scarlett 18i20"
     >
-      <rect x="212" y="595" width="1540" height="150" rx="6" className={classes.scarlettEdge} />
-      <rect x="219" y="600" width="1526" height="140" rx="3" className={classes.scarlettFace} />
+      <CapGradient id={cap} />
 
       <text x="358" y="618" className={classes.s}>
         INPUTS
@@ -239,7 +240,8 @@ function Scarlett({ cap }: { cap: string }) {
 const OCTO_GAINS = [243, 294, 352, 398, 444, 490, 536, 582];
 const OCTO_METER_X = Array.from({ length: 8 }, (_, i) => 641 + i * 11);
 
-function OctoPre({ cap }: { cap: string }) {
+export function OctoPreMkII() {
+  const cap = `${useId()}cap`;
   return (
     <svg
       className={classes.unit}
@@ -247,7 +249,7 @@ function OctoPre({ cap }: { cap: string }) {
       role="img"
       aria-label="Focusrite OctoPre MkII"
     >
-      <rect x="8" y="208" width="982" height="90" rx="3" className={classes.octoFace} />
+      <CapGradient id={cap} />
 
       <circle cx="42" cy="243" r="11" className={classes.badgeDisc} />
       <text x="42" y="247" className={classes.badgeMark}>
@@ -404,21 +406,14 @@ function OctoPre({ cap }: { cap: string }) {
   );
 }
 
-export function FocusriteStack() {
-  const cap = `${useId()}cap`;
+function CapGradient({ id }: { id: string }) {
   return (
-    <div className={classes.stack}>
-      <svg width="0" height="0" className={classes.defs} aria-hidden="true">
-        <defs>
-          <radialGradient id={cap} cx="40%" cy="32%" r="75%">
-            <stop offset="0" stopColor="#5a5c62" />
-            <stop offset="0.5" stopColor="#25262a" />
-            <stop offset="1" stopColor="#0c0c0e" />
-          </radialGradient>
-        </defs>
-      </svg>
-      <Scarlett cap={cap} />
-      <OctoPre cap={cap} />
-    </div>
+    <defs>
+      <radialGradient id={id} cx="40%" cy="32%" r="75%">
+        <stop offset="0" stopColor="#5a5c62" />
+        <stop offset="0.5" stopColor="#25262a" />
+        <stop offset="1" stopColor="#0c0c0e" />
+      </radialGradient>
+    </defs>
   );
 }

@@ -1,7 +1,8 @@
 import type { CSSProperties, ReactNode } from 'react';
 import type { GearItem, RackSize } from '@/content/gear';
+import { AvatarCab } from './AvatarCab';
 import { CarvinV3M } from './CarvinV3M';
-import { FocusriteStack } from './FocusriteStack';
+import { OctoPreMkII, Scarlett18i20 } from './Focusrite';
 import { Knob } from './hardware/Knob';
 import { Led } from './hardware/Led';
 import { Screw } from './hardware/Screw';
@@ -59,12 +60,14 @@ function Mount({
   size,
   kind,
   finish,
+  device,
   hidden,
   children,
 }: {
   size: RackSize;
   kind: string;
   finish?: string;
+  device?: string;
   hidden?: boolean;
   children: ReactNode;
 }) {
@@ -73,6 +76,7 @@ function Mount({
       className={classes.unit}
       data-kind={kind}
       data-finish={finish}
+      data-device={device}
       data-size={size}
       style={{ '--size': size } as CSSProperties}
       aria-hidden={hidden || undefined}
@@ -111,16 +115,52 @@ function PowerConditioner() {
   );
 }
 
+/**
+ * Gear that really is rack-mounted, drawn as itself: the item's size covers a 1U nameplate and the
+ * units bolted in under it. The Carvin head sits on black brackets across 2U; the Focusrite pair
+ * fill 1U each.
+ */
+const MOUNTED: Partial<
+  Record<GearItem['kind'], { device: string; size: RackSize; draw: ReactNode }[]>
+> = {
+  'amp-head': [{ device: 'carvin', size: 2, draw: <CarvinV3M /> }],
+  interface: [
+    { device: 'scarlett', size: 1, draw: <Scarlett18i20 /> },
+    { device: 'octopre', size: 1, draw: <OctoPreMkII /> },
+  ],
+};
+
+function Nameplate({ item }: { item: GearItem }) {
+  return (
+    <div className={classes.text}>
+      <h4 className={classes.name}>
+        {item.brand} <span className={classes.model}>{item.model}</span>
+      </h4>
+      <p className={classes.note}>{item.note}</p>
+    </div>
+  );
+}
+
 /** One piece of gear, drawn as a rack faceplate in the style of its category. Name first. */
 export function RackUnit({ item }: { item: GearItem }) {
+  const mounted = MOUNTED[item.kind];
+  if (mounted) {
+    return (
+      <>
+        <Mount size={1} kind="nameplate">
+          <Nameplate item={item} />
+        </Mount>
+        {mounted.map(({ device, size, draw }) => (
+          <Mount key={device} size={size} kind="device" device={device} hidden>
+            {draw}
+          </Mount>
+        ))}
+      </>
+    );
+  }
   return (
     <Mount size={item.size} kind={item.kind} finish={item.finish}>
-      <div className={classes.text}>
-        <h4 className={classes.name}>
-          {item.brand} <span className={classes.model}>{item.model}</span>
-        </h4>
-        <p className={classes.note}>{item.note}</p>
-      </div>
+      <Nameplate item={item} />
       <Faceplate item={item} />
     </Mount>
   );
@@ -178,28 +218,11 @@ function Faceplate({ item }: { item: GearItem }) {
           </span>
         </div>
       );
-    // The Focusrite pair: a Scarlett 18i20 stacked on an OctoPre MkII, under the text.
-    case 'interface':
-      return (
-        <div className={classes.hw} data-hw="interface" aria-hidden="true">
-          <FocusriteStack />
-        </div>
-      );
-    // Amp: the Carvin V3M head itself, drawn from the real thing.
-    case 'amp-head':
-      return (
-        <div className={classes.hw} data-hw="amp" aria-hidden="true">
-          <CarvinV3M />
-        </div>
-      );
-    // Cabinet: a grille-cloth panel with the speakers ghosting through.
+    // Cabinet: the white Avatar 2x12, speakers ghosting through the cloth.
     case 'speaker-cab':
       return (
         <div className={classes.hw} data-hw="cab" aria-hidden="true">
-          <span className={classes.grillePanel}>
-            <i />
-            <i />
-          </span>
+          <AvatarCab />
         </div>
       );
     case 'effects':
