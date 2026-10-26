@@ -322,18 +322,31 @@ function TubeStroke({ d }: { d: string }) {
 }
 
 /**
- * The first part of one coolant tube, in a plane running from the pump's left side to the foot
- * of the risers, at 10 units an em: out of the side of the pump, down and round under it, along
- * above the card, then turning up. `length` is the plane's run in em; `from` is the height it
- * leaves the pump at, in units down from the top of the case.
+ * Where the tubes leave the pump: two fittings on its left side, the tubes curling down the left
+ * of it and round underneath to head right. Drawn just behind the pump's face, from 6.4em along
+ * and 7em down, at 10 units an em.
  */
-function TubeRun({ length, from }: { length: number; from: number }) {
+function TubeExits() {
+  return (
+    <svg viewBox="0 0 30 64" className={classes.fill} overflow="visible">
+      <TubeStroke d="M17 12C5 12 2 28 4 42C6 54 14 58 30 58" />
+      <TubeStroke d="M17 24C11 24 9 34 10 44C11 51 18 54 30 54" />
+      <rect x="15" y="9" width="4" height="6" rx="1" fill="#2a2a30" />
+      <rect x="15" y="21" width="4" height="6" rx="1" fill="#2a2a30" />
+    </svg>
+  );
+}
+
+/**
+ * The run of one coolant tube, in a plane from under the pump to the foot of its riser, at 10
+ * units an em: along above the card, then turning up. `length` is the plane's run in em; `at` is
+ * its height in units down from the top of the case.
+ */
+function TubeRun({ length, at }: { length: number; at: number }) {
   const end = length * 10;
   return (
     <svg viewBox={`0 0 ${end} 200`} className={classes.fill} overflow="visible">
-      <TubeStroke
-        d={`M0 ${from}C-16 ${from} -18 128 6 128H${end - 22}C${end - 4} 128 ${end} 122 ${end} 112`}
-      />
+      <TubeStroke d={`M0 ${at}H${end - 22}C${end - 4} ${at} ${end} ${at - 6} ${end} 112`} />
     </svg>
   );
 }
@@ -547,11 +560,14 @@ export function BuildReduxTower() {
             <Fan key={x} at={[x, 2.6, -2.8]} size={5.5} turn="down" />
           ))}
           {/* Two tubes off the pump's left side, round under it, crossing as they climb to the tank. */}
+          <div className={`${classes.plane} ${classes.tubeExits}`}>
+            <TubeExits />
+          </div>
           <div className={`${classes.plane} ${classes.tube} ${classes.tubeNear}`}>
-            <TubeRun length={13.07} from={78} />
+            <TubeRun length={11.81} at={128} />
           </div>
           <div className={`${classes.plane} ${classes.tube} ${classes.tubeFar}`}>
-            <TubeRun length={11.44} from={90} />
+            <TubeRun length={10.21} at={124} />
           </div>
           <div className={`${classes.plane} ${classes.risers}`}>
             <TubeRisers />

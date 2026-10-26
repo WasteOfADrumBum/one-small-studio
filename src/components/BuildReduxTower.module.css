@@ -300,23 +300,32 @@
   box-shadow: inset 0 0.06em 0 rgb(255 255 255 / 0.18);
 }
 
-/* Each tube's run is in a plane turned to follow the line from the pump's side to the foot of
-   its riser: the near one ends by the glass, the far one by the back wall. */
+/* The tubes leave the pump's left side just behind its face and curl round under it. */
+.tubeExits {
+  top: 7em;
+  left: 6.4em;
+  width: 3em;
+  height: 6.4em;
+  transform: translateZ(-8.95em);
+}
+
+/* From under the pump each run turns to follow the line to the foot of its riser: the near one
+   ends by the glass, the far one by the back wall. */
 .tube {
   top: 0;
-  left: 8.2em;
+  left: 9.4em;
   height: 20em;
   transform-origin: 0 0;
 }
 
 .tubeNear {
-  width: 13.07em;
-  transform: translateZ(-9.4em) rotateY(-29.3deg);
+  width: 11.81em;
+  transform: translateZ(-8.95em) rotateY(-30.26deg);
 }
 
 .tubeFar {
-  width: 11.44em;
-  transform: translateZ(-9.4em) rotateY(-5deg);
+  width: 10.21em;
+  transform: translateZ(-8.95em) rotateY(-3.09deg);
 }
 
 /* The risers climb across the depth of the case, under the tank. */
