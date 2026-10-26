@@ -17,7 +17,8 @@ export type GearKind =
   | 'effects'
   | 'drum'
   | 'cymbals'
-  | 'drum-module';
+  | 'drum-module'
+  | 'mixer';
 
 export type GearItem = {
   brand: string;
@@ -61,7 +62,7 @@ export const gear: GearGroup[] = [
         brand: 'Pearl',
         model: 'Acoustic kits',
         note: 'Live and studio workhorse',
-        size: 4,
+        size: 2,
         half: true,
         kind: 'drum',
         finish: 'black',
@@ -70,7 +71,7 @@ export const gear: GearGroup[] = [
         brand: 'Ludwig',
         model: 'Acoustic kits',
         note: 'The classic rock and punk sound',
-        size: 4,
+        size: 2,
         half: true,
         kind: 'drum',
         finish: 'silver',
@@ -82,6 +83,14 @@ export const gear: GearGroup[] = [
         size: 2,
         half: true,
         kind: 'cymbals',
+      },
+      // Live sound only now and then, so it fills the rack without a nameplate of its own.
+      {
+        brand: 'Behringer',
+        model: 'Eurorack Pro RX1202FX',
+        note: 'Rack mixer for the odd live gig',
+        size: 3,
+        kind: 'mixer',
       },
       {
         brand: 'Alesis',

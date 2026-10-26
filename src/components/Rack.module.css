@@ -814,22 +814,7 @@
   font-size: 0.7rem;
 }
 
-/* A 4U half-rack is taller than it is wide: name on top, its controls underneath. */
-.unit[data-half][data-size='4'] .face {
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 10px;
-  padding: 8px 10px;
-}
-
-@container (min-width: 150px) {
-  .unit[data-half][data-size='4'] .hw {
-    display: grid;
-  }
-}
-
-/* The DM5 and BX1600 are drawn edge to edge. */
+/* The DM5, BX1600 and RX1202FX are drawn edge to edge. */
 .unit[data-device='dm5'] {
   --plate: linear-gradient(180deg, #3a3b42 0%, #25262b 100%);
 }
@@ -839,7 +824,22 @@
 }
 
 .unit[data-device='dm5'] .face,
-.unit[data-device='bx1600'] .face {
+.unit[data-device='bx1600'] .face,
+.unit[data-device='rx1202'] .face {
   padding: 0;
   align-items: stretch;
+}
+
+/* The mixer's own silver ears are part of its drawing. */
+.unit[data-device='rx1202'] {
+  grid-template-columns: 0 minmax(0, 1fr) 0;
+  --plate: #d4d6d9;
+}
+
+.unit[data-device='rx1202'] .ear {
+  visibility: hidden;
+}
+
+.unit[data-device='rx1202'] .face {
+  border: 0;
 }

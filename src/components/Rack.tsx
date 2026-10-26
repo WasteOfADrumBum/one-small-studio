@@ -2,13 +2,13 @@ import { useState, type CSSProperties, type ReactNode } from 'react';
 import type { GearItem, RackSize } from '@/content/gear';
 import { AlesisDM5 } from './AlesisDM5';
 import { AvatarCab } from './AvatarCab';
+import { BehringerRX1202FX } from './BehringerRX1202FX';
 import { BossGtPro } from './BossGtPro';
 import { CarvinBX1600 } from './CarvinBX1600';
 import { CarvinV3M } from './CarvinV3M';
 import { OctoPreMkII, Scarlett18i20 } from './Focusrite';
 import { FurmanM8Lx } from './Furman';
 import { LiveWirePC1100 } from './LiveWirePC1100';
-import { Knob } from './hardware/Knob';
 import { Screw } from './hardware/Screw';
 import classes from './Rack.module.css';
 
@@ -129,6 +129,7 @@ const MOUNTED: Partial<
   'amp-head': [{ device: 'carvin', size: 4, draw: <CarvinV3M /> }],
   'bass-amp': [{ device: 'bx1600', size: 2, draw: <CarvinBX1600 /> }],
   'drum-module': [{ device: 'dm5', size: 1, draw: <AlesisDM5 /> }],
+  mixer: [{ device: 'rx1202', size: 3, draw: <BehringerRX1202FX /> }],
   // The cab itself stands on its end behind the rack; see RackCabinet's `behind`.
   'speaker-cab': [],
   effects: [{ device: 'gtpro', size: 2, draw: <BossGtPro /> }],
@@ -157,9 +158,11 @@ export function RackUnit({ item }: { item: GearItem }) {
     const plate = (item.size - mounted.reduce((sum, m) => sum + m.size, 0)) as RackSize;
     return (
       <>
-        <Mount size={plate} kind="nameplate">
-          <Nameplate item={item} />
-        </Mount>
+        {plate > 0 && (
+          <Mount size={plate} kind="nameplate">
+            <Nameplate item={item} />
+          </Mount>
+        )}
         {mounted.map(({ device, size, draw }) => (
           <Mount key={device} size={size} kind="device" device={device} hidden>
             {draw}
@@ -177,7 +180,7 @@ export function RackUnit({ item }: { item: GearItem }) {
 }
 
 /**
- * Half-rack gear, two to a row side by side, each with its own ears. A lone half-rack unit gets a
+ * Half-rack gear, two to a row side by side, each with its own ears and just its name. A lone half-rack unit gets a
  * vented blank beside it to fill the row.
  */
 export function HalfRackRow({ items }: { items: GearItem[] }) {
@@ -193,7 +196,6 @@ export function HalfRackRow({ items }: { items: GearItem[] }) {
           half
         >
           <Nameplate item={item} />
-          <Faceplate item={item} />
         </Mount>
       ))}
       {items.length === 1 && (
@@ -262,22 +264,6 @@ function Faceplate({ item }: { item: GearItem }) {
       return (
         <div className={classes.hw} data-hw="cab" aria-hidden="true">
           <AvatarCab />
-        </div>
-      );
-    // Drum-related modules: a level display, a selector dial and grouped pads.
-    case 'drum':
-    case 'cymbals':
-      return (
-        <div className={classes.hw} data-hw="module" data-variant={item.kind} aria-hidden="true">
-          <span className={classes.lcd} data-tone="amber" data-bars>
-            {[0.5, 0.8, 0.35, 0.65, 0.9, 0.45, 0.7, 0.3].map((h, i) => (
-              <i key={i} style={{ '--h': h } as CSSProperties} />
-            ))}
-          </span>
-          <Knob size={28} angle={item.kind === 'cymbals' ? -50 : 60} />
-          <span className={classes.keys} data-pads={item.kind === 'cymbals' ? 'round' : ''}>
-            {pads(item.kind === 'cymbals' ? 6 : 8)}
-          </span>
         </div>
       );
     default:
