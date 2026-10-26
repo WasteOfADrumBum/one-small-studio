@@ -70,8 +70,9 @@ export function TrackList({ variant, label }: TrackListProps) {
                 data-playing={isPlaying || undefined}
                 aria-current={isCurrent ? 'true' : undefined}
                 onClick={() => onTrack(i)}
-                aria-label={`${isPlaying ? 'Pause' : 'Play'} ${track.title}, ${formatTime(track.duration)}`}
               >
+                {/* Named by what it shows, so voice control users can say what they see. */}
+                <span className="visually-hidden">{isPlaying ? 'Pause ' : 'Play '}</span>
                 <span className={classes.num} aria-hidden="true">
                   {isPlaying ? '▶' : String(i + 1).padStart(2, '0')}
                 </span>

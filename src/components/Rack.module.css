@@ -578,15 +578,6 @@
   grid-template-columns: repeat(5, 18px);
 }
 
-/* Cabinet: the Avatar 2x12, its 3:2 box as tall as the unit allows beside the text. */
-.hw[data-hw='cab'] {
-  width: min(58cqi, calc((var(--size) * var(--u) - 10px) * 1.5));
-}
-
-.unit[data-kind='speaker-cab'] .face {
-  flex-wrap: wrap;
-}
-
 /* ---- Power conditioner: the Furman fills its whole 1U panel ---- */
 
 .unit[data-kind='power'] {
@@ -653,24 +644,6 @@
 @container (max-width: 270px) {
   .hw {
     display: none;
-  }
-}
-
-/*
- * On phones, where the cases stack and a unit can grow without misaligning its neighbours, the cab
- * moves under its text instead of disappearing.
- */
-@media (max-width: $mantine-breakpoint-sm) {
-  @container (max-width: 270px) {
-    .unit[data-kind='speaker-cab'] .text {
-      flex-basis: 100%;
-    }
-
-    .hw.hw[data-hw='cab'] {
-      display: block;
-      width: min(100%, 140px);
-      padding-bottom: 6px;
-    }
   }
 }
 

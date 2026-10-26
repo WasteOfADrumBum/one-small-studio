@@ -1,7 +1,6 @@
 import { useState, type CSSProperties, type ReactNode } from 'react';
 import type { GearItem, RackSize } from '@/content/gear';
 import { AlesisDM5 } from './AlesisDM5';
-import { AvatarCab } from './AvatarCab';
 import { BehringerRX1202FX } from './BehringerRX1202FX';
 import { BossGtPro } from './BossGtPro';
 import { CarvinBX1600 } from './CarvinBX1600';
@@ -257,13 +256,6 @@ function Faceplate({ item }: { item: GearItem }) {
           <span className={classes.keys} data-row>
             {pads(5)}
           </span>
-        </div>
-      );
-    // Cabinet: the white Avatar 2x12, speakers ghosting through the cloth.
-    case 'speaker-cab':
-      return (
-        <div className={classes.hw} data-hw="cab" aria-hidden="true">
-          <AvatarCab />
         </div>
       );
     default:

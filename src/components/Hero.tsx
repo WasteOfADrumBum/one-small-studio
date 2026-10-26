@@ -20,7 +20,10 @@ export function Hero() {
             Live since {site.playingLiveSince} · Recording Workshop {site.recordingWorkshopGrad}
           </span>
           <h1 id="hero-title" className={classes.title}>
-            {words.map((word, i) => (
+            {/* The spaces keep the heading's text "One Small Studio" for screen readers; the flex
+                gap does the visual spacing. */}
+            {words.map((word, i) => [
+              i > 0 && ' ',
               <motion.span
                 key={word}
                 className={i === 1 ? classes.accent : undefined}
@@ -29,8 +32,8 @@ export function Hero() {
                 transition={{ delay: 0.1 + i * 0.1, duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
               >
                 {word}
-              </motion.span>
-            ))}
+              </motion.span>,
+            ])}
           </h1>
           <p className={classes.lede}>
             {site.tagline} Drummer, audio engineer, live sound tech and producer in {genreList}.

@@ -3,6 +3,16 @@ import { contact } from './routes/contact.js';
 
 const MUTATING = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
+/** The host an Origin header names, or null when it is missing or not a URL (such as "null"). */
+function originHost(origin: string | undefined): string | null {
+  if (!origin) return null;
+  try {
+    return new URL(origin).host;
+  } catch {
+    return null;
+  }
+}
+
 export const app = express();
 
 app.disable('x-powered-by');
@@ -13,9 +23,8 @@ app.use(express.json({ limit: '1mb' }));
 // CSRF: JSON calls that change data must come from this site's own pages.
 app.use((req: Request, res: Response, next: NextFunction) => {
   if (!MUTATING.has(req.method)) return next();
-  const origin = req.get('origin');
   const host = req.get('x-forwarded-host') ?? req.get('host');
-  if (!origin || new URL(origin).host !== host) return res.status(403).send('Forbidden');
+  if (!host || originHost(req.get('origin')) !== host) return res.status(403).send('Forbidden');
   next();
 });
 

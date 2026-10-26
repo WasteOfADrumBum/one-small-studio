@@ -54,8 +54,6 @@ const rigSpecs = [
   ['Storage', '4TB M.2 NVMe SSD'],
 ] as const;
 
-const clipLabel = (era: Era) => `${era.title}, ${era.lane} track, ${yearLabel(era)}`;
-
 /**
  * Section 2, "The Story": the timeline as an edit window on a studio monitor. Where the whole session
  * fits on the screen, the playhead moves along it; on smaller screens the session scrolls sideways
@@ -316,7 +314,6 @@ export function Story() {
                         className={classes.clip}
                         data-lane={c.lane}
                         aria-pressed={i === selected}
-                        aria-label={clipLabel(c)}
                         title={c.title}
                         onClick={() => !drag.moved() && select(i)}
                         onKeyDown={(e) => onClipKey(e, i)}
@@ -332,6 +329,8 @@ export function Story() {
                           <span className={classes.clipText}>
                             <span className={classes.clipTitle}>{c.title}</span>
                             <span className={classes.clipYears}>{yearLabel(c)}</span>
+                            {/* Named by what it shows, plus the lane for screen readers. */}
+                            <span className="visually-hidden">, {c.lane} track</span>
                           </span>
                         </span>
                         <Waveform seed={c.title} lane={c.lane} className={classes.wave} />
