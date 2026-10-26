@@ -1,10 +1,11 @@
-import type { CSSProperties, ReactNode } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
 import type { GearItem, RackSize } from '@/content/gear';
 import { AvatarCab } from './AvatarCab';
+import { BossGtPro } from './BossGtPro';
 import { CarvinV3M } from './CarvinV3M';
 import { OctoPreMkII, Scarlett18i20 } from './Focusrite';
+import { FurmanM8Lx } from './Furman';
 import { Knob } from './hardware/Knob';
-import { Led } from './hardware/Led';
 import { Screw } from './hardware/Screw';
 import classes from './Rack.module.css';
 
@@ -18,20 +19,35 @@ type CabinetProps = {
 /**
  * A carpet-covered rack case: a top and one side visible for depth, a thick front frame the gear
  * sits just behind, recessed metal rails, and a plinth on casters. The rack lights on the power
- * conditioner at the top wash down over the faceplates below.
+ * conditioner at the top wash down over the faceplates below; its rocker powers the whole rack and
+ * its dimmer sets how bright the lights are.
  */
 export function RackCabinet({ title, side, children }: CabinetProps) {
+  const [power, setPower] = useState(true);
+  const [lights, setLights] = useState(100);
   return (
     <section className={classes.cabinet} data-side={side}>
       <span className={classes.top} aria-hidden="true" />
       <span className={classes.sidePanel} aria-hidden="true" />
       <div className={classes.frame}>
         <h3 className={classes.plate}>{title}</h3>
-        <div className={classes.bay}>
+        <div
+          className={classes.bay}
+          data-power={power ? 'on' : 'off'}
+          style={{ '--lights': power ? lights / 100 : 0 } as CSSProperties}
+        >
           <span className={classes.rail} data-side="left" aria-hidden="true" />
           <span className={classes.rail} data-side="right" aria-hidden="true" />
           <div className={classes.units}>
-            <PowerConditioner />
+            <Mount size={1} kind="power">
+              <FurmanM8Lx
+                rack={title}
+                power={power}
+                onPower={setPower}
+                lights={lights}
+                onLights={setLights}
+              />
+            </Mount>
             {children}
           </div>
           <span className={classes.wash} aria-hidden="true" />
@@ -89,41 +105,15 @@ function Mount({
 }
 
 /**
- * The 1U power conditioner every case starts with: rack-light switch and dimmer, two pull-out
- * lamps, a status window, and the main rocker. Studio framing only, so it carries no brand, no
- * model and no live readings.
- */
-function PowerConditioner() {
-  return (
-    <Mount size={1} kind="power" hidden>
-      <span className={classes.pcGroup}>
-        <span className={classes.pcLabel}>Rack lights</span>
-        <span className={classes.toggle} />
-        <Knob size={16} angle={40} />
-      </span>
-      <span className={classes.lamp} />
-      <span className={classes.pcWindow}>
-        <Led on color="green" />
-        <span>Power</span>
-      </span>
-      <span className={classes.lamp} />
-      <span className={classes.pcGroup}>
-        <span className={classes.rocker} />
-        <span className={classes.pcLabel}>On</span>
-      </span>
-    </Mount>
-  );
-}
-
-/**
  * Gear that really is rack-mounted, drawn as itself: the item's size covers a 1U nameplate and the
- * units bolted in under it. The Carvin head sits on black brackets across 2U; the Focusrite pair
- * fill 1U each.
+ * units bolted in under it. The Carvin head sits on black brackets across 2U, the Boss GT-Pro fills
+ * 2U and the Focusrite pair fill 1U each.
  */
 const MOUNTED: Partial<
   Record<GearItem['kind'], { device: string; size: RackSize; draw: ReactNode }[]>
 > = {
   'amp-head': [{ device: 'carvin', size: 2, draw: <CarvinV3M /> }],
+  effects: [{ device: 'gtpro', size: 2, draw: <BossGtPro /> }],
   interface: [
     { device: 'scarlett', size: 1, draw: <Scarlett18i20 /> },
     { device: 'octopre', size: 1, draw: <OctoPreMkII /> },
@@ -225,20 +215,6 @@ function Faceplate({ item }: { item: GearItem }) {
           <AvatarCab />
         </div>
       );
-    case 'effects':
-      return (
-        <div className={classes.hw} data-hw="effects" aria-hidden="true">
-          <span className={classes.lcd} data-tone="red">
-            P01
-          </span>
-          <span className={classes.paramKnobs}>
-            {[-70, 10, 80].map((a) => (
-              <Knob key={a} size={20} angle={a} />
-            ))}
-          </span>
-          <span className={classes.keys}>{pads(6)}</span>
-        </div>
-      );
     // Drum-related modules: a level display, a selector dial and grouped pads.
     case 'drum':
     case 'cymbals':
@@ -249,7 +225,7 @@ function Faceplate({ item }: { item: GearItem }) {
               <i key={i} style={{ '--h': h } as CSSProperties} />
             ))}
           </span>
-          <Knob size={34} angle={item.kind === 'cymbals' ? -50 : 60} />
+          <Knob size={28} angle={item.kind === 'cymbals' ? -50 : 60} />
           <span className={classes.keys} data-pads={item.kind === 'cymbals' ? 'round' : ''}>
             {pads(item.kind === 'cymbals' ? 6 : 8)}
           </span>
@@ -261,7 +237,7 @@ function Faceplate({ item }: { item: GearItem }) {
           <span className={classes.lcd} data-tone="green">
             KIT 01
           </span>
-          <Knob size={40} angle={30} />
+          <Knob size={28} angle={30} />
           <span className={classes.keys} data-pads="">
             {pads(8)}
           </span>

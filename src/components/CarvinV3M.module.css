@@ -171,3 +171,12 @@
     opacity: 1;
   }
 }
+
+/* Unplugged: the valves cool and the LEDs go out. */
+:global([data-power='off']) .tube {
+  visibility: hidden;
+}
+
+:global([data-power='off']) .led {
+  opacity: 0.12;
+}

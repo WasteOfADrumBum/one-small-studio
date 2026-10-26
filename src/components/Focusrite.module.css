@@ -211,3 +211,17 @@
   font-weight: 400 !important;
   fill: #10324a;
 }
+
+/* Unplugged: meters and status lamps go dark. */
+:global([data-power='off']) .seg[data-lit],
+:global([data-power='off']) .green {
+  fill: #12301c;
+}
+
+:global([data-power='off']) .red {
+  fill: #3a1214;
+}
+
+:global([data-power='off']) .usb {
+  stroke: #12301c;
+}

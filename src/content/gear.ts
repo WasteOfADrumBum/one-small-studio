@@ -2,8 +2,9 @@
  * The Studio gear, in three rack cabinets. The admin will take this list over in a later phase.
  *
  * Every item is drawn as a rack-mounted module, whatever it really is. `size` is its height in rack
- * units (U) and `kind` picks the faceplate style that suggests its category. Both are presentation
- * only and say nothing about specs, ownership, or whether the real thing is rack gear.
+ * units (U) and `kind` picks the faceplate style that suggests its category. Real rack gear (the
+ * Carvin, the Focusrite pair, the Boss) is drawn as itself under a 1U nameplate, and its `size`
+ * counts both. Both are presentation only.
  */
 export type RackSize = 1 | 2 | 3;
 
@@ -66,7 +67,7 @@ export const gear: GearGroup[] = [
         brand: 'Boss',
         model: 'Effects',
         note: 'Pedals for everything from ska upstrokes to metal',
-        size: 2,
+        size: 3,
         kind: 'effects',
       },
     ],
