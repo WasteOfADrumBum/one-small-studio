@@ -6,6 +6,8 @@ type StudioMonitorProps = {
   children: ReactNode;
   /** Shown in the recessed display on the front of the desk unit the monitor stands on. */
   notes: ReactNode;
+  /** Shown under the desk unit, describing the computer it stands for. */
+  caption?: ReactNode;
 };
 
 /**
@@ -13,7 +15,7 @@ type StudioMonitorProps = {
  * front display carries the session notes. On wide screens it is the 49" 32:9 super ultrawide; on
  * tablets and phones, the 32" 16:9. `children` is the live screen content.
  */
-export function StudioMonitor({ children, notes }: StudioMonitorProps) {
+export function StudioMonitor({ children, notes, caption }: StudioMonitorProps) {
   return (
     <div className={classes.monitor}>
       <div className={classes.panel}>
@@ -34,6 +36,7 @@ export function StudioMonitor({ children, notes }: StudioMonitorProps) {
           <Screw className={classes.fastener} size={8} turn={-30} />
         </div>
       </div>
+      {caption}
     </div>
   );
 }

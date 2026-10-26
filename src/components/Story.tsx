@@ -46,6 +46,14 @@ const { rowOf, laneRows, laneTop, totalRows } = layout();
 /** Years from the last event's start to the end of the timeline: the post-roll it needs. */
 const tail = timelineEnd - clips[clips.length - 1].start;
 
+/** Josh's PC: the desk unit the monitor stands on. */
+const rigSpecs = [
+  ['CPU', 'AMD Ryzen 9 9950X3D'],
+  ['GPU', 'NVIDIA RTX 5090'],
+  ['Memory', '32GB DDR5'],
+  ['Storage', '4TB M.2 NVMe SSD'],
+] as const;
+
 const clipLabel = (era: Era) => `${era.title}, ${era.lane} track, ${yearLabel(era)}`;
 
 /**
@@ -119,6 +127,24 @@ export function Story() {
         </SectionHeader>
 
         <StudioMonitor
+          caption={
+            <div className={classes.rig}>
+              <p className={classes.rigText}>
+                <span className={classes.notesLabel}>The rig</span>
+                The box under the screen is my PC, a liquid-cooled Build Redux Ultra behind tempered
+                glass with red-lit fans. It runs every session and mix I make, and it doesn&apos;t
+                mind holding up the monitor.
+              </p>
+              <dl className={classes.rigSpecs}>
+                {rigSpecs.map(([part, model]) => (
+                  <div key={part}>
+                    <dt>{part}</dt>
+                    <dd>{model}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          }
           notes={
             <div className={classes.notes} aria-live="polite" aria-atomic="true">
               <div className={classes.notesHead}>
