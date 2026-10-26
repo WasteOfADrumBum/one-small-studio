@@ -47,7 +47,7 @@
   height: 0;
 }
 
-/* One em is a 24th of the tower's box: the case is 22em deep, 11em wide and 24em tall. */
+/* One em is a 24th of the tower's box: the case is 22em long, 11em deep and 24em tall. */
 .scene {
   position: absolute;
   inset: 0;
@@ -56,7 +56,7 @@
   perspective-origin: 30% 58%;
 }
 
-/* Turned so the glass side and the glass front with its fans both face out, like the renders. */
+/* Turned three-quarter on, like the render: the long glass front and the glass left side. */
 .case {
   position: absolute;
   top: 1.6em;
@@ -68,159 +68,312 @@
   transform-origin: 50% 50%;
 }
 
-.case > * {
-  position: absolute;
-  top: 0;
-  left: 0;
-  box-sizing: border-box;
-}
-
 .fill {
   display: block;
   width: 100%;
   height: 100%;
 }
 
-/* ---- Inside: the far wall with the board, the GPU nearer the glass, the rear wall ---- */
+/* ---- Parts: flat planes and solid boxes ---- */
 
-.tray,
-.gpu {
-  width: 22em;
-  height: 19em;
+.plane {
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
 }
 
-.tray {
-  transform: translateZ(-10.5em);
+/* A box's corner sits at (--x, --y, --z); it runs --w along, --h down and --d back. */
+.box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--w);
+  height: var(--h);
+  transform-style: preserve-3d;
+  transform-origin: 0 0;
+  transform: translate3d(var(--x), var(--y), var(--z));
 }
 
-.gpu {
-  transform: translateZ(-4.5em);
+.box[data-turn='end'] {
+  transform: translate3d(var(--x), var(--y), var(--z)) rotateY(90deg);
 }
 
-.rear {
-  display: flex;
-  justify-content: center;
-  width: 11em;
-  height: 19em;
-  padding-top: 2.6em;
-  background: linear-gradient(90deg, #0c0305, #3a0812);
+.box[data-turn='down'] {
+  transform: translate3d(var(--x), var(--y), var(--z)) rotateX(-90deg);
+}
+
+.face {
+  position: absolute;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.face[data-face='front'] {
+  inset: 0;
+}
+
+.face[data-face='left'],
+.face[data-face='right'] {
+  top: 0;
+  width: var(--d);
+  height: 100%;
   transform-origin: left;
   transform: rotateY(90deg);
 }
 
-.fan {
-  display: block;
-  flex: none;
-  width: 6.2em;
-  height: 6.2em;
+.face[data-face='left'] {
+  left: 0;
 }
 
-/* The 360mm radiator under the roof, its three fans facing down into the case. */
-.radiator {
-  display: flex;
-  top: 0.5em;
-  left: 1.8em;
-  width: 18.6em;
-  height: 6.6em;
-  padding-top: 0.2em;
-  background: repeating-linear-gradient(90deg, #121215 0 0.18em, #0a0a0c 0.18em 0.36em);
-  transform-origin: top;
-  transform: translateZ(-2.2em) rotateX(-90deg);
+.face[data-face='right'] {
+  left: 100%;
 }
 
-/* The three front intakes, stacked behind the front glass. */
-.intakes {
-  display: flex;
-  flex-direction: column;
-  left: 20.6em;
-  top: 0.4em;
-  width: 6.2em;
-  height: 18.6em;
-  transform-origin: left;
-  transform: translateZ(-2.4em) rotateY(90deg);
-}
-
-/* The 5090 is a brick, not a sheet: its top runs back from the face to the board, lit along the
-   front edge by the same rainbow bar. */
-.gpuTop {
-  top: 11.2em;
-  left: 1.6em;
-  width: 18.8em;
-  height: 6em;
-  background: repeating-linear-gradient(90deg, #2a2b30 0 0.12em, #18181c 0.12em 0.3em), #18181c;
-  box-shadow: inset 0 -1em 1.2em rgb(0 0 0 / 0.6);
-  transform-origin: top;
-  transform: translateZ(-4.5em) rotateX(-90deg);
-}
-
-.rainbowEdge {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 0.16em;
-  background: linear-gradient(90deg, #36d6ff, #5fe08a, #ffb547, #ff4fd8);
-  box-shadow: 0 0 0.6em rgb(255 255 255 / 0.4);
-}
-
-/* The top of the PSU shroud, catching the red light. */
-.shroudTop {
-  top: 19em;
-  width: 22em;
-  height: 11em;
-  background:
-    radial-gradient(ellipse 60% 70% at 55% 20%, rgb(255 42 64 / 0.22), transparent 70%),
-    repeating-linear-gradient(90deg, #121215 0 0.5em, #0b0b0d 0.5em 0.7em);
+.face[data-face='top'],
+.face[data-face='bottom'] {
+  left: 0;
+  width: 100%;
+  height: var(--d);
   transform-origin: top;
   transform: rotateX(-90deg);
 }
 
-/* ---- Outside: the glass side and front with their black rims, the shroud, the riser ---- */
-
-.side,
-.front {
-  height: 24em;
-  background:
-    linear-gradient(
-      112deg,
-      rgb(255 255 255 / 0.13) 0%,
-      rgb(255 255 255 / 0.03) 20%,
-      transparent 21%,
-      transparent 58%,
-      rgb(255 255 255 / 0.06) 59%,
-      rgb(255 255 255 / 0.015) 72%,
-      transparent 73%
-    ),
-    rgb(30 6 10 / 0.12);
-  box-shadow:
-    inset 0 0 0 0.22em #050506,
-    inset 0 0 0 calc(0.22em + 1px) rgb(255 255 255 / 0.14),
-    inset 0 0.5em 0 #050506;
+.face[data-face='top'] {
+  top: 0;
 }
 
-.side {
+.face[data-face='bottom'] {
+  top: 100%;
+}
+
+/* ---- The case's walls ---- */
+
+.backWall {
   width: 22em;
+  height: 19em;
+  transform: translateZ(-10.8em);
 }
 
-.front {
-  left: 22em;
-  width: 11em;
+.endWall {
+  width: 10.8em;
+  height: 19em;
   transform-origin: left;
   transform: rotateY(90deg);
 }
 
-.sideShroud,
-.frontShroud {
+.roof {
+  width: 22em;
+  height: 10.8em;
+  background:
+    radial-gradient(ellipse 50% 60% at 50% 50%, rgb(255 42 64 / 0.16), transparent 70%),
+    radial-gradient(circle, #020203 0.12em, transparent 0.15em) 0 0 / 0.4em 0.4em,
+    #0d0d10;
+  transform-origin: top;
+  transform: rotateX(-90deg);
+}
+
+/* ---- Fans: a frame with depth, its edges ringed in light like the render's fans ---- */
+
+.fan > .face:not([data-face='front']) {
+  background: linear-gradient(90deg, #121215 0 18%, #ff3a4c 18% 24%, #121215 24%);
+  box-shadow: 0 0 0.3em rgb(255 42 64 / 0.35);
+}
+
+.fan > .face[data-face='top'],
+.fan > .face[data-face='bottom'] {
+  background: linear-gradient(180deg, #121215 0 18%, #ff3a4c 18% 24%, #121215 24%);
+}
+
+/* ---- Board parts ---- */
+
+.ioCover > .face {
+  background: linear-gradient(160deg, #9f9799, #6f6769);
+}
+
+.ioCover > .face[data-face='front'] {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(170deg, #d6cdcf, #a49a9d 60%, #7e7577);
+  box-shadow: inset 0 0 0 0.06em rgb(255 255 255 / 0.25);
+}
+
+.msi {
+  writing-mode: vertical-rl;
+  font-family: var(--mantine-font-family);
+  font-size: 0.7em;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: 0.1em;
+  color: #3b2e32;
+}
+
+.alloy > .face {
+  background:
+    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.45) 0 0.08em, transparent 0.08em 0.24em),
+    linear-gradient(180deg, #5d5f66, #2b2c31);
+}
+
+.alloy > .face[data-face='top'] {
+  background: linear-gradient(180deg, #6a6c73, #3a3b41);
+}
+
+.ram > .face {
+  background: linear-gradient(180deg, #1a1a1f, #0b0b0e);
+}
+
+.ramLight,
+.ramTop {
   position: absolute;
+  inset: 0;
+}
+
+.ramLight {
+  inset: 0 0 auto;
+  height: 0.5em;
+  background: linear-gradient(90deg, #36d6ff, #ff4fd8);
+  box-shadow: 0 0 0.6em #ff4fd8;
+}
+
+.ramTop {
+  background: linear-gradient(180deg, #36d6ff, #6a5cff, #ff4fd8);
+  box-shadow: 0 0 0.8em 0.2em rgb(160 100 255 / 0.8);
+}
+
+.pump > .face {
+  background: linear-gradient(180deg, #1e1e23, #0b0b0d);
+}
+
+.pump > .face[data-face='front'] {
+  display: grid;
+  place-items: center;
+  border-radius: 0.5em;
+  background: radial-gradient(circle at 40% 35%, #26262c, #0c0c0f 70%);
+  box-shadow:
+    inset 0 0 0 0.08em #35353b,
+    0 0 1.2em rgb(255 42 64 / 0.35);
+}
+
+.pumpLogo {
+  width: 55%;
+  height: auto;
+}
+
+/* ---- The 5090 ---- */
+
+.gpu > .face {
+  background: linear-gradient(180deg, #2a2b30, #111114);
+}
+
+.gpu > .face[data-face='front'] {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0 0.6em 0 2.6em;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.16), transparent 0.3em),
+    linear-gradient(180deg, #4a4b52, #2b2c31 25%, #141417);
+  box-shadow: inset 0 -0.3em 0.4em rgb(0 0 0 / 0.6);
+}
+
+.gpu > .face[data-face='top'] {
+  background:
+    linear-gradient(90deg, transparent 30%, rgb(0 0 0 / 0.4) 30% 32%, transparent 32%),
+    linear-gradient(180deg, #3a3b41, #1f2024);
+}
+
+.gpu > .face[data-face='right'] {
+  background: repeating-linear-gradient(180deg, #2c2d33 0 0.08em, #0f0f12 0.08em 0.22em), #18181c;
+}
+
+.gpu > .face[data-face='bottom'] {
+  background: radial-gradient(circle at 30% 50%, #1a1a1e 1.8em, #08080a 1.9em);
+}
+
+.gpuEdge,
+.gpuTopEdge {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 0.14em;
+  background: linear-gradient(90deg, #36d6ff, #5fe08a, #ffb547, #ff4fd8);
+  box-shadow: 0 0 0.6em rgb(255 255 255 / 0.5);
+}
+
+.gpuTopEdge {
   inset: auto 0 0;
-  height: 5em;
+}
+
+.rtx {
+  font-family: var(--mantine-font-family);
+  font-size: 0.6em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #c4c6cc;
+  white-space: nowrap;
+}
+
+.gpuBadge {
+  width: 1.4em;
+  height: 1.2em;
+  margin-left: auto;
+  border-radius: 0.15em;
+  background: linear-gradient(90deg, #36d6ff, #5fe08a, #ffb547, #ff4fd8);
+  box-shadow: 0 0 0.7em rgb(255 255 255 / 0.4);
+}
+
+.gpuCable {
+  top: 9em;
+  left: 11.4em;
+  width: 6em;
+  height: 3.4em;
+  transform-origin: left;
+  transform: translateZ(-4.6em) rotateY(90deg);
+}
+
+/* ---- Cooling loop ---- */
+
+.radiator > .face {
+  background: repeating-linear-gradient(90deg, #17171b 0 0.1em, #08080a 0.1em 0.22em), #0c0c0e;
+  box-shadow: inset 0 0.1em 0 rgb(255 255 255 / 0.12);
+}
+
+.tank > .face {
+  background: linear-gradient(180deg, #1c1c21, #08080a);
+  box-shadow: inset 0 0.06em 0 rgb(255 255 255 / 0.18);
+}
+
+/* From the pump up to the tank: a plane turned to run along the line between them. */
+.tubes {
+  left: 9.8em;
+  width: 10.9em;
+  height: 8em;
+  transform-origin: 0 0;
+  transform: translateZ(-9.5em) rotateY(-27.3deg);
+}
+
+/* ---- Outside: the shroud, the glass and the riser ---- */
+
+.shroud > .face {
   background: linear-gradient(180deg, #1d1d22 0%, #0f0f12 35%, #070708 100%);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.16),
     inset 0 -0.22em 0 #030304;
 }
 
+.shroud > .face[data-face='right'] {
+  display: grid;
+  place-items: center;
+}
+
+.shroud > .face[data-face='top'] {
+  background:
+    radial-gradient(ellipse 70% 60% at 60% 50%, rgb(255 42 64 / 0.28), transparent 70%),
+    repeating-linear-gradient(90deg, #121215 0 0.5em, #0b0b0d 0.5em 0.7em);
+  box-shadow: none;
+}
+
 /* The shroud's recessed slot, like the renders. */
-.sideShroud::before {
-  content: '';
+.shroudSlot {
   position: absolute;
   top: 0.5em;
   left: 8%;
@@ -230,55 +383,60 @@
   background: #040405;
 }
 
-.frontShroud {
-  display: grid;
-  place-items: center;
+/* Drawn a little wide, since the end of the case is seen so far round. */
+.shroudLogo {
+  width: 2.3em;
+  height: 2.7em;
+  margin-top: 0.6em;
 }
 
-.logo {
-  width: 1.6em;
-  height: auto;
-  margin-top: 1em;
-  fill: #4c4c54;
+.glass {
+  height: 19em;
+  background:
+    linear-gradient(
+      112deg,
+      rgb(255 255 255 / 0.12) 0%,
+      rgb(255 255 255 / 0.03) 20%,
+      transparent 21%,
+      transparent 58%,
+      rgb(255 255 255 / 0.05) 59%,
+      rgb(255 255 255 / 0.015) 72%,
+      transparent 73%
+    ),
+    rgb(30 6 10 / 0.1);
+  box-shadow:
+    inset 0 0.55em 0 #050506,
+    inset 0 calc(0.55em + 1px) 0 rgb(255 255 255 / 0.12),
+    inset 0 0 0 1px rgb(255 255 255 / 0.14);
+}
+
+.glassFront {
+  width: 22em;
+}
+
+.glassSide {
+  left: 22em;
+  width: 11em;
+  transform-origin: left;
+  transform: rotateY(90deg);
 }
 
 /* Josh's black riser: a perforated slab on short legs. */
-.riserTop {
-  top: 24em;
-  left: -0.6em;
-  width: 23.2em;
-  height: 12.2em;
-  background: #141417;
-  transform-origin: top;
-  transform: translateZ(0.6em) rotateX(-90deg);
-}
-
-.riserSide,
-.riserFront {
-  top: 24em;
-  height: 1.6em;
+.riser > .face {
+  overflow: visible;
   background:
     radial-gradient(circle, #000 0.17em, transparent 0.2em) 0 50% / 1.2em 100% repeat-x,
     linear-gradient(180deg, #202024, #0d0d0f);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
 }
 
-.riserSide {
-  left: -0.6em;
-  width: 23.2em;
-  transform: translateZ(0.6em);
+.riser > .face[data-face='top'] {
+  background: #141417;
 }
 
-.riserFront {
-  left: 22.6em;
-  width: 12.2em;
-  transform-origin: left;
-  transform: translateZ(0.6em) rotateY(90deg);
-}
-
-.riserSide::before,
-.riserSide::after,
-.riserFront::after {
+.riser > .face[data-face='front']::before,
+.riser > .face[data-face='front']::after,
+.riser > .face[data-face='right']::after {
   content: '';
   position: absolute;
   top: 100%;
@@ -287,33 +445,16 @@
   background: linear-gradient(90deg, #0a0a0c, #1a1a1d, #070708);
 }
 
-.riserSide::before {
+.riser > .face[data-face='front']::before {
   left: 0.8em;
 }
 
-.riserSide::after,
-.riserFront::after {
+.riser > .face[data-face='front']::after,
+.riser > .face[data-face='right']::after {
   right: 0.8em;
 }
 
-/* ---- Labels and lighting ---- */
-
-.msi {
-  font-family: var(--mantine-font-family);
-  font-size: 9px;
-  font-weight: 800;
-  font-style: italic;
-  letter-spacing: 0.06em;
-  fill: #3b2e32;
-}
-
-.rtx {
-  font-family: var(--mantine-font-family);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  fill: #a3a5ac;
-}
+/* ---- Lighting ---- */
 
 .rotor {
   transform-box: fill-box;
