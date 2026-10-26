@@ -764,7 +764,8 @@
 
 /*
  * A big cab on its end on the floor behind the rack, four-fifths of the rack's height, with a
- * good part of it showing past the rack's right side. On phones it stands below the rack instead.
+ * good part of it showing past the rack's right side. On phones it sits upright below the rack
+ * instead, so the behind slot carries both drawings and shows one.
  */
 .behind {
   position: absolute;
@@ -781,16 +782,30 @@
   height: 100%;
 }
 
+.behind > svg:last-child {
+  display: none;
+}
+
 @media (max-width: 40em) {
   .behind {
     position: relative;
     z-index: auto;
     bottom: auto;
     align-self: center;
-    width: min(62%, 240px);
+    width: min(88%, 360px);
     height: auto;
+    aspect-ratio: auto;
     margin-top: 28px;
     translate: none;
+  }
+
+  .behind > svg:first-child {
+    display: none;
+  }
+
+  .behind > svg:last-child {
+    display: block;
+    height: auto;
   }
 }
 
