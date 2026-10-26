@@ -38,7 +38,12 @@ export function Studio() {
               power={group.power}
               side={i === 0 ? 'right' : i === gear.length - 1 ? 'left' : undefined}
               behind={
-                group.items.some((item) => item.kind === 'speaker-cab') && <AvatarCab sideways />
+                group.items.some((item) => item.kind === 'speaker-cab') && (
+                  <>
+                    <AvatarCab sideways />
+                    <AvatarCab />
+                  </>
+                )
               }
             >
               {racks[i].map((row) => {
