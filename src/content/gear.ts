@@ -1,5 +1,5 @@
 /**
- * The Studio gear, in two rack cabinets. The admin will take this list over in a later phase.
+ * The Studio gear, in two rack cabinets.
  *
  * Every item is drawn as a rack-mounted module, whatever it really is. `size` is its height in rack
  * units (U) and `kind` picks the faceplate style that suggests its category. Real rack gear (the
