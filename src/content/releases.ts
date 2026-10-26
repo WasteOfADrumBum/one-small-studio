@@ -4,8 +4,8 @@ import theManBehindTheMaskCover from '@/assets/covers/the-man-behind-the-mask.jp
 
 /**
  * The Catalog: one entry per release, each on its own shelf. Add releases here and the shelves and
- * liner notes grow with them, and the site's player can load any of them; the admin will take this
- * list over later. The first release is the one the player loads with the page.
+ * liner notes grow with them, and the site's player can load any of them. The first release is the
+ * one the player loads with the page.
  *
  * Releases are shown as record sleeves, but that's presentation only: `format` says what the
  * release really is, and the page says so next to it.

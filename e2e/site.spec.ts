@@ -55,7 +55,7 @@ test.describe('story timeline', () => {
     await expect(clips.first()).toHaveAttribute('aria-pressed', 'true');
     await story.getByRole('button', { name: 'Later' }).click();
     await expect(clips.nth(1)).toHaveAttribute('aria-pressed', 'true');
-    await expect(story.getByRole('heading', { level: 3 })).toHaveText('Playing out');
+    await expect(story.getByRole('heading', { level: 3 })).toHaveText('First snare');
 
     await clips.nth(1).focus();
     await site.keyboard.press('ArrowRight');
@@ -104,9 +104,9 @@ test.describe('talkback', () => {
     await expect(form.getByText('Message received')).toBeVisible();
   });
 
-  test('says so when the inbox is not connected', async ({ site }) => {
+  test('says so when the line is not connected', async ({ site }) => {
     await site.route('/api/contact', (r) =>
-      r.fulfill({ status: 503, json: { error: 'The inbox is not connected yet.' } }),
+      r.fulfill({ status: 503, json: { error: 'The talkback line is not connected yet.' } }),
     );
     const form = site.locator('#contact');
     await form.getByRole('textbox', { name: 'Name' }).fill('Sam');
@@ -115,6 +115,6 @@ test.describe('talkback', () => {
       .getByRole('textbox', { name: 'Message' })
       .fill('Loved the drum sound on that record.');
     await form.getByRole('button', { name: 'Send it' }).click();
-    await expect(form.getByText('The inbox is not connected yet.')).toBeVisible();
+    await expect(form.getByText('The talkback line is not connected yet.')).toBeVisible();
   });
 });

@@ -233,10 +233,12 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           allow="autoplay"
           tabIndex={-1}
           aria-hidden="true"
+          // A real player's size: at 1px the widget draws its waveform on an empty canvas and throws.
           style={{
             position: 'fixed',
-            width: 1,
-            height: 1,
+            left: 0,
+            width: 300,
+            height: 166,
             opacity: 0,
             pointerEvents: 'none',
             bottom: 0,

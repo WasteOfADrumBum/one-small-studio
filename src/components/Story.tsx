@@ -259,7 +259,8 @@ export function Story() {
                               } as CSSProperties
                             }
                           >
-                            {d.label}
+                            {/* A decade the session only clips the end of has no room for its name. */}
+                            {d.to - d.from >= 3 && d.label}
                           </span>
                         ))}
                       </div>

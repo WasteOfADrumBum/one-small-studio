@@ -1,20 +1,11 @@
 import request from 'supertest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const countDocuments = vi.fn();
-const create = vi.fn();
-vi.mock('./db.js', () => ({
-  hasDatabase: () => Boolean(process.env.MONGODB_URI),
-  connectDb: vi.fn(async () => undefined),
-}));
-vi.mock('./models/message.js', () => ({
-  MessageModel: {
-    countDocuments: (...a: unknown[]) => countDocuments(...a),
-    create: (...a: unknown[]) => create(...a),
-  },
-}));
+const fetchMock = vi.fn();
+vi.stubGlobal('fetch', fetchMock);
 
 const { app } = await import('./app.js');
+const { resetRateLimit } = await import('./routes/contact.js');
 
 const ORIGIN = 'http://studio.test';
 const valid = {
@@ -30,12 +21,21 @@ const post = (body: object) =>
 
 describe('API', () => {
   beforeEach(() => {
-    countDocuments.mockResolvedValue(0);
-    create.mockResolvedValue({});
+    resetRateLimit();
+    fetchMock.mockReset();
+    fetchMock.mockResolvedValue(new Response('{"id":"1"}', { status: 200 }));
   });
   afterEach(() => {
-    delete process.env.MONGODB_URI;
+    delete process.env.RESEND_API_KEY;
+    delete process.env.CONTACT_TO;
+    delete process.env.CONTACT_FROM;
   });
+
+  /** Mail settings as they would be in Vercel. */
+  const connect = () => {
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.CONTACT_TO = 'inbox@example.com';
+  };
 
   it('answers the health check', async () => {
     const res = await request(app).get('/api/health');
@@ -93,47 +93,59 @@ describe('API', () => {
       expect(fields).toEqual(expect.arrayContaining(['email', 'message']));
     });
 
-    it('pretends to accept honeypot submissions without storing them', async () => {
-      process.env.MONGODB_URI = 'mongodb://example';
+    it('pretends to accept honeypot submissions without sending them', async () => {
+      connect();
       const res = await post({ ...valid, website: 'https://spam.test' });
       expect(res.status).toBe(201);
-      expect(create).not.toHaveBeenCalled();
+      expect(fetchMock).not.toHaveBeenCalled();
     });
 
-    it('says the inbox is not connected when MONGODB_URI is unset', async () => {
+    it('says the line is not connected when mail is not set up', async () => {
+      process.env.RESEND_API_KEY = 're_test';
       const res = await post(valid);
       expect(res.status).toBe(503);
-      expect(create).not.toHaveBeenCalled();
+      expect(fetchMock).not.toHaveBeenCalled();
     });
 
-    it('stores a valid message with a hashed IP, never the IP itself', async () => {
-      process.env.MONGODB_URI = 'mongodb://example';
-      const res = await post(valid);
+    it('emails a valid message to the inbox, replying to the sender', async () => {
+      connect();
+      const res = await post({ ...valid, name: 'Sam\nSmith' });
       expect(res.status).toBe(201);
-      expect(create).toHaveBeenCalledTimes(1);
-      const saved = create.mock.calls[0][0];
-      expect(saved).toMatchObject({
-        name: 'Sam',
-        email: 'sam@example.com',
-        reason: 'hello',
-        body: valid.message,
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const [url, init] = fetchMock.mock.calls[0];
+      expect(url).toBe('https://api.resend.com/emails');
+      expect(init.headers.Authorization).toBe('Bearer re_test');
+      const mail = JSON.parse(init.body);
+      expect(mail).toMatchObject({
+        from: 'One Small Studio <onboarding@resend.dev>',
+        to: ['inbox@example.com'],
+        reply_to: 'sam@example.com',
+        subject: 'Talkback: Just saying hi from Sam Smith',
       });
-      expect(saved.ipHash).toMatch(/^[0-9a-f]{64}$/);
-      expect(JSON.stringify(saved)).not.toMatch(/127\.0\.0\.1|::1|::ffff/);
+      expect(mail.text).toContain(valid.message);
+    });
+
+    it('uses the configured sender when there is one', async () => {
+      connect();
+      process.env.CONTACT_FROM = 'Studio <talkback@studio.test>';
+      await post(valid);
+      expect(JSON.parse(fetchMock.mock.calls[0][1].body).from).toBe(
+        'Studio <talkback@studio.test>',
+      );
     });
 
     it('rate-limits a sender to three messages an hour', async () => {
-      process.env.MONGODB_URI = 'mongodb://example';
-      countDocuments.mockResolvedValue(3);
+      connect();
+      for (let i = 0; i < 3; i++) expect((await post(valid)).status).toBe(201);
       const res = await post(valid);
       expect(res.status).toBe(429);
-      expect(create).not.toHaveBeenCalled();
+      expect(fetchMock).toHaveBeenCalledTimes(3);
     });
 
-    it('hides database failures behind a generic 500', async () => {
-      process.env.MONGODB_URI = 'mongodb://example';
+    it('hides mail failures behind a generic 500', async () => {
+      connect();
       const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      create.mockRejectedValue(new Error('secret connection detail'));
+      fetchMock.mockResolvedValue(new Response('secret account detail', { status: 403 }));
       const res = await post(valid);
       expect(res.status).toBe(500);
       expect(JSON.stringify(res.body)).not.toContain('secret');
