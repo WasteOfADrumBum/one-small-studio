@@ -112,9 +112,10 @@ function Mount({
 }
 
 /**
- * Gear that really is rack-mounted, drawn as itself: the item's size covers a 1U nameplate and the
- * units bolted in under it. The Carvin head sits on black brackets across 2U under a 2U grid vent,
- * the Boss GT-Pro fills 2U and the Focusrite pair fill 1U each.
+ * Gear that really is rack-mounted, drawn as itself: the item's size covers a nameplate and the
+ * units bolted in under it. The Carvin is 4U, its head set back under a grid panel, the Boss
+ * GT-Pro fills 2U and the Focusrite pair fill 1U each. The Avatar cab is a nameplate only: the
+ * cab itself stands behind the rack.
  */
 const MOUNTED: Partial<
   Record<GearItem['kind'], { device: string; size: RackSize; draw: ReactNode }[]>
@@ -144,9 +145,11 @@ function Nameplate({ item }: { item: GearItem }) {
 export function RackUnit({ item }: { item: GearItem }) {
   const mounted = MOUNTED[item.kind];
   if (mounted) {
+    // The nameplate takes whatever of the item's size the gear itself does not.
+    const plate = (item.size - mounted.reduce((sum, m) => sum + m.size, 0)) as RackSize;
     return (
       <>
-        <Mount size={1} kind="nameplate">
+        <Mount size={plate} kind="nameplate">
           <Nameplate item={item} />
         </Mount>
         {mounted.map(({ device, size, draw }) => (

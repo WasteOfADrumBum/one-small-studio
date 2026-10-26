@@ -3,10 +3,10 @@
  *
  * Every item is drawn as a rack-mounted module, whatever it really is. `size` is its height in rack
  * units (U) and `kind` picks the faceplate style that suggests its category. Real rack gear (the
- * Carvin, the Focusrite pair, the Boss) is drawn as itself under a 1U nameplate, and its `size`
+ * Carvin, the Focusrite pair, the Boss) is drawn as itself under a nameplate, and its `size`
  * counts both. Both are presentation only.
  */
-export type RackSize = 1 | 2 | 3 | 4 | 5;
+export type RackSize = 1 | 2 | 3 | 4 | 5 | 6;
 
 export type GearKind =
   'daw' | 'interface' | 'amp-head' | 'speaker-cab' | 'effects' | 'drum' | 'cymbals' | 'drum-module';
@@ -88,21 +88,21 @@ export const gear: GearGroup[] = [
         brand: 'Boss',
         model: 'Effects',
         note: 'Pedals for everything from ska upstrokes to metal',
-        size: 3,
+        size: 4,
         kind: 'effects',
       },
       {
         brand: 'Carvin',
         model: 'V3M',
         note: 'The go-to head, plus a lot of other Carvin amps over the years',
-        size: 5,
+        size: 6,
         kind: 'amp-head',
       },
       {
         brand: 'Avatar',
         model: 'Cabinets',
         note: 'Speaker cabs behind the Carvins',
-        size: 1,
+        size: 2,
         kind: 'speaker-cab',
       },
     ],

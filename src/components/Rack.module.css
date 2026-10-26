@@ -298,8 +298,8 @@
 }
 
 /*
- * A 1U nameplate over gear drawn as itself: name and note side by side to fit the one space, the
- * note under the name only where the plate is too narrow.
+ * A nameplate over gear drawn as itself: name and note side by side, the note under the name only
+ * where the plate is too narrow.
  */
 .unit[data-kind='nameplate'] .face {
   padding: 2px 8px;
@@ -320,6 +320,15 @@
   margin: 0;
   font-size: 0.68rem;
   line-height: 1.2;
+}
+
+/* A 2U nameplate has room for bigger type. */
+.unit[data-kind='nameplate'][data-size='2'] .name {
+  font-size: clamp(1.1rem, 0.42 * var(--u), 1.6rem);
+}
+
+.unit[data-kind='nameplate'][data-size='2'] .note {
+  font-size: clamp(0.78rem, 0.25 * var(--u), 1rem);
 }
 
 @container (max-width: 250px) {

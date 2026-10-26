@@ -1,12 +1,6 @@
 .studio {
   padding: var(--oss-section-space) 0;
   overflow-x: clip;
-  /* A faint violet spill on the wall behind the racks. */
-  background: radial-gradient(
-    ellipse 50% 40% at 50% 62%,
-    rgb(var(--oss-neon-violet) / 0.06),
-    transparent 70%
-  );
 }
 
 /* Two cabinets side by side, stacked on phones. */
@@ -19,25 +13,6 @@
   gap: 24px;
   /* Room on the right for the Avatar cab standing behind the amps rack. */
   padding-right: min(14vw, 210px);
-}
-
-/* The room light washing down across the lids and faceplates: brightest at the top, gone by the base. */
-.row::after {
-  content: '';
-  position: absolute;
-  z-index: 3;
-  top: -36px;
-  left: 0;
-  right: 0;
-  height: 70%;
-  background: radial-gradient(
-    ellipse 70% 100% at 50% 0%,
-    rgb(var(--oss-neon-cyan) / 0.09),
-    rgb(var(--oss-neon-violet) / 0.04) 45%,
-    transparent 75%
-  );
-  mix-blend-mode: screen;
-  pointer-events: none;
 }
 
 @media (max-width: 40em) {
