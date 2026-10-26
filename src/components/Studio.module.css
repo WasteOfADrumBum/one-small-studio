@@ -1,5 +1,6 @@
 .studio {
   padding: var(--oss-section-space) 0;
+  overflow-x: clip;
   /* A faint violet spill on the wall behind the racks. */
   background: radial-gradient(
     ellipse 50% 40% at 50% 62%,
@@ -16,6 +17,8 @@
   align-items: stretch;
   /* Room between cases for the side panels the viewer can see. */
   gap: 24px;
+  /* Room on the right for the Avatar cab standing behind the amps rack. */
+  padding-right: min(14vw, 210px);
 }
 
 /* The room light washing down across the lids and faceplates: brightest at the top, gone by the base. */
@@ -41,5 +44,6 @@
   .row {
     grid-template-columns: minmax(0, 1fr);
     row-gap: 40px;
+    padding-right: 0;
   }
 }

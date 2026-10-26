@@ -10,7 +10,19 @@
 }
 
 .shade {
-  fill: rgb(0 0 0 / 0.38);
+  fill: rgb(0 0 0 / 0.22);
+}
+
+/* The valves' red light spilling round the inside of the rack, brightest at the middle. */
+.valveLight {
+  fill: #ff1a2a;
+  opacity: 0.45;
+  filter: blur(46px);
+  mix-blend-mode: screen;
+}
+
+:global([data-power='off']) .valveLight {
+  visibility: hidden;
 }
 
 .amp {

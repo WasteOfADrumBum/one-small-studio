@@ -102,7 +102,7 @@ export const gear: GearGroup[] = [
         brand: 'Avatar',
         model: 'Cabinets',
         note: 'Speaker cabs behind the Carvins',
-        size: 3,
+        size: 1,
         kind: 'speaker-cab',
       },
     ],

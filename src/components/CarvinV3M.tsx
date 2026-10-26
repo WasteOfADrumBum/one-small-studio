@@ -41,8 +41,8 @@ const ROW_TOP = 912;
 const ROW_BOTTOM = 1018;
 
 /** Tube-glow strength behind each vent slot, left bank then right bank. */
-const SLOTS_LEFT = [0.2, 0.4, 0.7, 0.95, 0.75, 0.45, 0.2];
-const SLOTS_RIGHT = [0.25, 0.55, 0.85, 1, 0.85, 0.55, 0.25];
+const SLOTS_LEFT = [0.7, 0.85, 0.95, 1, 0.95, 0.85, 0.7];
+const SLOTS_RIGHT = [0.75, 0.9, 1, 1, 1, 0.9, 0.75];
 
 /** The drive and boost LEDs: x, y, colour. Green boost, then channels 3, 2 and 1. */
 const LEDS: [number, number, string][] = [
@@ -125,10 +125,10 @@ function Head() {
         </radialGradient>
         {/* Valve light rising from the bottom of each slot. */}
         <linearGradient id={tube} x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0" stopColor="#ffe08a" />
-          <stop offset="0.3" stopColor="#ff9a2e" />
-          <stop offset="0.75" stopColor="#ff5a0a" stopOpacity="0.45" />
-          <stop offset="1" stopColor="#ff4d00" stopOpacity="0" />
+          <stop offset="0" stopColor="#ffd0d0" />
+          <stop offset="0.25" stopColor="#ff2a2a" />
+          <stop offset="0.75" stopColor="#e00018" stopOpacity="0.8" />
+          <stop offset="1" stopColor="#c00010" stopOpacity="0.35" />
         </linearGradient>
         <radialGradient id={halo}>
           <stop offset="0" stopColor="currentColor" stopOpacity="0.75" />
@@ -171,7 +171,7 @@ function Head() {
         <path
           d="M712 616 L780 640 L806 728 L834 640 L862 640 L820 772 L770 772 Z"
           fill={`url(#${tube})`}
-          opacity="0.35"
+          opacity="0.95"
           className={classes.tube}
         />
         <text x="914" y="772" className={classes.badge}>
@@ -322,16 +322,17 @@ export function CarvinV3M() {
       <rect x="-400" y="470" width="2420" height="530" fill={`url(#${carpet})`} />
 
       {/* The head, scaled from its own photo to sit between the brackets. */}
-      <g transform="translate(150.4 -356.9) scale(0.797)">
+      <g transform="translate(-37 -566.9) scale(1.05)">
         <Head />
       </g>
 
-      {/* Behind the grid the shell is in shadow. */}
+      {/* Behind the grid the shell is in shadow, lit red by the valves. */}
       <rect x="-400" y="-400" width="2420" height="688" className={classes.shade} />
+      <ellipse cx="810" cy="160" rx="760" ry="170" className={classes.valveLight} />
 
       {/* The two black brackets the head rests on. */}
-      <rect x="58" y="288" width="198" height="258" rx="14" className={classes.bracketBlock} />
-      <rect x="1331" y="288" width="198" height="258" rx="14" className={classes.bracketBlock} />
+      <rect x="38" y="288" width="68" height="290" rx="8" className={classes.bracketBlock} />
+      <rect x="1514" y="288" width="68" height="290" rx="8" className={classes.bracketBlock} />
 
       {/* The slotted grid panel in front, the shell and its valves showing through the slots. */}
       <rect

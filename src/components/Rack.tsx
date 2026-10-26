@@ -16,6 +16,8 @@ type CabinetProps = {
   power: 'furman' | 'livewire';
   /** Which side panel the viewer can see, from where the cabinet stands in the row. */
   side?: 'left' | 'right';
+  /** Gear standing on the floor behind the cabinet, poking out to its right. */
+  behind?: ReactNode;
   children: ReactNode;
 };
 
@@ -25,7 +27,7 @@ type CabinetProps = {
  * conditioner at the top wash down over the faceplates below; its rocker powers the whole rack and
  * its dimmer sets how bright the lights are.
  */
-export function RackCabinet({ title, power: conditioner, side, children }: CabinetProps) {
+export function RackCabinet({ title, power: conditioner, side, behind, children }: CabinetProps) {
   const [power, setPower] = useState(true);
   const Conditioner = conditioner === 'livewire' ? LiveWirePC1100 : FurmanM8Lx;
   const [lights, setLights] = useState(100);
@@ -62,6 +64,7 @@ export function RackCabinet({ title, power: conditioner, side, children }: Cabin
         <span className={classes.caster} />
         <span className={classes.caster} />
       </div>
+      {behind && <div className={classes.behind}>{behind}</div>}
     </section>
   );
 }
@@ -117,6 +120,8 @@ const MOUNTED: Partial<
   Record<GearItem['kind'], { device: string; size: RackSize; draw: ReactNode }[]>
 > = {
   'amp-head': [{ device: 'carvin', size: 4, draw: <CarvinV3M /> }],
+  // The cab itself stands on its end behind the rack; see RackCabinet's `behind`.
+  'speaker-cab': [],
   effects: [{ device: 'gtpro', size: 2, draw: <BossGtPro /> }],
   interface: [
     { device: 'scarlett', size: 1, draw: <Scarlett18i20 /> },

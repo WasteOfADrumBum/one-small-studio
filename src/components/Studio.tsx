@@ -1,5 +1,6 @@
 import { gear } from '@/content/gear';
 import { SectionHeader } from './SectionHeader';
+import { AvatarCab } from './AvatarCab';
 import { RackCabinet, RackFiller, RackUnit } from './Rack';
 import classes from './Studio.module.css';
 
@@ -22,6 +23,9 @@ export function Studio() {
               title={group.name}
               power={group.power}
               side={i === 0 ? 'right' : i === gear.length - 1 ? 'left' : undefined}
+              behind={
+                group.items.some((item) => item.kind === 'speaker-cab') && <AvatarCab sideways />
+              }
             >
               {group.items.map((item) => (
                 <RackUnit key={`${item.brand}-${item.model}`} item={item} />
