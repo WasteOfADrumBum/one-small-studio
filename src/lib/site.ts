@@ -28,7 +28,8 @@ export const featuredAlbum = {
 
 /** Sister sites and profiles. Leave a URL empty to hide its link. */
 export const links = [
-  { label: 'SoundCloud', href: site.soundcloud },
-  { label: 'One Small Photo', href: '' },
   { label: 'Web dev portfolio', href: '' },
+  { label: 'One Small Photo', href: '' },
+  { label: 'LinkedIn', href: '' },
+  { label: 'SoundCloud', href: site.soundcloud },
 ] as const;
