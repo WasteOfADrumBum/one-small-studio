@@ -556,32 +556,17 @@
   grid-template-columns: repeat(5, 18px);
 }
 
-/* Amp: a punched vent over the control row. */
+/* Amp: the head drawn to scale, as wide as the faceplate can spare beside the text. */
 .hw[data-hw='amp'] {
-  grid-template-columns: auto;
-  padding: 8px 10px;
-  border-radius: 3px;
-  background: var(--oss-aluminum);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.6),
-    inset 0 -2px 0 rgb(0 0 0 / 0.3),
-    0 0 0 1px #0b0b0d;
+  width: clamp(150px, 58cqi, 230px);
 }
 
-.ampVent {
+.unit[data-kind='amp-head'] .face {
+  flex-wrap: wrap;
+}
+
+.hw[data-hw='amp'] > svg {
   display: block;
-  height: 26px;
-  border-radius: 2px;
-  background:
-    radial-gradient(circle, #0b0b0d 1.6px, transparent 2px) 0 0 / 6px 6px,
-    #6f7277;
-  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.6);
-}
-
-.ampRow {
-  display: flex;
-  align-items: center;
-  gap: 5px;
 }
 
 /* Cabinet: a grille-cloth panel, the speakers ghosting through. */
@@ -745,6 +730,24 @@
   }
 }
 
+/*
+ * On phones, where the cases stack and a unit can grow without misaligning its neighbours, the amp
+ * moves under its text instead of disappearing.
+ */
+@media (max-width: $mantine-breakpoint-sm) {
+  @container (max-width: 270px) {
+    .unit[data-kind='amp-head'] .text {
+      flex-basis: 100%;
+    }
+
+    .hw.hw[data-hw='amp'] {
+      display: block;
+      width: min(100%, 250px);
+      padding-bottom: 6px;
+    }
+  }
+}
+
 @media (max-width: $mantine-breakpoint-sm) {
   .cabinet {
     --u: 52px;
@@ -771,7 +774,7 @@
 
 /*
  * Equipment quietly running: the recorder's clips drift past, the module level bars breathe and the
- * amp's jewel lamp glows unevenly, as valves do. All slow and small; static when motion is reduced.
+ * amp's valves glow unevenly (see CarvinV3M.module.css). All slow and small; static when motion is reduced.
  */
 @media (prefers-reduced-motion: no-preference) {
   .reel {
@@ -802,10 +805,6 @@
   .hw[data-hw='module'][data-variant='cymbals'] .lcd[data-bars] i {
     animation-name: level-soft;
   }
-
-  .ampRow > :first-child {
-    animation: valve-glow 5.5s ease-in-out infinite alternate;
-  }
 }
 
 @keyframes reel-scroll {
@@ -835,17 +834,5 @@
   }
   100% {
     scale: 1 0.8;
-  }
-}
-
-@keyframes valve-glow {
-  0% {
-    filter: brightness(1);
-  }
-  40% {
-    filter: brightness(0.86);
-  }
-  100% {
-    filter: brightness(1.08);
   }
 }

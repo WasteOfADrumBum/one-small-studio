@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react';
 import type { GearItem, RackSize } from '@/content/gear';
+import { CarvinV3M } from './CarvinV3M';
 import { Knob } from './hardware/Knob';
 import { Led } from './hardware/Led';
 import { Screw } from './hardware/Screw';
@@ -191,18 +192,11 @@ function Faceplate({ item }: { item: GearItem }) {
           </span>
         </div>
       );
-    // Amp: a vent grille over a row of chicken-head controls, a jewel lamp and a standby switch.
+    // Amp: the Carvin V3M head itself, drawn from the real thing.
     case 'amp-head':
       return (
         <div className={classes.hw} data-hw="amp" aria-hidden="true">
-          <span className={classes.ampVent} />
-          <span className={classes.ampRow}>
-            <Led on color="red" />
-            {[-60, 0, 40, -20, 70].map((a, i) => (
-              <Knob key={i} size={20} angle={a} />
-            ))}
-            <span className={classes.toggle} />
-          </span>
+          <CarvinV3M />
         </div>
       );
     // Cabinet: a grille-cloth panel with the speakers ghosting through.
