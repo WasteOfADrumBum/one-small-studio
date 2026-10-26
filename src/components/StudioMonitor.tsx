@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { BuildReduxTower } from './BuildReduxTower';
 import { Screw } from './hardware/Screw';
 import classes from './StudioMonitor.module.css';
 
@@ -13,31 +14,35 @@ type StudioMonitorProps = {
 /**
  * Josh's Sceptre curved monitor on its tripod stand, standing on a shallow black desk unit whose
  * front display carries the session notes. On wide screens it is the 49" 32:9 super ultrawide; on
- * tablets and phones, the 32" 16:9. `children` is the live screen content.
+ * tablets and phones, the 32" 16:9. Josh's PC stands on the desk behind it. `children` is the live
+ * screen content.
  */
 export function StudioMonitor({ children, notes, caption }: StudioMonitorProps) {
   return (
-    <div className={classes.monitor}>
-      <div className={classes.panel}>
-        <div className={classes.bezel}>
-          <div className={classes.screen}>{children}</div>
+    <>
+      <div className={classes.monitor}>
+        <BuildReduxTower />
+        <div className={classes.panel}>
+          <div className={classes.bezel}>
+            <div className={classes.screen}>{children}</div>
+          </div>
+          <div className={classes.chin} aria-hidden="true">
+            <span className={classes.logo}>Sceptre</span>
+            <span className={classes.power} />
+          </div>
         </div>
-        <div className={classes.chin} aria-hidden="true">
-          <span className={classes.logo}>Sceptre</span>
-          <span className={classes.power} />
-        </div>
-      </div>
-      <TripodStand />
-      <div className={classes.unit}>
-        <span className={classes.top} aria-hidden="true" />
-        <div className={classes.front}>
-          <Screw className={classes.fastener} size={8} turn={20} />
-          <div className={classes.display}>{notes}</div>
-          <Screw className={classes.fastener} size={8} turn={-30} />
+        <TripodStand />
+        <div className={classes.unit}>
+          <span className={classes.top} aria-hidden="true" />
+          <div className={classes.front}>
+            <Screw className={classes.fastener} size={8} turn={20} />
+            <div className={classes.display}>{notes}</div>
+            <Screw className={classes.fastener} size={8} turn={-30} />
+          </div>
         </div>
       </div>
       {caption}
-    </div>
+    </>
   );
 }
 

@@ -1,0 +1,112 @@
+/*
+ * The tower stands further back than the monitor, toward its right end: its radiator, fans, RAM
+ * and cooler rise above the screen, and the panel hides the rest. Its light spills onto the wall.
+ * It rises `--pc-peek` above the panel, into the `--pc-room` the monitor leaves and past it.
+ */
+.tower {
+  position: absolute;
+  z-index: 0;
+  top: calc(var(--pc-room) - var(--pc-peek));
+  right: calc((100% - var(--panel-w)) / 2 + var(--panel-w) * 0.03);
+  width: var(--pc-w);
+  pointer-events: none;
+}
+
+/* Red from the fans, thrown onto the wall round the case. */
+.tower::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -12% -18% 4%;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(200 16 46 / 0.55),
+    rgb(200 16 46 / 0.18) 60%,
+    transparent
+  );
+  filter: blur(30px);
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 10px 18px rgb(0 0 0 / 0.7));
+}
+
+.msi {
+  font-family: var(--mantine-font-family);
+  font-size: 11px;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  fill: #1a1a1d;
+}
+
+.rtx {
+  font-family: var(--mantine-font-family);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  fill: #8a8c92;
+}
+
+.rotor {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.blockLogo {
+  filter: drop-shadow(0 0 4px rgb(255 51 72 / 0.9));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rotor {
+    animation: spin 2.4s linear infinite;
+  }
+
+  .rotor[data-reverse] {
+    animation-direction: reverse;
+  }
+
+  .ring {
+    animation: breathe 4s ease-in-out infinite;
+  }
+
+  .ram {
+    animation: rgb 6s linear infinite;
+  }
+
+  .badge {
+    animation: badge 3s ease-in-out infinite;
+  }
+
+  .tower::before {
+    animation: breathe 4s ease-in-out infinite;
+  }
+}
+
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.72;
+  }
+}
+
+@keyframes rgb {
+  to {
+    filter: hue-rotate(360deg);
+  }
+}
+
+@keyframes badge {
+  50% {
+    opacity: 0.65;
+  }
+}

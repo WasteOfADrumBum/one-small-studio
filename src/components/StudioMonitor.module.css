@@ -1,10 +1,15 @@
 .monitor {
   --panel-w: min(100%, 880px);
+  /* Josh's PC stands behind the panel; its top part rises above the screen, so leave it room. */
+  --pc-w: calc(var(--panel-w) * 0.4);
+  --pc-peek: calc(var(--pc-w) / 0.875 * 0.46);
+  --pc-room: var(--pc-peek);
   position: relative;
   isolation: isolate;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-top: var(--pc-room);
 }
 
 /* A bias light behind the monitor, cast onto the wall: broad and soft, never an outline. */
@@ -75,6 +80,9 @@
 @media (min-width: 80em) {
   .monitor {
     --panel-w: min(100vw - var(--oss-gutter) * 2 - 24px, 1560px);
+    --pc-w: calc(var(--panel-w) * 0.28);
+    /* Here the PC clears the end of the section title, so it may rise into the space beside it. */
+    --pc-room: max(0px, var(--pc-peek) - 150px);
   }
 
   .panel {

@@ -46,7 +46,7 @@ const { rowOf, laneRows, laneTop, totalRows } = layout();
 /** Years from the last event's start to the end of the timeline: the post-roll it needs. */
 const tail = timelineEnd - clips[clips.length - 1].start;
 
-/** Josh's PC: the desk unit the monitor stands on. */
+/** Josh's PC, standing behind the monitor. */
 const rigSpecs = [
   ['CPU', 'AMD Ryzen 9 9950X3D'],
   ['GPU', 'NVIDIA RTX 5090'],
@@ -131,9 +131,8 @@ export function Story() {
             <div className={classes.rig}>
               <p className={classes.rigText}>
                 <span className={classes.notesLabel}>The rig</span>
-                The box under the screen is my PC, a liquid-cooled Build Redux Ultra behind tempered
-                glass with red-lit fans. It runs every session and mix I make, and it doesn&apos;t
-                mind holding up the monitor.
+                That&apos;s my PC glowing behind the screen, a liquid-cooled Build Redux Ultra with
+                a tempered-glass side and red-lit fans. It runs every session and mix I make.
               </p>
               <dl className={classes.rigSpecs}>
                 {rigSpecs.map(([part, model]) => (

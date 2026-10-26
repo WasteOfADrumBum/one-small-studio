@@ -645,7 +645,7 @@
 
 .rig {
   width: min(100%, 900px);
-  margin-top: 30px;
+  margin: 30px auto 0;
   padding-inline: 16px;
 }
 
