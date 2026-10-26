@@ -39,12 +39,12 @@ export function StudioMonitor({ children, notes }: StudioMonitorProps) {
 }
 
 /**
- * The Sceptre tripod, seen from the front: a gunmetal column with a red ring above the hub, two
+ * The Sceptre tripod, seen from the front: a short gunmetal column with a red ring above the hub, two
  * legs splayed forward and out, and a short one running back.
  */
 function TripodStand() {
   return (
-    <svg className={classes.stand} viewBox="0 0 600 180" aria-hidden="true">
+    <svg className={classes.stand} viewBox="0 60 600 120" aria-hidden="true">
       <defs>
         <linearGradient id="sceptre-column" x1="0" x2="1" y1="0" y2="0">
           <stop offset="0" stopColor="#2c2e32" />
@@ -94,7 +94,7 @@ function TripodStand() {
       </g>
 
       {/* Column, red ring and hub. */}
-      <rect x="284" y="0" width="32" height="104" fill="url(#sceptre-column)" />
+      <rect x="284" y="56" width="32" height="48" fill="url(#sceptre-column)" />
       <rect
         x="282"
         y="94"
