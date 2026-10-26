@@ -1,4 +1,5 @@
 import { featuredAlbum } from '@/lib/site';
+import theBeautyOfSurrenderCover from '@/assets/covers/the-beauty-of-surrender.jpg';
 import theManBehindTheMaskCover from '@/assets/covers/the-man-behind-the-mask.jpg';
 
 /**
@@ -103,5 +104,17 @@ export const releases: Release[] = [
       'https://api.soundcloud.com/playlists/soundcloud:playlists:2318834286?secret_token=s-duy6W5y03yk',
     // Josh's own cover, so the shelf shows it without asking SoundCloud.
     artwork: theManBehindTheMaskCover,
+  },
+  {
+    id: 'the-beauty-of-surrender',
+    title: 'The Beauty of Surrender',
+    artist: 'Joshua Small',
+    credit: 'Artist',
+    format: 'Digital EP on SoundCloud',
+    pageUrl:
+      'https://soundcloud.com/joshua-small-325495450/sets/the-beauty-of-surrender/s-py9dEaW5BYO',
+    playerUrl:
+      'https://api.soundcloud.com/playlists/soundcloud:playlists:2319757563?secret_token=s-py9dEaW5BYO',
+    artwork: theBeautyOfSurrenderCover,
   },
 ];
