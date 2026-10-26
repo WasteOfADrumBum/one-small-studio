@@ -1,10 +1,22 @@
 /*
  * Rack cases. Carpet-covered boxes seen from slightly above and in front: a top surface and one
  * narrow side for depth, a thick front frame with aluminium trim, and the gear set just behind it.
- * One rack unit (U) is the rhythm everything snaps to; the rails carry three holes per U.
+ * One rack unit (U) is the rhythm everything snaps to, in true proportion to the rack's width:
+ * 1.75in of height to 19in across. The bay is the size container, and U is registered as a length
+ * so each of its children works it out once against the bay and hands the pixels down.
+ * The rails carry three holes per U.
  */
+@property --u {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 32px;
+}
+
+.bay > * {
+  --u: max(26px, calc(100cqi * 1.75 / 19));
+}
+
 .cabinet {
-  --u: 54px;
   --rail: 20px;
   --frame: 14px;
   --depth: 16px;
@@ -128,7 +140,8 @@
 .bay {
   position: relative;
   flex: 1;
-  padding: 4px 0 calc(var(--u) / 6);
+  container-type: inline-size;
+  padding: 4px 0 6px;
   border-radius: 2px;
   background: var(--oss-metal-cavity);
   box-shadow:
@@ -275,10 +288,6 @@
   --accent: #e0b45c;
 }
 
-.unit[data-kind='amp-head'] {
-  --plate: var(--oss-fabric-nap), linear-gradient(180deg, #1d1d21 0%, #141417 100%);
-}
-
 .unit[data-kind='effects'] {
   --plate: var(--oss-metal-black);
 }
@@ -288,21 +297,85 @@
   --accent: var(--oss-green);
 }
 
-/* The Focusrite pair stacked under the text, on a plain charcoal panel. */
-.unit[data-kind='interface'] {
-  --plate: var(--oss-brushed-grain), linear-gradient(180deg, #232327 0%, #18181b 100%);
-  --accent: #ff3b47;
+/*
+ * A nameplate over gear drawn as itself: name and note side by side, the note under the name only
+ * where the plate is too narrow.
+ */
+.unit[data-kind='nameplate'] .face {
+  padding: 2px 8px;
 }
 
-.unit[data-kind='interface'] .face {
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: center;
-  gap: 8px;
+.unit[data-kind='nameplate'] .text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.unit[data-kind='interface'] .text {
+.unit[data-kind='nameplate'] .name {
   flex: none;
+  font-size: 0.95rem;
+}
+
+.unit[data-kind='nameplate'] .note {
+  margin: 0;
+  font-size: 0.68rem;
+  line-height: 1.2;
+}
+
+/* A 2U nameplate has room for bigger type. */
+.unit[data-kind='nameplate'][data-size='2'] .name {
+  font-size: clamp(1.1rem, 0.42 * var(--u), 1.6rem);
+}
+
+.unit[data-kind='nameplate'][data-size='2'] .note {
+  font-size: clamp(0.78rem, 0.25 * var(--u), 1rem);
+}
+
+@container (max-width: 250px) {
+  .unit[data-kind='nameplate'] .text {
+    display: block;
+  }
+}
+
+/* Rack-mounted gear: the faceplate is the unit's own panel, its drawing centred on it. */
+.unit[data-kind='device'] .face {
+  justify-content: center;
+  padding: 3px 0;
+}
+
+/* The Carvin sits back in the rack under its grid panel, all drawn edge to edge. */
+.unit[data-device='carvin'] {
+  --plate: #111113;
+}
+
+/* The GT-Pro's grey panel runs out to its rack ears. */
+.unit[data-device='gtpro'] {
+  --plate: linear-gradient(135deg, #5a5c61 0%, #64676d 60%, #575a5f 100%);
+}
+
+.unit[data-device='carvin'] .face,
+.unit[data-device='gtpro'] .face {
+  padding: 0;
+  align-items: stretch;
+}
+
+.unit[data-device='scarlett'] {
+  --plate: #0b0b0c;
+}
+
+/* The 18i20's red anodised edge runs round the whole panel. */
+.unit[data-device='scarlett'] .face {
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 3px #d8202c;
+}
+
+.unit[data-device='octopre'] {
+  --plate: linear-gradient(180deg, #2f3034 0%, #26272b 100%);
+}
+
+.unit[data-device='scarlett'] .face,
+.unit[data-device='octopre'] .face {
+  padding: 4px 6px;
 }
 
 .face {
@@ -311,7 +384,7 @@
   align-items: center;
   gap: 12px;
   min-width: 0;
-  padding: 8px 8px;
+  padding: 4px 8px;
   border-left: 1px solid rgb(0 0 0 / 0.2);
   border-right: 1px solid rgb(0 0 0 / 0.2);
 }
@@ -324,7 +397,7 @@
 .name {
   margin: 0;
   font-family: var(--mantine-font-family-headings);
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   line-height: 1.15;
   letter-spacing: 0.04em;
@@ -333,13 +406,13 @@
 }
 
 .unit[data-size='3'] .name {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
 }
 
 .model {
   margin-left: 4px;
   font-family: var(--mantine-font-family-monospace);
-  font-size: 0.7rem;
+  font-size: 0.62rem;
   font-weight: 600;
   letter-spacing: 0.12em;
   color: var(--accent);
@@ -347,9 +420,9 @@
 }
 
 .note {
-  margin: 3px 0 0;
-  font-size: 0.85rem;
-  line-height: 1.4;
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  line-height: 1.25;
   color: var(--ink-soft);
 }
 
@@ -360,11 +433,6 @@
   display: grid;
   align-items: center;
   gap: 6px 8px;
-}
-
-/* Focusrite: the drawn units span the faceplate, so they stay even when it is narrow. */
-.hw.hw[data-hw='interface'] {
-  display: block;
 }
 
 /* Small backlit displays: the only lit things on a faceplate. */
@@ -416,12 +484,6 @@
   text-shadow: 0 0 4px rgb(95 224 138 / 0.5);
 }
 
-.paramKnobs {
-  grid-area: knobs;
-  display: flex;
-  gap: 4px;
-}
-
 .keys {
   grid-area: keys;
   display: grid;
@@ -444,26 +506,19 @@
 }
 
 .keys[data-pads='round'] {
-  grid-template-columns: repeat(3, 16px);
+  grid-template-columns: repeat(3, 13px);
 }
 
 .keys[data-pads] i {
-  height: 14px;
+  height: 11px;
   border-radius: 3px;
   background: linear-gradient(180deg, #3a3d44, #1f2025);
 }
 
 .keys[data-pads='round'] i {
-  height: 16px;
+  height: 13px;
   border-radius: 50%;
   background: radial-gradient(circle at 40% 35%, #6b5a36, #2a2418);
-}
-
-/* Boss: preset display, parameter knobs, and a block of buttons. */
-.hw[data-hw='effects'] {
-  grid-template-areas:
-    'lcd keys'
-    'knobs keys';
 }
 
 /* Alesis: kit display over grouped pads, with a big data dial beside them. */
@@ -523,140 +578,24 @@
   grid-template-columns: repeat(5, 18px);
 }
 
-/* Amp: the head drawn to scale, as wide as the faceplate can spare beside the text. */
-.hw[data-hw='amp'] {
-  width: clamp(150px, 58cqi, 230px);
+/* Cabinet: the Avatar 2x12, its 3:2 box as tall as the unit allows beside the text. */
+.hw[data-hw='cab'] {
+  width: min(58cqi, calc((var(--size) * var(--u) - 10px) * 1.5));
 }
 
-.unit[data-kind='amp-head'] .face {
+.unit[data-kind='speaker-cab'] .face {
   flex-wrap: wrap;
 }
 
-.hw[data-hw='amp'] > svg {
-  display: block;
-}
-
-/* Cabinet: a grille-cloth panel, the speakers ghosting through. */
-.grillePanel {
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  width: 150px;
-  height: calc(var(--size) * var(--u) - 26px);
-  border-radius: 3px;
-  background:
-    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 3px),
-    repeating-linear-gradient(-45deg, rgb(0 0 0 / 0.35) 0 1px, transparent 1px 3px), #2a2a2e;
-  box-shadow:
-    inset 0 0 0 3px #111113,
-    inset 0 0 0 4px rgb(255 255 255 / 0.06),
-    inset 0 3px 6px rgb(0 0 0 / 0.7);
-}
-
-.grillePanel i {
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgb(0 0 0 / 0.3) 0 28%,
-    rgb(0 0 0 / 0.14) 30% 62%,
-    transparent 65%
-  );
-}
-
-/* A switch the size of a fingertip. */
-.toggle {
-  display: inline-block;
-  flex: none;
-  width: 9px;
-  height: 16px;
-  border-radius: 2px;
-  background: linear-gradient(180deg, #e1e3e6 0 45%, #55585e 55%);
-  box-shadow:
-    0 0 0 2px #121214,
-    0 1px 2px rgb(0 0 0 / 0.7);
-}
-
-/* ---- Power conditioner ---- */
+/* ---- Power conditioner: the Furman fills its whole 1U panel ---- */
 
 .unit[data-kind='power'] {
-  --plate: var(--oss-brushed-grain), linear-gradient(180deg, #1c1c20 0%, #121215 100%);
+  --plate: var(--oss-brushed-grain), linear-gradient(180deg, #19191c 0%, #0f0f11 100%);
   z-index: 2;
 }
 
 .unit[data-kind='power'] .face {
-  justify-content: space-between;
-  gap: 8px;
-  padding: 0 8px;
-}
-
-.pcGroup {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.pcLabel {
-  font-family: var(--mantine-font-family-monospace);
-  font-size: 0.56rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #9a9aa3;
-  white-space: nowrap;
-}
-
-.pcWindow {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 8px;
-  border-radius: 2px;
-  background: #050607;
-  box-shadow: var(--oss-recess);
-  font-family: var(--mantine-font-family-monospace);
-  font-size: 0.62rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--oss-green);
-}
-
-.rocker {
-  display: inline-block;
-  width: 16px;
-  height: 22px;
-  border-radius: 2px;
-  background: linear-gradient(180deg, #ff5a5a 0 48%, #b4121c 52%);
-  box-shadow:
-    0 0 0 2px #0b0b0d,
-    inset 0 1px 0 rgb(255 255 255 / 0.4),
-    0 0 6px rgb(255 77 100 / 0.35);
-}
-
-/* The pull-out rack lamps, lit and casting light down over the rack. */
-.lamp {
-  position: relative;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 35%, #3a3a40, #0d0d10 70%);
-  box-shadow:
-    0 0 0 2px #050506,
-    0 3px 4px rgb(0 0 0 / 0.7);
-}
-
-.lamp::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 100%;
-  width: 70px;
-  height: 22px;
-  translate: -50% -6px;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, rgb(220 240 255 / 0.45), transparent);
-  filter: blur(3px);
-  pointer-events: none;
+  padding: 0;
 }
 
 /* The rack lights' wash: brightest under the conditioner, fading down the faceplates. */
@@ -670,6 +609,32 @@
     radial-gradient(ellipse 40% 26% at 72% 10%, rgb(200 230 255 / 0.1), transparent 75%),
     linear-gradient(180deg, rgb(150 210 255 / 0.06), transparent 45%);
   mix-blend-mode: screen;
+  opacity: var(--lights, 1);
+}
+
+/*
+ * The conditioner powers everything below it. The rack lights also light the faceplates, so they
+ * dim with the dimmer; switched off, the gear goes dark and grey and stops moving.
+ */
+.units > :not(:first-child) {
+  filter: brightness(calc(0.5 + var(--lights, 1) * 0.5));
+}
+
+.bay[data-power='off'] .units > :not(:first-child) {
+  filter: brightness(0.6) saturate(0.25);
+}
+
+.bay[data-power='off'] .units > :not(:first-child) * {
+  animation-play-state: paused !important;
+}
+
+.bay[data-power='off'] .lcd {
+  color: transparent;
+  text-shadow: none;
+}
+
+.bay[data-power='off'] .reel {
+  visibility: hidden;
 }
 
 /* Two rows of punched ventilation slots on a filler panel. */
@@ -691,25 +656,19 @@
   }
 }
 
-@container (max-width: 300px) {
-  .pcLabel {
-    display: none;
-  }
-}
-
 /*
- * On phones, where the cases stack and a unit can grow without misaligning its neighbours, the amp
+ * On phones, where the cases stack and a unit can grow without misaligning its neighbours, the cab
  * moves under its text instead of disappearing.
  */
 @media (max-width: $mantine-breakpoint-sm) {
   @container (max-width: 270px) {
-    .unit[data-kind='amp-head'] .text {
+    .unit[data-kind='speaker-cab'] .text {
       flex-basis: 100%;
     }
 
-    .hw.hw[data-hw='amp'] {
+    .hw.hw[data-hw='cab'] {
       display: block;
-      width: min(100%, 250px);
+      width: min(100%, 140px);
       padding-bottom: 6px;
     }
   }
@@ -717,7 +676,6 @@
 
 @media (max-width: $mantine-breakpoint-sm) {
   .cabinet {
-    --u: 52px;
     --rail: 16px;
     --frame: 10px;
   }
@@ -802,4 +760,86 @@
   100% {
     scale: 1 0.8;
   }
+}
+
+/*
+ * A big cab on its end on the floor behind the rack, four-fifths of the rack's height, with a
+ * good part of it showing past the rack's right side. On phones it stands below the rack instead.
+ */
+.behind {
+  position: absolute;
+  z-index: -3;
+  right: 0;
+  bottom: 14px;
+  height: 86%;
+  aspect-ratio: 2 / 3;
+  translate: 46% 0;
+}
+
+.behind > svg {
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 40em) {
+  .behind {
+    position: relative;
+    z-index: auto;
+    bottom: auto;
+    align-self: center;
+    width: min(62%, 240px);
+    height: auto;
+    margin-top: 28px;
+    translate: none;
+  }
+}
+
+/* ---- Half-rack gear: two units side by side, each half the rack's width ---- */
+
+.halves {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+}
+
+.unit[data-half] .face {
+  padding: 4px 6px;
+}
+
+.unit[data-half] .name {
+  font-size: 0.95rem;
+}
+
+.unit[data-half] .note {
+  font-size: 0.7rem;
+}
+
+/* The DM5, BX1600 and RX1202FX are drawn edge to edge. */
+.unit[data-device='dm5'] {
+  --plate: linear-gradient(180deg, #3a3b42 0%, #25262b 100%);
+}
+
+.unit[data-device='bx1600'] {
+  --plate: #121214;
+}
+
+.unit[data-device='dm5'] .face,
+.unit[data-device='bx1600'] .face,
+.unit[data-device='rx1202'] .face {
+  padding: 0;
+  align-items: stretch;
+}
+
+/* The mixer's own silver ears are part of its drawing. */
+.unit[data-device='rx1202'] {
+  grid-template-columns: 0 minmax(0, 1fr) 0;
+  --plate: #d4d6d9;
+}
+
+.unit[data-device='rx1202'] .ear {
+  visibility: hidden;
+}
+
+.unit[data-device='rx1202'] .face {
+  border: 0;
 }

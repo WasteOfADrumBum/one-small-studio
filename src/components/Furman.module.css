@@ -1,0 +1,264 @@
+/*
+ * The Furman M-8Lx front panel. Everything is placed along the panel in percentages and sized in
+ * rack units, so it keeps the real panel's layout at any width.
+ */
+.panel {
+  --ink: #e4e4e8;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: calc(var(--u) - 2px);
+}
+
+.panel > * {
+  position: absolute;
+  top: 50%;
+  translate: -50% -50%;
+}
+
+.tiny {
+  display: block;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: max(3.5px, calc(var(--u) * 0.11));
+  text-align: center;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ink);
+  opacity: 0.85;
+}
+
+.logo {
+  left: 1%;
+  translate: 0 -50%;
+  font-family: 'Arial Black', Arial, Helvetica, sans-serif;
+  font-size: calc(var(--u) * 0.2);
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.model {
+  left: auto;
+  right: 0;
+  translate: 0 -50%;
+  padding-right: 2%;
+  font-family: 'Arial Narrow', Arial, Helvetica, sans-serif;
+  font-size: calc(var(--u) * 0.2);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.outletGroup {
+  left: 14%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+/* A US socket: two blades and the round-topped ground. */
+.outlet {
+  position: relative;
+  width: calc(var(--u) * 0.56);
+  height: calc(var(--u) * 0.56);
+  border-radius: 2px;
+  background: #0b0b0c;
+  box-shadow:
+    inset 0 0 0 1px #2c2c30,
+    0 0 0 1px #000;
+}
+
+.outlet i {
+  position: absolute;
+  top: 20%;
+  width: 11%;
+  height: 32%;
+  background: #000;
+  box-shadow: inset 0 0 0 1px #3a3a3e;
+}
+
+.outlet i:nth-child(1) {
+  left: 24%;
+}
+
+.outlet i:nth-child(2) {
+  right: 24%;
+}
+
+.outlet i:nth-child(3) {
+  top: auto;
+  bottom: 14%;
+  left: 39%;
+  width: 22%;
+  height: 22%;
+  border-radius: 50% 50% 0 0;
+}
+
+/* LIGHTS / DIMMER: a small knurled knob over a native range input, so it works from the keyboard. */
+.dimmer {
+  left: 22.5%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  cursor: pointer;
+}
+
+.dimKnob {
+  position: relative;
+  width: calc(var(--u) * 0.3);
+  height: calc(var(--u) * 0.3);
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #f2f3f5, #9a9da3 55%, #3f4146);
+  box-shadow:
+    0 0 0 1.5px #0a0a0b,
+    0 1px 2px rgb(0 0 0 / 0.8);
+  rotate: var(--turn);
+}
+
+.dimKnob::after {
+  content: '';
+  position: absolute;
+  left: calc(50% - 1px);
+  top: 8%;
+  width: 2px;
+  height: 36%;
+  border-radius: 1px;
+  background: #111;
+}
+
+/* The real control: invisible, but covering the knob and its labels with a touch-sized target. */
+.dimmer input {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: max(28px, 100%);
+  height: max(28px, 100%);
+  margin: 0;
+  translate: -50% -50%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.dimmer:has(input:focus-visible) .dimKnob,
+.rocker:focus-visible {
+  outline: 2px solid var(--oss-crimson-bright);
+  outline-offset: 2px;
+}
+
+/* The two pull-out rack lamps; each throws light down the rack when on. */
+.lamp {
+  width: calc(var(--u) * 0.72);
+  height: calc(var(--u) * 0.72);
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 32%, #3c3c42, #0d0d10 68%);
+  box-shadow:
+    0 0 0 1.5px #050506,
+    0 2px 3px rgb(0 0 0 / 0.8);
+}
+
+.lamp[data-side='left'] {
+  left: 29%;
+}
+
+.lamp[data-side='right'] {
+  left: 71%;
+}
+
+.lamp::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: calc(var(--u) * 2.4);
+  height: calc(var(--u) * 0.7);
+  translate: -50% -30%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(220 240 255 / 0.5), transparent);
+  filter: blur(3px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.panel[data-on] .lamp::after {
+  opacity: var(--lights, 1);
+}
+
+.protection {
+  left: 79.7%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.okLed {
+  width: calc(var(--u) * 0.18);
+  height: calc(var(--u) * 0.18);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #4a4a52, #101012);
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.6);
+}
+
+.panel[data-on] .okLed {
+  background: radial-gradient(circle at 35% 30%, #fff 0%, var(--oss-green) 45%);
+  box-shadow: var(--oss-glow-green);
+}
+
+.powerGroup {
+  left: 87.8%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+/* POWER-ON: a black rocker, pressed in at the top when on. */
+.rocker {
+  display: block;
+  width: calc(var(--u) * 0.44);
+  height: calc(var(--u) * 0.56);
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #1c1c1f 0 48%, #050506 52% 100%);
+  box-shadow:
+    0 0 0 1.5px #000,
+    inset 0 -2px 0 rgb(255 255 255 / 0.12);
+  cursor: pointer;
+  position: relative;
+}
+
+.rocker[aria-checked='false'] {
+  background: linear-gradient(180deg, #050506 0 48%, #1c1c1f 52% 100%);
+  box-shadow:
+    0 0 0 1.5px #000,
+    inset 0 2px 0 rgb(255 255 255 / 0.12);
+}
+
+/* A larger, invisible hit area round the small rocker. */
+.rocker::before {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 28px;
+  height: 28px;
+  translate: -50% -50%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lamp::after,
+  .okLed {
+    transition:
+      opacity 250ms ease,
+      background 250ms ease,
+      box-shadow 250ms ease;
+  }
+
+  .dimKnob {
+    transition: rotate 120ms ease-out;
+  }
+}

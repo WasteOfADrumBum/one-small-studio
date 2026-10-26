@@ -1,10 +1,49 @@
 /* The Carvin V3M head: grey shell, black front panel, Arial-style silkscreen. */
-.amp {
+.rack {
   display: block;
   width: 100%;
-  height: auto;
-  overflow: visible;
+  height: 100%;
+}
+
+.recess {
+  fill: #232326;
+}
+
+.shade {
+  fill: rgb(0 0 0 / 0.22);
+}
+
+/* The valves' red light spilling round the inside of the rack, brightest at the middle. */
+.valveLight {
+  fill: #ff1a2a;
+  opacity: 0.45;
+  filter: blur(46px);
+  mix-blend-mode: screen;
+}
+
+:global([data-power='off']) .valveLight {
+  visibility: hidden;
+}
+
+.amp {
   filter: drop-shadow(0 3px 3px rgb(0 0 0 / 0.75));
+}
+
+.bracketBlock {
+  fill: #141416;
+  stroke: #36373c;
+  stroke-width: 2;
+}
+
+.gridPanel {
+  fill: #0e0e10;
+  stroke: rgb(255 255 255 / 0.08);
+  stroke-width: 2;
+}
+
+.gridEdge {
+  stroke: rgb(255 255 255 / 0.1);
+  stroke-width: 2;
 }
 
 .amp text {
@@ -170,4 +209,13 @@
   100% {
     opacity: 1;
   }
+}
+
+/* Unplugged: the valves cool and the LEDs go out. */
+:global([data-power='off']) .tube {
+  visibility: hidden;
+}
+
+:global([data-power='off']) .led {
+  opacity: 0.12;
 }

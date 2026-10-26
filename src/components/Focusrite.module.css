@@ -1,19 +1,9 @@
-/* The Scarlett 18i20 stacked on the OctoPre MkII, each as wide as the faceplate allows. */
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.75));
-}
-
-.defs {
-  position: absolute;
-}
-
+/* As wide as the faceplate, never taller than it. */
 .unit {
   display: block;
   width: 100%;
   height: auto;
+  max-height: 100%;
 }
 
 .unit text {
@@ -106,15 +96,7 @@
   stroke-width: 2;
 }
 
-/* ---- Scarlett 18i20: red anodised edge round a black panel ---- */
-
-.scarlettEdge {
-  fill: #d8202c;
-}
-
-.scarlettFace {
-  fill: #0b0b0c;
-}
+/* ---- Scarlett 18i20 ---- */
 
 .scarlettLogo {
   font-size: 14px;
@@ -166,13 +148,7 @@
   fill: #3a1214;
 }
 
-/* ---- OctoPre MkII: charcoal panel, outlined sections, blue-ringed gains ---- */
-
-.octoFace {
-  fill: #2b2c30;
-  stroke: #151518;
-  stroke-width: 1.5;
-}
+/* ---- OctoPre MkII: outlined sections, blue-ringed gains ---- */
 
 .box {
   fill: none;
@@ -234,4 +210,18 @@
   font-size: 6px;
   font-weight: 400 !important;
   fill: #10324a;
+}
+
+/* Unplugged: meters and status lamps go dark. */
+:global([data-power='off']) .seg[data-lit],
+:global([data-power='off']) .green {
+  fill: #12301c;
+}
+
+:global([data-power='off']) .red {
+  fill: #3a1214;
+}
+
+:global([data-power='off']) .usb {
+  stroke: #12301c;
 }
