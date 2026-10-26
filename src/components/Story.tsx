@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import { useReducedMotion } from 'motion/react';
-import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import { IconChevronLeft, IconChevronRight, IconWaveSine } from '@tabler/icons-react';
 import { eras, lanes, timelineEnd, timelineStart, yearLabel, type Era } from '@/content/story';
 import { SectionHeader } from './SectionHeader';
 import { StudioMonitor } from './StudioMonitor';
@@ -102,7 +102,6 @@ export function Story() {
 
   const sessionStyle = {
     '--years': years.length,
-    '--rows': totalRows,
     '--sel-x': era.start - timelineStart,
     '--sel-w': (era.end ?? timelineEnd) - era.start,
   } as CSSProperties;
@@ -136,14 +135,22 @@ export function Story() {
         >
           <div className={classes.window}>
             <div className={classes.titleBar} aria-hidden="true">
-              <span className={classes.lights}>
-                <i />
-                <i />
-                <i />
-              </span>
+              <IconWaveSine size={14} stroke={2} className={classes.appIcon} />
               <span>Edit: The Story</span>
               <span className={classes.titleMeta}>
                 {lanes.length} tracks · {clips.length} clips
+              </span>
+              {/* Windows caption buttons: minimize, maximize, close. */}
+              <span className={classes.caption}>
+                <svg viewBox="0 0 10 10">
+                  <path d="M0 5.5h10" />
+                </svg>
+                <svg viewBox="0 0 10 10">
+                  <rect x="0.5" y="0.5" width="9" height="9" />
+                </svg>
+                <svg viewBox="0 0 10 10" data-close>
+                  <path d="M0 0l10 10M10 0L0 10" />
+                </svg>
               </span>
             </div>
 
@@ -157,7 +164,7 @@ export function Story() {
                   aria-controls="story-timeline"
                 >
                   <IconChevronLeft size={16} aria-hidden="true" />
-                  Earlier
+                  <span className={classes.navLabel}>Earlier</span>
                 </button>
                 <button
                   type="button"
@@ -166,7 +173,7 @@ export function Story() {
                   disabled={!timeline.canLater}
                   aria-controls="story-timeline"
                 >
-                  Later
+                  <span className={classes.navLabel}>Later</span>
                   <IconChevronRight size={16} aria-hidden="true" />
                 </button>
               </div>
@@ -175,7 +182,7 @@ export function Story() {
                 <span className={classes.counterLabel}>Playhead</span>
                 <span className={classes.counterValue}>{playheadYear}</span>
               </div>
-              <div className={classes.counter} aria-hidden="true">
+              <div className={classes.counter} data-kind="selection" aria-hidden="true">
                 <span className={classes.counterLabel}>Selection</span>
                 <span className={classes.counterValue}>{yearLabel(era)}</span>
               </div>
@@ -188,7 +195,10 @@ export function Story() {
               </div>
             </div>
 
-            <div className={classes.stage} style={{ '--tail': tail } as CSSProperties}>
+            <div
+              className={classes.stage}
+              style={{ '--tail': tail, '--rows': totalRows } as CSSProperties}
+            >
               <div
                 ref={viewport}
                 id="story-timeline"

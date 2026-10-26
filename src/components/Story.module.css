@@ -6,11 +6,21 @@
 
 /* ---- The edit window on screen ---- */
 
+/* Track height, worked out from the screen's height so the tracks fill the monitor. */
+@property --row-fit {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 66px;
+}
+
 .window {
   --year: 40px;
   --head: 176px;
-  --row-h: 66px;
+  --row-min: 44px;
+  --row-max: 66px;
   --ruler-h: 52px;
+  /* Room kept for the sideways scrollbar under the tracks. */
+  --sb: 14px;
   --ui: #15171a;
   --ui-line: rgb(255 255 255 / 0.07);
   display: flex;
@@ -21,36 +31,58 @@
 
 .titleBar {
   display: flex;
+  flex: none;
   align-items: center;
-  gap: 12px;
-  height: 26px;
-  padding: 0 10px;
+  gap: 8px;
+  height: 30px;
+  padding: 0 0 0 10px;
   background: linear-gradient(180deg, #24262a, #1b1d20);
   border-bottom: 1px solid #070708;
   font-size: 0.72rem;
   color: #a9adb3;
 }
 
-.lights {
-  display: inline-flex;
-  gap: 6px;
-}
-
-.lights i {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #3b3d42;
+.appIcon {
+  color: var(--oss-crimson-bright);
 }
 
 .titleMeta {
   margin-left: auto;
+  padding-right: 6px;
   font-family: var(--mantine-font-family-monospace);
   color: #7d838a;
 }
 
+/* Minimize, maximize and close, drawn the way Windows draws them: hairline glyphs in wide cells. */
+.caption {
+  display: flex;
+  align-self: stretch;
+  margin-left: auto;
+}
+
+.titleMeta + .caption {
+  margin-left: 0;
+}
+
+.caption svg {
+  box-sizing: content-box;
+  width: 10px;
+  height: 10px;
+  padding: 0 18px;
+  align-self: center;
+  fill: none;
+  stroke: #c9ccd1;
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.caption svg[data-close] {
+  shape-rendering: geometricPrecision;
+}
+
 .toolbar {
   display: flex;
+  flex: none;
   align-items: center;
   gap: 16px;
   padding: 8px 10px;
@@ -144,12 +176,21 @@
   --lead: calc(var(--lane-vis) * var(--anchor));
   --trail: max(0px, calc(var(--lane-vis) * (1 - var(--anchor)) - var(--tail) * var(--year)));
   position: relative;
-  container-type: inline-size;
+  flex: 1;
+  min-height: 0;
+  /* Sized by the screen, not its content, so the tracks can be fitted to it. */
+  container-type: size;
 }
 
 .viewport {
-  overflow-x: auto;
-  overflow-y: hidden;
+  --row-fit: clamp(
+    var(--row-min),
+    (100cqh - var(--ruler-h) - var(--sb)) / var(--rows),
+    var(--row-max)
+  );
+  --row-h: var(--row-fit);
+  height: 100%;
+  overflow: auto;
   overscroll-behavior-x: contain;
   scroll-padding-inline: var(--head) 12px;
   cursor: grab;
@@ -163,6 +204,7 @@
 
 .session {
   position: relative;
+  min-height: 100%;
   width: calc(var(--head) + var(--lead) + var(--years) * var(--year) + var(--trail));
   background: #0c0d0f;
 }
@@ -170,6 +212,13 @@
 .rulerRow,
 .trackRow {
   display: flex;
+}
+
+/* The ruler stays on top when a short screen scrolls the tracks up and down. */
+.rulerRow {
+  position: sticky;
+  top: 0;
+  z-index: 6;
 }
 
 .corner,
@@ -507,7 +556,7 @@
 /* The playhead stays put while the session moves under it, like a DAW's scrolling playback. */
 .playhead {
   position: absolute;
-  z-index: 5;
+  z-index: 7;
   top: 20px;
   bottom: 12px;
   left: calc(var(--head) + var(--lead));
@@ -592,6 +641,37 @@
   line-height: 1.6;
 }
 
+/* On the 32:9 ultrawide the screen is short for its width, so the tracks run slimmer. */
+@media (min-width: 80em) {
+  .window {
+    --row-min: 32px;
+  }
+
+  .toolbar {
+    padding-block: 5px;
+  }
+
+  .navButton {
+    min-height: 32px;
+  }
+
+  /* Track name and state share one line so a slim track still reads cleanly. */
+  .trackHead {
+    grid-template-columns: 6px 20px auto 1fr;
+    grid-template-rows: auto;
+    align-items: center;
+  }
+
+  .trackChip {
+    grid-row: 1;
+  }
+
+  .trackState {
+    grid-column: 4;
+    justify-self: end;
+  }
+}
+
 @media (max-width: $mantine-breakpoint-md) {
   .modes {
     display: none;
@@ -609,13 +689,48 @@
     display: none;
   }
 
+  .titleBar {
+    height: 24px;
+    font-size: 0.68rem;
+  }
+
+  .caption svg {
+    width: 8px;
+    height: 8px;
+    padding: 0 9px;
+  }
+
+  /* The 16:9 screen is short on a phone: one slim row of transport controls. */
   .toolbar {
-    flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
+    padding: 5px 6px;
+  }
+
+  .navButton {
+    min-height: 32px;
+    padding: 0 8px;
+  }
+
+  .navLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .counter {
     margin-left: auto;
+    padding: 3px 8px;
+  }
+
+  .counter[data-kind='selection'] {
+    display: none;
+  }
+
+  .counterValue {
+    font-size: 0.95rem;
   }
 
   .trackHead {
