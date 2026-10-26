@@ -57,9 +57,10 @@ const rigSpecs = [
 const clipLabel = (era: Era) => `${era.title}, ${era.lane} track, ${yearLabel(era)}`;
 
 /**
- * Section 2, "The Story": the timeline as an edit window on a studio monitor. The session scrolls
- * sideways inside the screen with fixed track headers; clips are selectable, and the desk unit
- * under the monitor shows the full story of the selected one.
+ * Section 2, "The Story": the timeline as an edit window on a studio monitor. Where the whole session
+ * fits on the screen, the playhead moves along it; on smaller screens the session scrolls sideways
+ * under a fixed playhead, with fixed track headers. Clips are selectable, and the desk unit under the
+ * monitor shows the full story of the selected one.
  */
 export function Story() {
   const [selected, setSelected] = useState(0);
@@ -90,10 +91,12 @@ export function Story() {
     if (index !== null) setSelected(index);
   };
 
-  // Selection never scrolls the timeline by itself; keyboard focus brings a clip into view.
+  // Selection never scrolls the timeline by itself; keyboard focus brings a clip into view. When the
+  // whole session fits on screen, the playhead moves to the selected clip instead.
   const select = (index: number, focus = false) => {
     const next = Math.max(0, Math.min(clips.length - 1, index));
     setSelected(next);
+    timeline.seek(next);
     if (focus) clipRefs.current[next]?.focus();
   };
 
@@ -222,7 +225,15 @@ export function Story() {
 
             <div
               className={classes.stage}
-              style={{ '--tail': tail, '--rows': totalRows } as CSSProperties}
+              data-scrubbing={timeline.scrubbing || undefined}
+              style={
+                {
+                  '--tail': tail,
+                  '--rows': totalRows,
+                  '--years': years.length,
+                  '--ph': timeline.year - timelineStart,
+                } as CSSProperties
+              }
             >
               <div
                 ref={viewport}

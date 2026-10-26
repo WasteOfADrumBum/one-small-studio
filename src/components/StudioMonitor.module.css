@@ -1,15 +1,27 @@
 .monitor {
   --panel-w: min(100%, 880px);
-  /* Josh's PC stands behind the panel; its top part rises above the screen, so leave it room. */
-  --pc-w: calc(var(--panel-w) * 0.66);
-  --pc-peek: calc(var(--pc-w) * 0.4);
-  --pc-room: var(--pc-peek);
+  /*
+   * Josh's PC stands behind the right end of the panel and taller than it, so the monitor leaves
+   * room above for it. On phones it hangs from the top of that room and rises 42% of its height
+   * above the screen; from tablets up it stands on the desk beside the desk unit, and the room is
+   * what its height leaves over the monitor's (the panel, the stand and about 172px of desk unit).
+   */
+  --pc-w: calc(var(--panel-w) * 0.62);
+  --pc-h: calc(var(--pc-w) * 1.25);
+  --pc-room: calc(var(--pc-h) * 0.42);
   position: relative;
   isolation: isolate;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-top: var(--pc-room);
+}
+
+@media (min-width: 48em) {
+  .monitor {
+    --pc-w: calc(var(--panel-w) * 0.8);
+    --pc-room: max(0px, var(--pc-h) - var(--panel-w) * 0.687 - 172px);
+  }
 }
 
 /* A bias light behind the monitor, cast onto the wall: broad and soft, never an outline. */
@@ -80,9 +92,8 @@
 @media (min-width: 80em) {
   .monitor {
     --panel-w: min(100vw - var(--oss-gutter) * 2 - 24px, 1560px);
-    --pc-w: calc(var(--panel-w) * 0.36);
-    /* Here the PC clears the end of the section title, so it may rise into the space beside it. */
-    --pc-room: max(0px, var(--pc-peek) - 90px);
+    --pc-w: calc(var(--panel-w) * 0.52);
+    --pc-room: max(0px, var(--pc-h) - var(--panel-w) * 0.369 - 172px);
   }
 
   .panel {
