@@ -5,12 +5,15 @@ import { BossGtPro } from './BossGtPro';
 import { CarvinV3M } from './CarvinV3M';
 import { OctoPreMkII, Scarlett18i20 } from './Focusrite';
 import { FurmanM8Lx } from './Furman';
+import { LiveWirePC1100 } from './LiveWirePC1100';
 import { Knob } from './hardware/Knob';
 import { Screw } from './hardware/Screw';
 import classes from './Rack.module.css';
 
 type CabinetProps = {
   title: string;
+  /** Which power conditioner tops the rack. */
+  power: 'furman' | 'livewire';
   /** Which side panel the viewer can see, from where the cabinet stands in the row. */
   side?: 'left' | 'right';
   children: ReactNode;
@@ -22,8 +25,9 @@ type CabinetProps = {
  * conditioner at the top wash down over the faceplates below; its rocker powers the whole rack and
  * its dimmer sets how bright the lights are.
  */
-export function RackCabinet({ title, side, children }: CabinetProps) {
+export function RackCabinet({ title, power: conditioner, side, children }: CabinetProps) {
   const [power, setPower] = useState(true);
+  const Conditioner = conditioner === 'livewire' ? LiveWirePC1100 : FurmanM8Lx;
   const [lights, setLights] = useState(100);
   return (
     <section className={classes.cabinet} data-side={side}>
@@ -40,7 +44,7 @@ export function RackCabinet({ title, side, children }: CabinetProps) {
           <span className={classes.rail} data-side="right" aria-hidden="true" />
           <div className={classes.units}>
             <Mount size={1} kind="power">
-              <FurmanM8Lx
+              <Conditioner
                 rack={title}
                 power={power}
                 onPower={setPower}
@@ -106,13 +110,16 @@ function Mount({
 
 /**
  * Gear that really is rack-mounted, drawn as itself: the item's size covers a 1U nameplate and the
- * units bolted in under it. The Carvin head sits on black brackets across 2U, the Boss GT-Pro fills
- * 2U and the Focusrite pair fill 1U each.
+ * units bolted in under it. The Carvin head sits on black brackets across 2U under a 2U grid vent,
+ * the Boss GT-Pro fills 2U and the Focusrite pair fill 1U each.
  */
 const MOUNTED: Partial<
   Record<GearItem['kind'], { device: string; size: RackSize; draw: ReactNode }[]>
 > = {
-  'amp-head': [{ device: 'carvin', size: 2, draw: <CarvinV3M /> }],
+  'amp-head': [
+    { device: 'grid', size: 2, draw: <span className={classes.grid} /> },
+    { device: 'carvin', size: 2, draw: <CarvinV3M /> },
+  ],
   effects: [{ device: 'gtpro', size: 2, draw: <BossGtPro /> }],
   interface: [
     { device: 'scarlett', size: 1, draw: <Scarlett18i20 /> },

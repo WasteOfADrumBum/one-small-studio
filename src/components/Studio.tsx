@@ -20,6 +20,7 @@ export function Studio() {
             <RackCabinet
               key={group.name}
               title={group.name}
+              power={group.power}
               side={i === 0 ? 'right' : i === gear.length - 1 ? 'left' : undefined}
             >
               {group.items.map((item) => (

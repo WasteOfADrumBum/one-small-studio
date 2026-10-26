@@ -6,7 +6,7 @@
  * Carvin, the Focusrite pair, the Boss) is drawn as itself under a 1U nameplate, and its `size`
  * counts both. Both are presentation only.
  */
-export type RackSize = 1 | 2 | 3;
+export type RackSize = 1 | 2 | 3 | 4 | 5;
 
 export type GearKind =
   'daw' | 'interface' | 'amp-head' | 'speaker-cab' | 'effects' | 'drum' | 'cymbals' | 'drum-module';
@@ -23,12 +23,15 @@ export type GearItem = {
 
 export type GearGroup = {
   name: string;
+  /** The power conditioner on top of the rack, which also works its power and lights. */
+  power: 'furman' | 'livewire';
   items: GearItem[];
 };
 
 export const gear: GearGroup[] = [
   {
     name: 'Recording',
+    power: 'furman',
     items: [
       {
         brand: 'Avid',
@@ -48,12 +51,21 @@ export const gear: GearGroup[] = [
   },
   {
     name: 'Amps and effects',
+    power: 'livewire',
+    // In the order of the real guitar rack, top to bottom.
     items: [
+      {
+        brand: 'Boss',
+        model: 'Effects',
+        note: 'Pedals for everything from ska upstrokes to metal',
+        size: 3,
+        kind: 'effects',
+      },
       {
         brand: 'Carvin',
         model: 'V3M',
         note: 'The go-to head, plus a lot of other Carvin amps over the years',
-        size: 3,
+        size: 5,
         kind: 'amp-head',
       },
       {
@@ -63,17 +75,11 @@ export const gear: GearGroup[] = [
         size: 3,
         kind: 'speaker-cab',
       },
-      {
-        brand: 'Boss',
-        model: 'Effects',
-        note: 'Pedals for everything from ska upstrokes to metal',
-        size: 3,
-        kind: 'effects',
-      },
     ],
   },
   {
     name: 'Drums',
+    power: 'furman',
     items: [
       {
         brand: 'Pearl',
