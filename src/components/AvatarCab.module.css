@@ -1,0 +1,56 @@
+/* The Avatar 2x12: white tolex frame, black grille cloth, script logo. */
+.cab {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 3px 3px rgb(0 0 0 / 0.75));
+}
+
+/* Light falls from above, so the top rail is brightest and the bottom darkest. */
+.lit {
+  fill: rgb(255 255 255 / 0.25);
+}
+
+.side {
+  fill: rgb(0 0 0 / 0.03);
+}
+
+.shade {
+  fill: rgb(0 0 0 / 0.08);
+}
+
+.under {
+  fill: rgb(0 0 0 / 0.14);
+}
+
+.mitre {
+  stroke: rgb(0 0 0 / 0.22);
+  stroke-width: 1.5;
+}
+
+.trim {
+  fill: #f4f3ee;
+  stroke: rgb(0 0 0 / 0.25);
+  stroke-width: 1.5;
+}
+
+/* The cloth sits just behind the trim. */
+.recess {
+  fill: none;
+  stroke: rgb(0 0 0 / 0.6);
+  stroke-width: 4;
+}
+
+.logo {
+  font-family: 'Brush Script MT', 'Segoe Script', 'Snell Roundhand', cursive;
+  font-size: 50px;
+  font-style: italic;
+  font-weight: 700;
+  fill: #f6f6f2;
+}
+
+.corner {
+  fill: #141416;
+  stroke: #000;
+  stroke-width: 1;
+}

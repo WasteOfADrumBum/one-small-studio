@@ -1,36 +1,61 @@
-import type { CSSProperties, ReactNode } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
 import type { GearItem, RackSize } from '@/content/gear';
+import { AlesisDM5 } from './AlesisDM5';
+import { AvatarCab } from './AvatarCab';
+import { BehringerRX1202FX } from './BehringerRX1202FX';
+import { BossGtPro } from './BossGtPro';
+import { CarvinBX1600 } from './CarvinBX1600';
 import { CarvinV3M } from './CarvinV3M';
-import { FocusriteStack } from './FocusriteStack';
-import { Knob } from './hardware/Knob';
-import { Led } from './hardware/Led';
+import { OctoPreMkII, Scarlett18i20 } from './Focusrite';
+import { FurmanM8Lx } from './Furman';
+import { LiveWirePC1100 } from './LiveWirePC1100';
 import { Screw } from './hardware/Screw';
 import classes from './Rack.module.css';
 
 type CabinetProps = {
   title: string;
+  /** Which power conditioner tops the rack. */
+  power: 'furman' | 'livewire';
   /** Which side panel the viewer can see, from where the cabinet stands in the row. */
   side?: 'left' | 'right';
+  /** Gear standing on the floor behind the cabinet, poking out to its right. */
+  behind?: ReactNode;
   children: ReactNode;
 };
 
 /**
  * A carpet-covered rack case: a top and one side visible for depth, a thick front frame the gear
  * sits just behind, recessed metal rails, and a plinth on casters. The rack lights on the power
- * conditioner at the top wash down over the faceplates below.
+ * conditioner at the top wash down over the faceplates below; its rocker powers the whole rack and
+ * its dimmer sets how bright the lights are.
  */
-export function RackCabinet({ title, side, children }: CabinetProps) {
+export function RackCabinet({ title, power: conditioner, side, behind, children }: CabinetProps) {
+  const [power, setPower] = useState(true);
+  const Conditioner = conditioner === 'livewire' ? LiveWirePC1100 : FurmanM8Lx;
+  const [lights, setLights] = useState(100);
   return (
     <section className={classes.cabinet} data-side={side}>
       <span className={classes.top} aria-hidden="true" />
       <span className={classes.sidePanel} aria-hidden="true" />
       <div className={classes.frame}>
         <h3 className={classes.plate}>{title}</h3>
-        <div className={classes.bay}>
+        <div
+          className={classes.bay}
+          data-power={power ? 'on' : 'off'}
+          style={{ '--lights': power ? lights / 100 : 0 } as CSSProperties}
+        >
           <span className={classes.rail} data-side="left" aria-hidden="true" />
           <span className={classes.rail} data-side="right" aria-hidden="true" />
           <div className={classes.units}>
-            <PowerConditioner />
+            <Mount size={1} kind="power">
+              <Conditioner
+                rack={title}
+                power={power}
+                onPower={setPower}
+                lights={lights}
+                onLights={setLights}
+              />
+            </Mount>
             {children}
           </div>
           <span className={classes.wash} aria-hidden="true" />
@@ -41,6 +66,7 @@ export function RackCabinet({ title, side, children }: CabinetProps) {
         <span className={classes.caster} />
         <span className={classes.caster} />
       </div>
+      {behind && <div className={classes.behind}>{behind}</div>}
     </section>
   );
 }
@@ -59,12 +85,17 @@ function Mount({
   size,
   kind,
   finish,
+  device,
+  half,
   hidden,
   children,
 }: {
   size: RackSize;
   kind: string;
   finish?: string;
+  device?: string;
+  /** A half-rack unit, half the rack's width. */
+  half?: boolean;
   hidden?: boolean;
   children: ReactNode;
 }) {
@@ -73,7 +104,9 @@ function Mount({
       className={classes.unit}
       data-kind={kind}
       data-finish={finish}
+      data-device={device}
       data-size={size}
+      data-half={half || undefined}
       style={{ '--size': size } as CSSProperties}
       aria-hidden={hidden || undefined}
     >
@@ -85,44 +118,92 @@ function Mount({
 }
 
 /**
- * The 1U power conditioner every case starts with: rack-light switch and dimmer, two pull-out
- * lamps, a status window, and the main rocker. Studio framing only, so it carries no brand, no
- * model and no live readings.
+ * Gear that really is rack-mounted, drawn as itself: the item's size covers a nameplate and the
+ * units bolted in under it. The Carvin is 4U, its head set back under a grid panel, the Boss
+ * GT-Pro fills 2U, the Focusrite pair and the Alesis DM5 fill 1U each and the BX1600 fills 2U.
+ * The Avatar cab is a nameplate only: the cab itself stands behind the rack.
  */
-function PowerConditioner() {
+const MOUNTED: Partial<
+  Record<GearItem['kind'], { device: string; size: RackSize; draw: ReactNode }[]>
+> = {
+  'amp-head': [{ device: 'carvin', size: 4, draw: <CarvinV3M /> }],
+  'bass-amp': [{ device: 'bx1600', size: 2, draw: <CarvinBX1600 /> }],
+  'drum-module': [{ device: 'dm5', size: 1, draw: <AlesisDM5 /> }],
+  mixer: [{ device: 'rx1202', size: 3, draw: <BehringerRX1202FX /> }],
+  // The cab itself stands on its end behind the rack; see RackCabinet's `behind`.
+  'speaker-cab': [],
+  effects: [{ device: 'gtpro', size: 2, draw: <BossGtPro /> }],
+  interface: [
+    { device: 'scarlett', size: 1, draw: <Scarlett18i20 /> },
+    { device: 'octopre', size: 1, draw: <OctoPreMkII /> },
+  ],
+};
+
+function Nameplate({ item }: { item: GearItem }) {
   return (
-    <Mount size={1} kind="power" hidden>
-      <span className={classes.pcGroup}>
-        <span className={classes.pcLabel}>Rack lights</span>
-        <span className={classes.toggle} />
-        <Knob size={16} angle={40} />
-      </span>
-      <span className={classes.lamp} />
-      <span className={classes.pcWindow}>
-        <Led on color="green" />
-        <span>Power</span>
-      </span>
-      <span className={classes.lamp} />
-      <span className={classes.pcGroup}>
-        <span className={classes.rocker} />
-        <span className={classes.pcLabel}>On</span>
-      </span>
-    </Mount>
+    <div className={classes.text}>
+      <h4 className={classes.name}>
+        {item.brand} <span className={classes.model}>{item.model}</span>
+      </h4>
+      <p className={classes.note}>{item.note}</p>
+    </div>
   );
 }
 
 /** One piece of gear, drawn as a rack faceplate in the style of its category. Name first. */
 export function RackUnit({ item }: { item: GearItem }) {
+  const mounted = MOUNTED[item.kind];
+  if (mounted) {
+    // The nameplate takes whatever of the item's size the gear itself does not.
+    const plate = (item.size - mounted.reduce((sum, m) => sum + m.size, 0)) as RackSize;
+    return (
+      <>
+        {plate > 0 && (
+          <Mount size={plate} kind="nameplate">
+            <Nameplate item={item} />
+          </Mount>
+        )}
+        {mounted.map(({ device, size, draw }) => (
+          <Mount key={device} size={size} kind="device" device={device} hidden>
+            {draw}
+          </Mount>
+        ))}
+      </>
+    );
+  }
   return (
     <Mount size={item.size} kind={item.kind} finish={item.finish}>
-      <div className={classes.text}>
-        <h4 className={classes.name}>
-          {item.brand} <span className={classes.model}>{item.model}</span>
-        </h4>
-        <p className={classes.note}>{item.note}</p>
-      </div>
+      <Nameplate item={item} />
       <Faceplate item={item} />
     </Mount>
+  );
+}
+
+/**
+ * Half-rack gear, two to a row side by side, each with its own ears and just its name. A lone half-rack unit gets a
+ * vented blank beside it to fill the row.
+ */
+export function HalfRackRow({ items }: { items: GearItem[] }) {
+  const size = Math.max(...items.map((item) => item.size)) as RackSize;
+  return (
+    <div className={classes.halves}>
+      {items.map((item) => (
+        <Mount
+          key={`${item.brand}-${item.model}`}
+          size={size}
+          kind={item.kind}
+          finish={item.finish}
+          half
+        >
+          <Nameplate item={item} />
+        </Mount>
+      ))}
+      {items.length === 1 && (
+        <Mount size={size} kind="filler" half hidden>
+          <span className={classes.vent} />
+        </Mount>
+      )}
+    </div>
   );
 }
 
@@ -178,70 +259,11 @@ function Faceplate({ item }: { item: GearItem }) {
           </span>
         </div>
       );
-    // The Focusrite pair: a Scarlett 18i20 stacked on an OctoPre MkII, under the text.
-    case 'interface':
-      return (
-        <div className={classes.hw} data-hw="interface" aria-hidden="true">
-          <FocusriteStack />
-        </div>
-      );
-    // Amp: the Carvin V3M head itself, drawn from the real thing.
-    case 'amp-head':
-      return (
-        <div className={classes.hw} data-hw="amp" aria-hidden="true">
-          <CarvinV3M />
-        </div>
-      );
-    // Cabinet: a grille-cloth panel with the speakers ghosting through.
+    // Cabinet: the white Avatar 2x12, speakers ghosting through the cloth.
     case 'speaker-cab':
       return (
         <div className={classes.hw} data-hw="cab" aria-hidden="true">
-          <span className={classes.grillePanel}>
-            <i />
-            <i />
-          </span>
-        </div>
-      );
-    case 'effects':
-      return (
-        <div className={classes.hw} data-hw="effects" aria-hidden="true">
-          <span className={classes.lcd} data-tone="red">
-            P01
-          </span>
-          <span className={classes.paramKnobs}>
-            {[-70, 10, 80].map((a) => (
-              <Knob key={a} size={20} angle={a} />
-            ))}
-          </span>
-          <span className={classes.keys}>{pads(6)}</span>
-        </div>
-      );
-    // Drum-related modules: a level display, a selector dial and grouped pads.
-    case 'drum':
-    case 'cymbals':
-      return (
-        <div className={classes.hw} data-hw="module" data-variant={item.kind} aria-hidden="true">
-          <span className={classes.lcd} data-tone="amber" data-bars>
-            {[0.5, 0.8, 0.35, 0.65, 0.9, 0.45, 0.7, 0.3].map((h, i) => (
-              <i key={i} style={{ '--h': h } as CSSProperties} />
-            ))}
-          </span>
-          <Knob size={34} angle={item.kind === 'cymbals' ? -50 : 60} />
-          <span className={classes.keys} data-pads={item.kind === 'cymbals' ? 'round' : ''}>
-            {pads(item.kind === 'cymbals' ? 6 : 8)}
-          </span>
-        </div>
-      );
-    case 'drum-module':
-      return (
-        <div className={classes.hw} data-hw="module" aria-hidden="true">
-          <span className={classes.lcd} data-tone="green">
-            KIT 01
-          </span>
-          <Knob size={40} angle={30} />
-          <span className={classes.keys} data-pads="">
-            {pads(8)}
-          </span>
+          <AvatarCab />
         </div>
       );
     default:

@@ -1,0 +1,236 @@
+/* The Boss GT-Pro: grey brushed panel, silver inset, black key blocks, Arial silkscreen. */
+.gt {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.gt text {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.white {
+  font-size: 19px;
+  fill: #f2f2f2;
+}
+
+.dark,
+.darkStart {
+  font-size: 19px;
+  fill: #141416;
+}
+
+.gt .darkStart {
+  font-size: 16px;
+  text-anchor: start;
+}
+
+.darkSmall {
+  font-size: 13px;
+  fill: #141416;
+}
+
+.bar {
+  fill: #141416;
+}
+
+.barText {
+  font-size: 19px;
+  fill: #f2f2f2;
+}
+
+.customBox {
+  fill: none;
+  stroke: #141416;
+  stroke-width: 2;
+}
+
+.soloBox {
+  fill: none;
+  stroke: #141416;
+  stroke-width: 2.5;
+}
+
+.silverEdge {
+  fill: none;
+  stroke: #7d8086;
+  stroke-width: 2;
+}
+
+.screw {
+  fill: #c9cbcf;
+  stroke: #6e7177;
+  stroke-width: 2;
+}
+
+.screwHead {
+  fill: #8d9096;
+}
+
+.blueNut {
+  fill: #3d7fd9;
+  stroke: #12305c;
+  stroke-width: 4;
+}
+
+.chromeNut {
+  fill: #a8abb0;
+  stroke: #3a3b3f;
+  stroke-width: 4;
+}
+
+.hole {
+  fill: #050506;
+}
+
+.peak {
+  fill: #ff3030;
+  fill-opacity: 0.35;
+}
+
+/* Knobs: a black knurled skirt, its tick ring, and a brushed silver cap with a black line. */
+.tick {
+  stroke: #0d0d0f;
+  stroke-width: 5;
+}
+
+.knobShadow {
+  fill: rgb(0 0 0 / 0.45);
+}
+
+.skirt {
+  fill: #121214;
+}
+
+.knurl {
+  fill: none;
+  stroke: #3a3b40;
+  stroke-width: 5;
+  stroke-dasharray: 4 5;
+}
+
+.index {
+  stroke: #0b0b0c;
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.dial {
+  fill: #0d0d0f;
+}
+
+.display {
+  fill: #0a0a0d;
+  stroke: #000;
+  stroke-width: 3;
+}
+
+.digits {
+  font-family: var(--mantine-font-family-monospace) !important;
+  font-size: 104px;
+  letter-spacing: 6px;
+  fill: #ff2a1a;
+  fill-opacity: 0.85;
+}
+
+.lcd {
+  fill: #1f2fa0;
+}
+
+.lcdText {
+  font-family: var(--mantine-font-family-monospace) !important;
+  font-size: 30px;
+  fill: #d8e2ff;
+  text-anchor: start !important;
+}
+
+.block {
+  fill: #18181b;
+}
+
+.key {
+  fill: #1e1f22;
+  stroke: #050506;
+  stroke-width: 3;
+}
+
+.keyLamp {
+  fill: #3a3b40;
+}
+
+.jump {
+  fill: none;
+  stroke: #f2f2f2;
+  stroke-width: 2.5;
+}
+
+.logoBox {
+  fill: none;
+  stroke: #e9e9eb;
+  stroke-width: 4;
+}
+
+.logoMark {
+  fill: none;
+  stroke: #e9e9eb;
+  stroke-width: 5;
+}
+
+.boss {
+  font-family: 'Arial Black', Arial, sans-serif !important;
+  font-size: 54px;
+  font-weight: 900 !important;
+  letter-spacing: 3px;
+  fill: #ececee;
+}
+
+.model {
+  font-family: 'Arial Black', Arial, sans-serif !important;
+  font-size: 84px;
+  font-weight: 900 !important;
+  fill: #dcdde0;
+}
+
+.tagline {
+  font-size: 17px;
+  fill: #dcdde0;
+}
+
+.bezel {
+  fill: #0e0e10;
+  stroke: #2b2c30;
+  stroke-width: 3;
+}
+
+.rocker {
+  fill: #050506;
+}
+
+.rockerFace {
+  fill: #2a2b2f;
+}
+
+.cosm {
+  fill: #0e0e10;
+}
+
+.cosmText {
+  font-family: 'Arial Black', Arial, sans-serif !important;
+  font-size: 22px;
+  font-style: italic;
+  font-weight: 900 !important;
+  fill: #f2f2f2;
+}
+
+/* Unplugged: the display and the peak lamp go dark. */
+:global([data-power='off']) .digits,
+:global([data-power='off']) .lcdText,
+:global([data-power='off']) .peak {
+  fill-opacity: 0.06;
+}
+
+:global([data-power='off']) .lcd {
+  fill: #0b0d22;
+}

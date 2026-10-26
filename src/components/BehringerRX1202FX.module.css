@@ -1,0 +1,263 @@
+/* The Behringer RX1202FX: silver panel, dark grey strips, silver EQ columns, coloured knob caps. */
+.mixer {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.mixer text {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.seam {
+  stroke: #9a9da3;
+  stroke-width: 2;
+}
+
+.slot {
+  fill: #fff;
+  stroke: #8d9096;
+  stroke-width: 2;
+}
+
+.mixer .earTitle {
+  font-size: 15px;
+  fill: #141416;
+  text-anchor: start;
+}
+
+.mixer .earText {
+  font-size: 8px;
+  fill: #26272b;
+  text-anchor: start;
+}
+
+.logoMark {
+  fill: none;
+  stroke: #26272b;
+  stroke-width: 2.5;
+}
+
+.logo {
+  font-size: 14px;
+  font-weight: 400 !important;
+  fill: #26272b;
+}
+
+.strip {
+  fill: #50535a;
+  stroke: #33353a;
+  stroke-width: 1.5;
+}
+
+.header {
+  fill: #3e4046;
+  stroke: #d8dade;
+  stroke-width: 1.5;
+}
+
+.number {
+  font-size: 15px;
+  fill: #f2f2f4;
+}
+
+.column {
+  fill: #e8e9eb;
+}
+
+.mixer .label {
+  font-size: 11px;
+  fill: #141416;
+  text-anchor: start;
+}
+
+.fxBox {
+  fill: #141416;
+}
+
+.fxText {
+  font-size: 10px;
+  fill: #fff;
+}
+
+.white {
+  font-size: 10px;
+  fill: #f2f2f4;
+}
+
+.tick {
+  stroke: #26272b;
+  stroke-width: 1.5;
+}
+
+.skirt {
+  fill: #2a2b30;
+}
+
+.black {
+  fill: #141416;
+}
+
+.blue {
+  fill: #2f4a8a;
+}
+
+.red {
+  fill: #c8202c;
+}
+
+.pointer {
+  stroke: #f2f2f4;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+.clip {
+  fill: #6a1a1a;
+}
+
+.screw {
+  fill: #2a2b30;
+  stroke: #6a6d73;
+  stroke-width: 1.5;
+}
+
+.scale {
+  font-size: 10px;
+  fill: #f2f2f4;
+}
+
+.track {
+  fill: #08080a;
+}
+
+.cap {
+  fill: #b8bbc0;
+  stroke: #6e7177;
+  stroke-width: 1.5;
+}
+
+.mainCap {
+  fill: #4a5568;
+  stroke: #2a2f3a;
+  stroke-width: 1.5;
+}
+
+.capLine {
+  stroke: #f4f4f6;
+  stroke-width: 3;
+}
+
+.footer {
+  fill: #e8e9eb;
+  stroke: #33353a;
+  stroke-width: 1;
+}
+
+.footerText {
+  font-size: 11px;
+  fill: #141416;
+}
+
+.title {
+  font-size: 15px;
+  fill: #f2f2f4;
+}
+
+.subtitle {
+  font-size: 8px;
+  fill: #f2f2f4;
+}
+
+.display {
+  fill: #1a0606;
+}
+
+.digits {
+  font-family: var(--mantine-font-family-monospace) !important;
+  font-size: 34px;
+  fill: #ff3a1a;
+}
+
+.ledOff {
+  fill: #5a1414;
+}
+
+.sig {
+  fill: #3ddc4a;
+}
+
+.fxLogo {
+  font-family: 'Arial Black', Arial, sans-serif !important;
+  font-size: 30px;
+  font-weight: 900 !important;
+  fill: none !important;
+  stroke: #f2f2f4;
+  stroke-width: 1.5;
+}
+
+.power {
+  fill: #ffd52a;
+}
+
+.phantom {
+  fill: #ff3030;
+}
+
+.meter {
+  fill-opacity: 0.25;
+}
+
+.meter[data-lit] {
+  fill-opacity: 1;
+}
+
+.presetBox {
+  fill: none;
+  stroke: #f2f2f4;
+  stroke-width: 1.2;
+}
+
+.presetTitle {
+  font-size: 12px;
+  fill: #f2f2f4;
+}
+
+.mixer .preset {
+  font-size: 9.5px;
+  fill: #f2f2f4;
+  text-anchor: end;
+}
+
+.button {
+  fill: #3a3c42;
+  stroke: #000;
+  stroke-width: 1.5;
+}
+
+.phonesIcon {
+  fill: none;
+  stroke: #f2f2f4;
+  stroke-width: 3;
+}
+
+.jackNut {
+  fill: #1a1a1d;
+  stroke: #9a9da3;
+  stroke-width: 3;
+}
+
+.hole {
+  fill: #000;
+}
+
+/* Unplugged: the display, power lamp and meters go out. */
+:global([data-power='off']) .digits,
+:global([data-power='off']) .sig,
+:global([data-power='off']) .power,
+:global([data-power='off']) .phantom,
+:global([data-power='off']) .meter {
+  fill-opacity: 0.1;
+}
