@@ -52,7 +52,7 @@
   position: absolute;
   inset: 0;
   font-size: calc(100cqw / 24);
-  perspective: 60em;
+  perspective: 50em;
   perspective-origin: 30% 58%;
 }
 
@@ -111,6 +111,11 @@
 
 .face[data-face='front'] {
   inset: 0;
+}
+
+.face[data-face='middle'] {
+  inset: 0;
+  transform: translateZ(calc(var(--d) * -0.5));
 }
 
 .face[data-face='back'] {
@@ -187,6 +192,13 @@
 
 /* ---- Board parts ---- */
 
+/* The VRM heatsink across the top of the board is the same white alloy as the I/O cover. */
+.vrm > .face[data-face='front'] {
+  background:
+    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.18) 0 0.06em, transparent 0.06em 0.3em),
+    linear-gradient(170deg, #d6cdcf, #a49a9d 60%, #7e7577);
+}
+
 .ioCover > .face {
   background: linear-gradient(160deg, #9f9799, #6f6769);
 }
@@ -206,16 +218,6 @@
   font-style: italic;
   letter-spacing: 0.1em;
   color: #3b2e32;
-}
-
-.alloy > .face {
-  background:
-    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.45) 0 0.08em, transparent 0.08em 0.24em),
-    linear-gradient(180deg, #5d5f66, #2b2c31);
-}
-
-.alloy > .face[data-face='top'] {
-  background: linear-gradient(180deg, #6a6c73, #3a3b41);
 }
 
 .gpuCable > svg {

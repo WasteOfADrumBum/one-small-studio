@@ -39,8 +39,6 @@ function ReduxLogoLit({ className }: { className?: string }) {
   );
 }
 
-const blades = Array.from({ length: 7 }, (_, i) => (i * 360) / 7);
-
 /**
  * The four mounting brackets that hold a round fan's frame: a lug with a screw hole at each corner,
  * on an arm running in from the ring, so the frame reads as a circle crossed by an X.
@@ -59,11 +57,14 @@ function FanBrackets({ fill }: { fill: string }) {
 }
 
 /**
- * A 120mm fan's face, round in a 100x100 box with only its brackets reaching the corners: curved
- * blades lit red from the hub out and the double light ring round the rim like Josh's fans. Spins
- * one way or the other.
+ * A 120mm fan's face, round in a 100x100 box with only its brackets reaching the corners, ringed
+ * in red light. Josh has two kinds: the radiator and exhaust fans (`hub`) glow through a big
+ * frosted hub, a bright ring round a dark centre, their blades faint behind it; the three on the
+ * back wall show five broad swirled blades, black-edged, lit red from the middle. Spins one way
+ * or the other.
  */
-function FanFace({ reverse = false }: { reverse?: boolean }) {
+function FanFace({ reverse = false, hub = false }: { reverse?: boolean; hub?: boolean }) {
+  const count = hub ? 7 : 5;
   return (
     <svg viewBox="-50 -50 100 100" className={classes.fill} overflow="visible">
       <FanBrackets fill="url(#pc-housing)" />
@@ -71,19 +72,31 @@ function FanFace({ reverse = false }: { reverse?: boolean }) {
       <circle r="46" fill="url(#pc-well)" />
       <g className={classes.rotor} data-reverse={reverse || undefined}>
         <circle r="44" fill="none" />
-        {blades.map((turn) => (
+        {Array.from({ length: count }, (_, i) => (
           <path
-            key={turn}
-            d="M11 -6C20 -26 38 -30 44 -14A45 45 0 0 1 44 12C34 2 22 0 12 6Z"
+            key={i}
+            d={
+              hub
+                ? 'M11 -6C20 -26 38 -30 44 -14A45 45 0 0 1 44 12C34 2 22 0 12 6Z'
+                : 'M8 -10C22 -34 46 -26 45 -6A45 45 0 0 1 36 26C34 6 24 -4 10 2Z'
+            }
             fill="url(#pc-blade)"
-            stroke="#ff8a8f"
-            strokeOpacity="0.35"
-            strokeWidth="0.7"
-            transform={`rotate(${turn})`}
+            opacity={hub ? 0.45 : 1}
+            stroke={hub ? '#ff8a8f' : '#120204'}
+            strokeOpacity={hub ? 0.3 : 0.9}
+            strokeWidth={hub ? 0.7 : 1.6}
+            transform={`rotate(${(i * 360) / count})`}
           />
         ))}
-        <circle r="13" fill="url(#pc-hub)" />
+        {!hub && <circle r="12" fill="url(#pc-hub)" />}
       </g>
+      {hub && (
+        <g className={classes.glow}>
+          <circle r="22" fill="#ff8a5a" opacity="0.7" filter="url(#pc-bloom)" />
+          <circle r="20" fill="url(#pc-frost)" />
+          <circle r="10.5" cx="1.5" cy="2" fill="#140306" />
+        </g>
+      )}
       <g className={classes.glow}>
         <circle
           r="45"
@@ -95,15 +108,19 @@ function FanFace({ reverse = false }: { reverse?: boolean }) {
         />
         <circle r="48" fill="none" stroke="#ffd6db" strokeWidth="1.2" opacity="0.85" />
         <circle r="45" fill="none" stroke="#ff4a5c" strokeWidth="2.4" />
-        <circle
-          r="16"
-          fill="none"
-          stroke="#ff3a2a"
-          strokeWidth="7"
-          opacity="0.6"
-          filter="url(#pc-bloom)"
-        />
-        <circle r="15.5" fill="none" stroke="#ff7a5c" strokeWidth="1.8" />
+        {!hub && (
+          <>
+            <circle
+              r="15"
+              fill="none"
+              stroke="#ff3a2a"
+              strokeWidth="7"
+              opacity="0.6"
+              filter="url(#pc-bloom)"
+            />
+            <circle r="14" fill="none" stroke="#ff7a5c" strokeWidth="1.6" />
+          </>
+        )}
       </g>
     </svg>
   );
@@ -130,7 +147,7 @@ function FanBack() {
   );
 }
 
-type Face = 'front' | 'back' | 'right' | 'left' | 'top' | 'bottom';
+type Face = 'front' | 'middle' | 'back' | 'right' | 'left' | 'top' | 'bottom';
 
 type BoxProps = {
   /** Top-left-front corner, in em: x along the glass front, y down, z back from the glass. */
@@ -167,20 +184,28 @@ function Box({ at: [x, y, z], size: [w, h, d], turn, className, faces }: BoxProp
   );
 }
 
-/** A round fan with its frame's depth: the lit face, and a second ring and brackets behind it. */
+/**
+ * A round fan with its frame's depth: the lit face, and two more light rings and the brackets
+ * behind it, so the side of the frame shows the stacked arcs Josh's fans have.
+ */
 function Fan({
   at,
   size,
   turn,
   reverse,
-}: Pick<BoxProps, 'at' | 'turn'> & { size: number; reverse?: boolean }) {
+  hub,
+}: Pick<BoxProps, 'at' | 'turn'> & { size: number; reverse?: boolean; hub?: boolean }) {
   return (
     <Box
       at={at}
       size={[size, size, size * 0.2]}
       turn={turn}
       className={classes.fan}
-      faces={{ back: <FanBack />, front: <FanFace reverse={reverse} /> }}
+      faces={{
+        back: <FanBack />,
+        middle: <FanBack />,
+        front: <FanFace reverse={reverse} hub={hub} />,
+      }}
     />
   );
 }
@@ -203,6 +228,11 @@ function Defs() {
           <stop offset="0.25" stopColor="#ff7a4a" />
           <stop offset="0.55" stopColor="#c8182c" />
           <stop offset="1" stopColor="#3c0610" />
+        </radialGradient>
+        <radialGradient id="pc-frost" r="0.5">
+          <stop offset="0.45" stopColor="#fff1c8" />
+          <stop offset="0.75" stopColor="#ffb070" />
+          <stop offset="1" stopColor="#ff4a3a" />
         </radialGradient>
         <radialGradient id="pc-hub" r="0.5" cx="0.4" cy="0.35">
           <stop offset="0" stopColor="#2c2c32" />
@@ -281,6 +311,17 @@ function BackWall() {
       <path d="M52 118h74M52 152h74" stroke="#2e2e34" strokeWidth="3" />
       <rect x="60" y="102" width="56" height="7" rx="1.5" fill="url(#pc-alloy)" />
       <rect x="110" y="156" width="30" height="20" rx="2" fill="url(#pc-alloy)" opacity="0.8" />
+      {/* The 24-pin's braided leads down the right edge of the board. */}
+      <path
+        d={Array.from(
+          { length: 9 },
+          (_, i) =>
+            `M${140 + i * 1.6} 58C${136 + i * 1.6} 80 ${138 + i * 1.6} 96 ${148 + i * 1.2} 116`,
+        ).join('')}
+        stroke="#050506"
+        strokeWidth="1.3"
+        fill="none"
+      />
       {/* The socket's backplate shadow round the pump. */}
       <rect x="78" y="68" width="40" height="40" rx="4" fill="#060506" opacity="0.8" />
     </svg>
@@ -486,15 +527,15 @@ export function BuildReduxTower() {
 
           {/* Board parts with real height off the board. */}
           <Box
-            at={[4.3, 3.9, -9.6]}
-            size={[1.9, 7, 1]}
+            at={[4.1, 3.8, -9.5]}
+            size={[2.3, 8.8, 1.1]}
             className={classes.ioCover}
             faces={{ front: <span className={classes.msi}>MSI</span>, right: null, top: null }}
           />
           <Box
-            at={[6.6, 4, -9.8]}
-            size={[5.4, 1.3, 0.8]}
-            className={classes.alloy}
+            at={[6.4, 3.8, -9.8]}
+            size={[5.8, 1.6, 0.9]}
+            className={`${classes.ioCover} ${classes.vrm}`}
             faces={{ front: null, right: null, bottom: null, top: null }}
           />
           {[12.6, 13.5].map((x) => (
@@ -557,7 +598,7 @@ export function BuildReduxTower() {
             faces={{ front: null, right: null, bottom: null }}
           />
           {[2.3, 7.95, 13.6].map((x) => (
-            <Fan key={x} at={[x, 2.6, -2.8]} size={5.5} turn="down" />
+            <Fan key={x} at={[x, 2.6, -2.8]} size={5.5} turn="down" hub />
           ))}
           {/* Two tubes off the pump's left side, round under it, crossing as they climb to the tank. */}
           <div className={`${classes.plane} ${classes.tubeExits}`}>
@@ -574,7 +615,7 @@ export function BuildReduxTower() {
           </div>
 
           {/* The exhaust, high on the far end wall. */}
-          <Fan at={[1.4, 4.2, -2.8]} size={5.5} turn="end" reverse />
+          <Fan at={[1.4, 4.2, -2.8]} size={5.5} turn="end" reverse hub />
 
           {/* PSU shroud, then the glass front and left side. */}
           <Box
