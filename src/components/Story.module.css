@@ -741,6 +741,11 @@
     display: none;
   }
 
+  /* With the track count hidden, the caption buttons push themselves to the right again. */
+  .titleMeta + .caption {
+    margin-left: auto;
+  }
+
   .titleBar {
     height: 24px;
     font-size: 0.68rem;

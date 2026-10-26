@@ -5,263 +5,325 @@ const reduxR = 'M0 0H13L20 7V12L15 17L20 24H13L8 17H6V24H0ZM6 6V11H12L13 10V7L12
 
 const blades = Array.from({ length: 7 }, (_, i) => (i * 360) / 7);
 
-type FanProps = { cx: number; cy: number; r: number; squash?: number; reverse?: boolean };
-
 /**
- * A 120mm fan with a lit ring, seen through the glass. `squash` narrows it for the front intakes,
- * which face out of the case at an angle to the viewer.
+ * A 120mm fan, face on, in a 100x100 box: dark housing, shutter-style blades that sweep round the
+ * hub, and the red light ring round the rim and the hub. Spins unless `still`.
  */
-function Fan({ cx, cy, r, squash = 1, reverse = false }: FanProps) {
+function Fan({ reverse = false }: { reverse?: boolean }) {
   return (
-    <g transform={`translate(${cx} ${cy}) scale(${(squash * r) / 40} ${r / 40})`}>
-      <circle r="40" fill="url(#redux-fan-well)" />
+    <svg viewBox="-50 -50 100 100" className={classes.fan}>
+      <rect x="-50" y="-50" width="100" height="100" rx="9" fill="url(#pc-housing)" />
+      <circle r="46" fill="url(#pc-well)" />
       <g className={classes.rotor} data-reverse={reverse || undefined}>
-        {/* Keeps the rotor's box centred on the hub so it spins in place. */}
-        <circle r="36" fill="none" />
+        <circle r="44" fill="none" />
         {blades.map((turn) => (
           <path
             key={turn}
-            d="M4 -7C14 -16 26 -24 34 -16C30 -8 20 -2 9 1Z"
-            fill="url(#redux-blade)"
+            d="M11 -6C20 -26 38 -30 45 -14A46 46 0 0 1 45 12C34 2 22 0 12 6Z"
+            fill="url(#pc-blade)"
+            stroke="rgb(255 140 150 / 0.45)"
+            strokeWidth="0.7"
             transform={`rotate(${turn})`}
           />
         ))}
-        <circle r="10" fill="#1a0507" stroke="#3a0b10" strokeWidth="1.5" />
+        <circle r="13" fill="url(#pc-hub)" />
       </g>
-      <circle className={classes.ring} r="38" fill="none" stroke="#ff2b3f" strokeWidth="3.2" />
-      <circle
-        r="38"
-        fill="none"
-        stroke="#ff2b3f"
-        strokeWidth="7"
-        opacity="0.35"
-        filter="url(#redux-bloom)"
+      <g className={classes.glow}>
+        <circle
+          r="45"
+          fill="none"
+          stroke="#ff2a40"
+          strokeWidth="9"
+          opacity="0.45"
+          filter="url(#pc-bloom)"
+        />
+        <circle r="45" fill="none" stroke="#ff5466" strokeWidth="2.6" />
+        <circle r="45" fill="none" stroke="#ffd0d5" strokeWidth="0.8" opacity="0.8" />
+        <circle
+          r="15"
+          fill="none"
+          stroke="#ff2a40"
+          strokeWidth="6"
+          opacity="0.5"
+          filter="url(#pc-bloom)"
+        />
+        <circle r="15" fill="none" stroke="#ff6676" strokeWidth="1.6" />
+      </g>
+    </svg>
+  );
+}
+
+/** Gradients and the bloom filter shared by every part of the tower. */
+function Defs() {
+  return (
+    <svg className={classes.defs} aria-hidden="true">
+      <defs>
+        <radialGradient id="pc-well" r="0.5">
+          <stop offset="0.3" stopColor="#1c0306" />
+          <stop offset="0.86" stopColor="#4d0811" />
+          <stop offset="1" stopColor="#0d0204" />
+        </radialGradient>
+        <linearGradient id="pc-housing" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stopColor="#1d1d22" />
+          <stop offset="1" stopColor="#09090b" />
+        </linearGradient>
+        <linearGradient id="pc-blade" x1="0" x2="1" y1="0" y2="0.3">
+          <stop offset="0" stopColor="#3a0710" />
+          <stop offset="0.6" stopColor="#8d1424" />
+          <stop offset="1" stopColor="#ff4d60" />
+        </linearGradient>
+        <radialGradient id="pc-hub" r="0.5" cx="0.4" cy="0.35">
+          <stop offset="0" stopColor="#2c2c32" />
+          <stop offset="1" stopColor="#0b0b0d" />
+        </radialGradient>
+        <radialGradient id="pc-tray" cx="0.55" cy="0.45" r="0.7">
+          <stop offset="0" stopColor="#3b0812" />
+          <stop offset="0.6" stopColor="#1a0408" />
+          <stop offset="1" stopColor="#090204" />
+        </radialGradient>
+        <linearGradient id="pc-board" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stopColor="#17141a" />
+          <stop offset="1" stopColor="#0b0a0d" />
+        </linearGradient>
+        <linearGradient id="pc-alloy" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stopColor="#5d5f66" />
+          <stop offset="0.5" stopColor="#34353b" />
+          <stop offset="1" stopColor="#1c1c21" />
+        </linearGradient>
+        <linearGradient id="pc-shroud-io" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0" stopColor="#b9a7ab" />
+          <stop offset="0.5" stopColor="#e5d9dc" />
+          <stop offset="1" stopColor="#a4878d" />
+        </linearGradient>
+        <linearGradient id="pc-gpu" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stopColor="#4a4b52" />
+          <stop offset="0.18" stopColor="#2b2c31" />
+          <stop offset="1" stopColor="#111114" />
+        </linearGradient>
+        <linearGradient id="pc-rainbow" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stopColor="#36d6ff" />
+          <stop offset="0.25" stopColor="#6a5cff" />
+          <stop offset="0.5" stopColor="#ff4fd8" />
+          <stop offset="0.75" stopColor="#ffb547" />
+          <stop offset="1" stopColor="#5fe08a" />
+        </linearGradient>
+        <linearGradient id="pc-rainbow-x" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0" stopColor="#36d6ff" />
+          <stop offset="0.33" stopColor="#5fe08a" />
+          <stop offset="0.66" stopColor="#ffb547" />
+          <stop offset="1" stopColor="#ff4fd8" />
+        </linearGradient>
+        <linearGradient id="pc-tube" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0" stopColor="#020203" />
+          <stop offset="0.45" stopColor="#2a1418" />
+          <stop offset="1" stopColor="#020203" />
+        </linearGradient>
+        <filter id="pc-bloom" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="3.5" />
+        </filter>
+      </defs>
+    </svg>
+  );
+}
+
+/** The motherboard tray: the MSI board, cooler block with the lit R, RGB memory and the tubes. */
+function Tray() {
+  return (
+    <svg viewBox="0 0 220 190" className={classes.fill} preserveAspectRatio="none">
+      <rect width="220" height="190" fill="url(#pc-tray)" />
+      {/* Cable grommets in the tray, beside the board. */}
+      {[40, 78, 116].map((y) => (
+        <rect key={y} x="186" y={y} width="9" height="26" rx="3" fill="#050506" />
+      ))}
+      <rect x="30" y="16" width="142" height="164" rx="2" fill="url(#pc-board)" stroke="#2a1d22" />
+      <path
+        d="M58 40h40M58 46h26M150 120h16M150 126h10M44 160h60M44 166h40"
+        stroke="#2a1b20"
+        strokeWidth="1.4"
       />
-    </g>
+      {/* VRM heatsink and the white I/O cover with the MSI badge. */}
+      <rect x="54" y="20" width="58" height="13" rx="2" fill="url(#pc-alloy)" />
+      <rect x="30" y="18" width="20" height="66" rx="2" fill="url(#pc-shroud-io)" />
+      <text x="40" y="51" className={classes.msi} transform="rotate(-90 40 51)">
+        MSI
+      </text>
+      {/* M.2 heatsink and chipset plate. */}
+      <rect x="58" y="104" width="64" height="7" rx="1.5" fill="url(#pc-alloy)" />
+      <rect x="130" y="150" width="34" height="22" rx="2" fill="url(#pc-alloy)" opacity="0.8" />
+
+      {/* RGB memory: rainbow light bars that fade through the colours. */}
+      <rect x="128" y="26" width="20" height="74" fill="#0b0b0e" />
+      <g className={classes.rainbow}>
+        <rect
+          x="124"
+          y="22"
+          width="28"
+          height="82"
+          fill="url(#pc-rainbow)"
+          opacity="0.5"
+          filter="url(#pc-bloom)"
+        />
+        <rect x="131" y="27" width="5" height="72" rx="1" fill="url(#pc-rainbow)" />
+        <rect x="140" y="27" width="5" height="72" rx="1" fill="url(#pc-rainbow)" />
+      </g>
+
+      {/* Pump block with the R, and its tubes running up to the radiator. */}
+      <g fill="none" strokeLinecap="round">
+        <path d="M92 54C92 22 196 34 206 0" stroke="url(#pc-tube)" strokeWidth="8" />
+        <path d="M108 54C112 28 206 44 214 0" stroke="url(#pc-tube)" strokeWidth="8" />
+      </g>
+      <rect
+        x="80"
+        y="50"
+        width="40"
+        height="40"
+        rx="6"
+        fill="#141418"
+        stroke="#35353b"
+        strokeWidth="1.5"
+      />
+      <rect x="85" y="55" width="30" height="30" rx="4" fill="#1c0408" />
+      <rect
+        x="85"
+        y="55"
+        width="30"
+        height="30"
+        rx="4"
+        fill="#ff2a40"
+        opacity="0.35"
+        filter="url(#pc-bloom)"
+      />
+      <path d={reduxR} transform="translate(91 59) scale(0.9)" fill="#ff4256" fillRule="evenodd" />
+
+      {/* Expansion slot covers on the back wall, below the board's top half. */}
+      <g stroke="#26262b" strokeWidth="4">
+        {[118, 130, 142, 154, 166].map((y) => (
+          <path key={y} d={`M4 ${y}h22`} />
+        ))}
+      </g>
+    </svg>
+  );
+}
+
+/** The RTX 5090, nearer the glass than the board, with its rainbow light bar and badge. */
+function Gpu() {
+  return (
+    <svg viewBox="0 0 220 190" className={classes.fill} preserveAspectRatio="none">
+      {/* Power cable, braided, dropping into the shroud. */}
+      <g stroke="#060607" strokeWidth="2.6" strokeLinecap="round">
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <path
+            key={i}
+            d={`M${104 + i * 3} 140C${104 + i * 3} 160 ${98 + i * 3} 176 ${96 + i * 3} 192`}
+          />
+        ))}
+      </g>
+      <path
+        d="M22 112H196L204 119V138L196 144H22L16 138V118Z"
+        fill="url(#pc-gpu)"
+        stroke="#55565d"
+        strokeWidth="0.8"
+      />
+      <path d="M22 113H196" stroke="#8a8b92" strokeWidth="0.8" opacity="0.7" />
+      {/* Shroud facets and fin stack. */}
+      <path
+        d="M60 116L78 128L60 140M120 116L138 128"
+        fill="none"
+        stroke="#151518"
+        strokeWidth="4"
+      />
+      <g stroke="#3a3b41" strokeWidth="0.8">
+        {Array.from({ length: 20 }, (_, i) => (
+          <path key={i} d={`M${84 + i * 2.6} 118v20`} />
+        ))}
+      </g>
+      <text x="30" y="135" className={classes.rtx}>
+        GEFORCE RTX
+      </text>
+      <rect x="168" y="118" width="26" height="22" rx="2" fill="#0a0a0c" />
+      <g className={classes.rainbow}>
+        <path d="M24 111.5H150" stroke="url(#pc-rainbow-x)" strokeWidth="1.6" />
+        <path
+          d="M24 111.5H150"
+          stroke="url(#pc-rainbow-x)"
+          strokeWidth="5"
+          opacity="0.5"
+          filter="url(#pc-bloom)"
+        />
+        <path d="M174 123h14v4l-3 3v6h-8v-6l-3 -3z" fill="url(#pc-rainbow-x)" />
+        <rect
+          x="166"
+          y="116"
+          width="30"
+          height="26"
+          rx="3"
+          fill="url(#pc-rainbow-x)"
+          opacity="0.35"
+          filter="url(#pc-bloom)"
+        />
+        <path
+          d="M171 121v3M191 121v3M171 135v3M191 135v3"
+          stroke="url(#pc-rainbow-x)"
+          strokeWidth="1.4"
+        />
+      </g>
+    </svg>
+  );
+}
+
+/** A plane of fans laid out along its length: the radiator above, or the stacked front intakes. */
+function FanRow({ count, reverse = false }: { count: number; reverse?: boolean }) {
+  return (
+    <>
+      {Array.from({ length: count }, (_, i) => (
+        <Fan key={i} reverse={reverse} />
+      ))}
+    </>
   );
 }
 
 /**
- * Josh's Build Redux Ultra, seen from its tempered-glass side: the 360mm radiator and three red
- * fans across the top, the rear exhaust, three front intakes, the liquid-cooler block with the R,
- * RGB memory, and the RTX 5090 with its lit badge over the PSU shroud.
+ * Josh's Build Redux Ultra, built as a box in CSS 3D and seen three-quarter on: the glass side and
+ * the glass front, with the radiator's three fans overhead, the rear exhaust, three front intakes,
+ * the cooler block with the R, rainbow RGB memory and the RTX 5090 inside, on its black riser.
  */
 export function BuildReduxTower() {
   return (
     <div className={classes.tower} aria-hidden="true">
-      <svg viewBox="0 0 420 480" className={classes.svg}>
-        <defs>
-          <radialGradient id="redux-cavity" cx="0.55" cy="0.4" r="0.75">
-            <stop offset="0" stopColor="#3a0710" />
-            <stop offset="0.55" stopColor="#1a0408" />
-            <stop offset="1" stopColor="#0a0204" />
-          </radialGradient>
-          <radialGradient id="redux-fan-well" r="0.5">
-            <stop offset="0.25" stopColor="#2a0609" />
-            <stop offset="0.85" stopColor="#4a0a12" />
-            <stop offset="1" stopColor="#120305" />
-          </radialGradient>
-          <linearGradient id="redux-blade" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0" stopColor="#5c0d18" />
-            <stop offset="1" stopColor="#ff4256" stopOpacity="0.75" />
-          </linearGradient>
-          <linearGradient id="redux-ram" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stopColor="#3cf2ff" />
-            <stop offset="0.3" stopColor="#5d6bff" />
-            <stop offset="0.55" stopColor="#ff3cd2" />
-            <stop offset="0.8" stopColor="#ff9d3c" />
-            <stop offset="1" stopColor="#7dff6a" />
-          </linearGradient>
-          <linearGradient id="redux-gpu" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stopColor="#3a3b40" />
-            <stop offset="0.35" stopColor="#24252a" />
-            <stop offset="1" stopColor="#121215" />
-          </linearGradient>
-          <linearGradient id="redux-shroud" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stopColor="#1b1b1f" />
-            <stop offset="1" stopColor="#0b0b0d" />
-          </linearGradient>
-          <linearGradient id="redux-glass" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0" stopColor="#fff" stopOpacity="0.08" />
-            <stop offset="0.35" stopColor="#fff" stopOpacity="0.02" />
-            <stop offset="0.351" stopColor="#fff" stopOpacity="0" />
-            <stop offset="0.7" stopColor="#fff" stopOpacity="0" />
-            <stop offset="1" stopColor="#fff" stopOpacity="0.05" />
-          </linearGradient>
-          <filter id="redux-bloom" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="4" />
-          </filter>
-        </defs>
-
-        {/* Feet, then the black case. */}
-        <rect x="26" y="466" width="40" height="12" rx="2" fill="#050506" />
-        <rect x="354" y="466" width="40" height="12" rx="2" fill="#050506" />
-        <rect x="0" y="0" width="420" height="470" rx="6" fill="#0b0b0d" stroke="#232327" />
-
-        {/* The glass chamber, lit red from inside. */}
-        <rect x="9" y="9" width="402" height="352" rx="2" fill="url(#redux-cavity)" />
-
-        {/* Motherboard (MSI) and the rear I/O shield. */}
-        <rect x="78" y="58" width="226" height="262" rx="3" fill="#0d0a0c" stroke="#24161a" />
-        <path d="M92 74h60M92 82h40M250 220h40M250 228h28" stroke="#2a1a1e" strokeWidth="2" />
-        <rect x="84" y="64" width="34" height="58" rx="2" fill="#7c7f86" opacity="0.55" />
-        <text x="101" y="98" className={classes.msi} transform="rotate(-90 101 98)">
-          MSI
-        </text>
-
-        {/* Expansion slot covers on the back wall. */}
-        <g stroke="#2b2b30" strokeWidth="5">
-          {[262, 278, 294, 310, 326].map((y) => (
-            <path key={y} d={`M16 ${y}h44`} />
-          ))}
-        </g>
-
-        {/* Top radiator and its three fans, seen edge-on from the side. */}
-        <rect x="74" y="14" width="262" height="14" rx="3" fill="#141416" stroke="#2a2a2e" />
-        {[118, 205, 292].map((cx) => (
-          <g key={cx}>
-            <ellipse cx={cx} cy="38" rx="38" ry="9" fill="#2a060b" />
-            <ellipse
-              className={classes.ring}
-              cx={cx}
-              cy="38"
-              rx="38"
-              ry="9"
-              fill="none"
-              stroke="#ff2b3f"
-              strokeWidth="3"
-            />
-            <ellipse
-              cx={cx}
-              cy="38"
-              rx="38"
-              ry="9"
-              fill="none"
-              stroke="#ff2b3f"
-              strokeWidth="8"
-              opacity="0.4"
-              filter="url(#redux-bloom)"
-            />
-          </g>
-        ))}
-
-        {/* Rear exhaust. */}
-        <Fan cx={50} cy={160} r={40} reverse />
-
-        {/* RGB memory, two sticks beside the cooler. */}
-        <g className={classes.ram}>
-          <rect x="232" y="88" width="8" height="104" rx="1.5" fill="url(#redux-ram)" />
-          <rect x="246" y="88" width="8" height="104" rx="1.5" fill="url(#redux-ram)" />
-          <rect
-            x="228"
-            y="84"
-            width="30"
-            height="112"
-            fill="url(#redux-ram)"
-            opacity="0.35"
-            filter="url(#redux-bloom)"
-          />
-        </g>
-
-        {/* Liquid cooler: the pump block with the lit R, and its braided tubes to the radiator. */}
-        <g fill="none" stroke="#050506" strokeWidth="8" strokeLinecap="round">
-          <path d="M176 120C176 70 300 96 306 30" />
-          <path d="M196 120C204 80 318 108 322 30" />
-        </g>
-        <g fill="none" stroke="#3a1015" strokeWidth="1.5" strokeLinecap="round" opacity="0.8">
-          <path d="M173 116C173 68 297 93 303 30" />
-          <path d="M193 116C201 77 315 105 319 30" />
-        </g>
-        <rect
-          x="156"
-          y="120"
-          width="60"
-          height="60"
-          rx="7"
-          fill="#0f0f12"
-          stroke="#2c2c31"
-          strokeWidth="2"
-        />
-        <rect x="163" y="127" width="46" height="46" rx="4" fill="#160509" />
-        <path
-          className={classes.blockLogo}
-          d={reduxR}
-          transform="translate(175 135) scale(1.1)"
-          fill="#ff3348"
-          fillRule="evenodd"
-        />
-
-        {/* Front intakes behind the corner glass. */}
-        <Fan cx={364} cy={92} r={44} squash={0.8} />
-        <Fan cx={364} cy={192} r={44} squash={0.8} />
-        <Fan cx={364} cy={292} r={44} squash={0.8} />
-
-        {/* RTX 5090 across the board, with its power cable dropping into the shroud. */}
-        <g>
-          <path d="M84 232H326L334 240V286L326 292H84Z" fill="url(#redux-gpu)" stroke="#3a3b40" />
-          <path
-            d="M150 238L176 262L150 286M244 238L270 262"
-            fill="none"
-            stroke="#141417"
-            strokeWidth="6"
-          />
-          <g stroke="#2b2c31" strokeWidth="1.2">
-            {Array.from({ length: 18 }, (_, i) => (
-              <path key={i} d={`M${184 + i * 4} 244v34`} />
-            ))}
-          </g>
-          <text x="96" y="276" className={classes.rtx}>
-            GEFORCE RTX
-          </text>
-          <g fill="#8a8c92" opacity="0.7">
-            {[0, 1, 2, 3].map((i) => (
-              <path key={i} d={`M${196 + i * 9} 278l5 -9h4l-5 9z`} />
-            ))}
-          </g>
-          <rect x="282" y="246" width="40" height="38" rx="3" fill="#0c0d0f" />
-          <g className={classes.badge}>
-            <path d="M292 256h20v6l-4 4v10h-12v-10l-4 -4z" fill="#45f28a" />
-            <path d="M296 262h12M302 262v12" stroke="#0c0d0f" strokeWidth="2" />
-            <circle cx="287" cy="252" r="1.6" fill="#7dfdd8" />
-            <circle cx="317" cy="252" r="1.6" fill="#5ad8ff" />
-            <circle cx="287" cy="278" r="1.6" fill="#7dfdd8" />
-            <circle cx="317" cy="278" r="1.6" fill="#5ad8ff" />
-            <rect
-              x="282"
-              y="246"
-              width="40"
-              height="38"
-              rx="3"
-              fill="#45f28a"
-              opacity="0.3"
-              filter="url(#redux-bloom)"
-            />
-          </g>
-          <g stroke="#08080a" strokeWidth="3" strokeLinecap="round">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <path
-                key={i}
-                d={`M${206 + i * 3.5} 292C${206 + i * 3.5} 320 ${200 + i * 3.5} 340 ${196 + i * 3.5} 362`}
-              />
-            ))}
-          </g>
-        </g>
-
-        {/* The glass itself: a faint sheen, and the front corner where the panel wraps round. */}
-        <rect x="9" y="9" width="402" height="352" fill="url(#redux-glass)" />
-        <path d="M318 9V361" stroke="#fff" strokeOpacity="0.07" strokeWidth="1.5" />
-
-        {/* PSU shroud with the R on its front corner. */}
-        <path d="M9 361H411V462H9Z" fill="url(#redux-shroud)" />
-        <path d="M9 361H411" stroke="#2c2c31" strokeWidth="2" />
-        <path d="M40 372H300L292 382H48Z" fill="#070708" />
-        <path
-          d={reduxR}
-          transform="translate(372 404) scale(1.15)"
-          fill="#4a4a50"
-          fillRule="evenodd"
-        />
-      </svg>
+      <Defs />
+      <div className={classes.scene}>
+        <div className={classes.case}>
+          <div className={classes.tray}>
+            <Tray />
+          </div>
+          <div className={classes.gpu}>
+            <Gpu />
+          </div>
+          <div className={classes.rear}>
+            <Fan reverse />
+          </div>
+          <div className={classes.radiator}>
+            <FanRow count={3} />
+          </div>
+          <div className={classes.intakes}>
+            <FanRow count={3} reverse />
+          </div>
+          <div className={classes.shroudTop} />
+          <div className={classes.side}>
+            <span className={classes.sideShroud} />
+          </div>
+          <div className={classes.front}>
+            <span className={classes.frontShroud}>
+              <svg viewBox="0 0 20 24" className={classes.logo}>
+                <path d={reduxR} fillRule="evenodd" />
+              </svg>
+            </span>
+          </div>
+          <div className={classes.riserTop} />
+          <div className={classes.riserSide} />
+          <div className={classes.riserFront} />
+        </div>
+      </div>
     </div>
   );
 }
