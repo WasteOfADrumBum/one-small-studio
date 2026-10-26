@@ -77,9 +77,13 @@ function Defs() {
           <stop offset="1" stopColor="#0b0b0d" />
         </radialGradient>
         <radialGradient id="pc-tray" cx="0.55" cy="0.45" r="0.7">
-          <stop offset="0" stopColor="#3b0812" />
-          <stop offset="0.6" stopColor="#1a0408" />
-          <stop offset="1" stopColor="#090204" />
+          <stop offset="0" stopColor="#5e1020" />
+          <stop offset="0.6" stopColor="#2a0610" />
+          <stop offset="1" stopColor="#100307" />
+        </radialGradient>
+        <radialGradient id="pc-spill" cx="1" cy="0.45" r="0.6">
+          <stop offset="0" stopColor="#ff2a40" stopOpacity="0.45" />
+          <stop offset="1" stopColor="#ff2a40" stopOpacity="0" />
         </radialGradient>
         <linearGradient id="pc-board" x1="0" x2="1" y1="0" y2="1">
           <stop offset="0" stopColor="#17141a" />
@@ -131,6 +135,8 @@ function Tray() {
   return (
     <svg viewBox="0 0 220 190" className={classes.fill} preserveAspectRatio="none">
       <rect width="220" height="190" fill="url(#pc-tray)" />
+      {/* Light from the front intakes and the radiator fans washing across the back. */}
+      <rect width="220" height="190" fill="url(#pc-spill)" />
       {/* Cable grommets in the tray, beside the board. */}
       {[40, 78, 116].map((y) => (
         <rect key={y} x="186" y={y} width="9" height="26" rx="3" fill="#050506" />
@@ -295,6 +301,9 @@ export function BuildReduxTower() {
         <div className={classes.case}>
           <div className={classes.tray}>
             <Tray />
+          </div>
+          <div className={classes.gpuTop}>
+            <span className={`${classes.rainbowEdge} ${classes.rainbow}`} />
           </div>
           <div className={classes.gpu}>
             <Gpu />

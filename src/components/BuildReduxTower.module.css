@@ -1,18 +1,28 @@
 /*
- * Josh's PC stands behind the monitor at its right end, on its riser, and rises above the screen
- * the way the Build Redux renders show it beside a monitor: the radiator fans, the front intakes,
- * the cooler and the RAM show over the top, and the panel hides the rest. It rises `--pc-peek`
- * above the panel, into the `--pc-room` the monitor leaves above it and past that.
+ * Josh's PC stands on the desk behind the right end of the monitor, taller than the screen, the way
+ * his mock-up has it: as far out past the panel's end as the window allows, at the most 62% of its
+ * width. On phones there is no room beside the panel, so it rises over the top of it instead.
  */
 .tower {
   position: absolute;
   z-index: 0;
-  top: calc(var(--pc-room) - var(--pc-peek));
-  right: calc((100% - var(--panel-w)) / 2 + var(--panel-w) * 0.01);
+  bottom: 6px;
+  right: max(
+    calc((100% - 100vw) / 2 + 20px),
+    calc((100% - var(--panel-w)) / 2 - var(--pc-w) * 0.62)
+  );
   width: var(--pc-w);
-  aspect-ratio: 26 / 29.5;
+  aspect-ratio: 24 / 30;
   container-type: inline-size;
   pointer-events: none;
+}
+
+@media (max-width: 47.99em) {
+  .tower {
+    top: 0;
+    bottom: auto;
+    right: calc((100% - var(--panel-w)) / 2 - 4px);
+  }
 }
 
 /* Red from the fans, thrown onto the wall round the case. */
@@ -37,23 +47,24 @@
   height: 0;
 }
 
-/* One em is a 26th of the tower's box: the case is 22em deep, 11em wide and 24em tall. */
+/* One em is a 24th of the tower's box: the case is 22em deep, 11em wide and 24em tall. */
 .scene {
   position: absolute;
   inset: 0;
-  font-size: calc(100cqw / 26);
-  perspective: 70em;
-  perspective-origin: 45% 32%;
+  font-size: calc(100cqw / 24);
+  perspective: 60em;
+  perspective-origin: 30% 58%;
 }
 
+/* Turned so the glass side and the glass front with its fans both face out, like the renders. */
 .case {
   position: absolute;
-  top: 1.4em;
-  left: 0.6em;
+  top: 1.6em;
+  left: -2.9em;
   width: 22em;
   height: 24em;
   transform-style: preserve-3d;
-  transform: rotateY(-40deg);
+  transform: rotateY(-46deg);
   transform-origin: 50% 50%;
 }
 
@@ -92,7 +103,7 @@
   width: 11em;
   height: 19em;
   padding-top: 2.6em;
-  background: linear-gradient(90deg, #08080a, #1d050a);
+  background: linear-gradient(90deg, #0c0305, #3a0812);
   transform-origin: left;
   transform: rotateY(90deg);
 }
@@ -100,17 +111,17 @@
 .fan {
   display: block;
   flex: none;
-  width: 6em;
-  height: 6em;
+  width: 6.2em;
+  height: 6.2em;
 }
 
 /* The 360mm radiator under the roof, its three fans facing down into the case. */
 .radiator {
   display: flex;
   top: 0.5em;
-  left: 2.4em;
-  width: 18em;
-  height: 6.4em;
+  left: 1.8em;
+  width: 18.6em;
+  height: 6.6em;
   padding-top: 0.2em;
   background: repeating-linear-gradient(90deg, #121215 0 0.18em, #0a0a0c 0.18em 0.36em);
   transform-origin: top;
@@ -122,11 +133,32 @@
   display: flex;
   flex-direction: column;
   left: 20.6em;
-  top: 0.6em;
-  width: 6em;
-  height: 18em;
+  top: 0.4em;
+  width: 6.2em;
+  height: 18.6em;
   transform-origin: left;
-  transform: translateZ(-2.5em) rotateY(90deg);
+  transform: translateZ(-2.4em) rotateY(90deg);
+}
+
+/* The 5090 is a brick, not a sheet: its top runs back from the face to the board, lit along the
+   front edge by the same rainbow bar. */
+.gpuTop {
+  top: 11.2em;
+  left: 1.6em;
+  width: 18.8em;
+  height: 6em;
+  background: repeating-linear-gradient(90deg, #2a2b30 0 0.12em, #18181c 0.12em 0.3em), #18181c;
+  box-shadow: inset 0 -1em 1.2em rgb(0 0 0 / 0.6);
+  transform-origin: top;
+  transform: translateZ(-4.5em) rotateX(-90deg);
+}
+
+.rainbowEdge {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 0.16em;
+  background: linear-gradient(90deg, #36d6ff, #5fe08a, #ffb547, #ff4fd8);
+  box-shadow: 0 0 0.6em rgb(255 255 255 / 0.4);
 }
 
 /* The top of the PSU shroud, catching the red light. */

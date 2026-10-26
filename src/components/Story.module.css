@@ -576,6 +576,39 @@
   border-top: 9px solid var(--oss-sky);
 }
 
+/*
+ * Where all the years fit at a readable width (on the ultrawide), nothing scrolls: the years stretch
+ * to fill the screen, the pre- and post-roll go, and the playhead moves along the session to the
+ * year in `--ph` instead. The space kept for a sideways scrollbar goes too.
+ */
+@container (min-width: 1166px) {
+  .viewport,
+  .playhead {
+    --year: calc((100cqw - var(--head) - 8px) / var(--years));
+    --lead: 0px;
+    --trail: 0px;
+  }
+
+  .viewport {
+    --sb: 0px;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  .ruler {
+    cursor: ew-resize;
+  }
+
+  .playhead {
+    left: calc(var(--head) + var(--ph, 0) * var(--year));
+    transition: left 450ms cubic-bezier(0.3, 0.7, 0.2, 1);
+  }
+
+  .stage[data-scrubbing] .playhead {
+    transition: none;
+  }
+}
+
 /* ---- Session notes on the desk unit's display ---- */
 
 .notesHead {
