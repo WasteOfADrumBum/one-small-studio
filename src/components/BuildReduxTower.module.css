@@ -219,25 +219,16 @@
 }
 
 .ram > .face {
+  overflow: visible;
   background: linear-gradient(180deg, #1a1a1f, #0b0b0e);
 }
 
-.ramLight,
-.ramTop {
+/* Each stick's light bar runs its whole length, fading through the rainbow. */
+.ramLight {
   position: absolute;
   inset: 0;
-}
-
-.ramLight {
-  inset: 0 0 auto;
-  height: 0.5em;
-  background: linear-gradient(90deg, #36d6ff, #ff4fd8);
-  box-shadow: 0 0 0.6em #ff4fd8;
-}
-
-.ramTop {
-  background: linear-gradient(180deg, #36d6ff, #6a5cff, #ff4fd8);
-  box-shadow: 0 0 0.8em 0.2em rgb(160 100 255 / 0.8);
+  background: linear-gradient(180deg, #ff4fd8, #6a5cff, #36d6ff, #5fe08a, #ffb547);
+  box-shadow: 0 0 0.8em 0.25em rgb(160 100 255 / 0.7);
 }
 
 .pump > .face {
@@ -265,69 +256,29 @@
   background: linear-gradient(180deg, #2a2b30, #111114);
 }
 
-.gpu > .face[data-face='front'] {
-  display: flex;
-  align-items: center;
-  gap: 0.6em;
-  padding: 0 0.6em 0 2.6em;
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 0.16), transparent 0.3em),
-    linear-gradient(180deg, #4a4b52, #2b2c31 25%, #141417);
-  box-shadow: inset 0 -0.3em 0.4em rgb(0 0 0 / 0.6);
-}
-
-.gpu > .face[data-face='top'] {
-  background:
-    linear-gradient(90deg, transparent 30%, rgb(0 0 0 / 0.4) 30% 32%, transparent 32%),
-    linear-gradient(180deg, #3a3b41, #1f2024);
-}
-
 .gpu > .face[data-face='right'] {
-  background: repeating-linear-gradient(180deg, #2c2d33 0 0.08em, #0f0f12 0.08em 0.22em), #18181c;
+  background: linear-gradient(180deg, #2a2b30, #111114);
+  box-shadow: inset 0 0 0 0.12em #0c0c0f;
 }
 
 .gpu > .face[data-face='bottom'] {
   background: radial-gradient(circle at 30% 50%, #1a1a1e 1.8em, #08080a 1.9em);
 }
 
-.gpuEdge,
-.gpuTopEdge {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 0.14em;
-  background: linear-gradient(90deg, #36d6ff, #5fe08a, #ffb547, #ff4fd8);
-  box-shadow: 0 0 0.6em rgb(255 255 255 / 0.5);
-}
-
-.gpuTopEdge {
-  inset: auto 0 0;
-}
-
 .rtx {
   font-family: var(--mantine-font-family);
-  font-size: 0.6em;
+  font-size: 7px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #c4c6cc;
-  white-space: nowrap;
-}
-
-.gpuBadge {
-  width: 1.4em;
-  height: 1.2em;
-  margin-left: auto;
-  border-radius: 0.15em;
-  background: linear-gradient(90deg, #36d6ff, #5fe08a, #ffb547, #ff4fd8);
-  box-shadow: 0 0 0.7em rgb(255 255 255 / 0.4);
+  letter-spacing: 0.06em;
+  fill: #b9bbc2;
 }
 
 .gpuCable {
-  top: 9em;
-  left: 11.4em;
-  width: 6em;
-  height: 3.4em;
-  transform-origin: left;
-  transform: translateZ(-4.6em) rotateY(90deg);
+  top: 13.8em;
+  left: 11.6em;
+  width: 1.4em;
+  height: 6.4em;
+  transform: translateZ(-2.45em);
 }
 
 /* ---- Cooling loop ---- */
@@ -342,13 +293,23 @@
   box-shadow: inset 0 0.06em 0 rgb(255 255 255 / 0.18);
 }
 
-/* From the pump up to the tank: a plane turned to run along the line between them. */
-.tubes {
-  left: 9.8em;
-  width: 10.9em;
-  height: 8em;
+/* Each tube runs in a plane turned to follow the line from the pump's side to its end of the
+   tank: the near one to the end by the glass, the far one to the end by the back wall. */
+.tube {
+  top: 0;
+  left: 8.2em;
+  height: 20em;
   transform-origin: 0 0;
-  transform: translateZ(-9.5em) rotateY(-27.3deg);
+}
+
+.tubeNear {
+  width: 13.07em;
+  transform: translateZ(-9.4em) rotateY(-29.3deg);
+}
+
+.tubeFar {
+  width: 11.44em;
+  transform: translateZ(-9.4em) rotateY(-5deg);
 }
 
 /* ---- Outside: the shroud, the glass and the riser ---- */

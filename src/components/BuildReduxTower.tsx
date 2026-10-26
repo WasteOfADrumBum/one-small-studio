@@ -214,6 +214,11 @@ function Defs() {
           <stop offset="0.66" stopColor="#ffb547" />
           <stop offset="1" stopColor="#ff4fd8" />
         </linearGradient>
+        <linearGradient id="pc-frame" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stopColor="#55565d" />
+          <stop offset="0.5" stopColor="#3a3b41" />
+          <stop offset="1" stopColor="#25262b" />
+        </linearGradient>
         <pattern id="pc-mesh" width="6" height="6" patternUnits="userSpaceOnUse">
           <circle cx="3" cy="3" r="1.6" fill="#030304" />
         </pattern>
@@ -274,41 +279,123 @@ function EndWall() {
   );
 }
 
-/** The two coolant tubes, arcing down from the radiator's end tank into the top of the pump. */
-function Tubes() {
-  const runs = ['M98 15C98 52 40 44 8 72', 'M107 15C107 58 50 54 18 72'];
+/**
+ * One coolant tube, drawn in a plane that runs from the pump's left side to one end of the
+ * radiator's tank, at 10 units an em: out of the side of the pump, down and round under it, along
+ * above the card, then straight up into the tank. `length` is the plane's run in em; `from` is
+ * the height it leaves the pump at, in units down from the top of the case.
+ */
+function Tube({ length, from }: { length: number; from: number }) {
+  const end = length * 10;
+  const d = `M0 ${from}C-16 ${from} -18 128 6 128H${end - 22}C${end - 4} 128 ${end} 116 ${end} 98V14`;
   return (
-    <svg viewBox="0 0 109 80" className={classes.fill}>
-      {runs.map((d) => (
-        <g key={d} fill="none" strokeLinecap="round">
-          <path d={d} stroke="#050506" strokeWidth="6" />
-          <path d={d} stroke="#2b1a1e" strokeWidth="3" transform="translate(-1 -1)" />
-          <path
-            d={d}
-            stroke="#ff5a6a"
-            strokeOpacity="0.45"
-            strokeWidth="0.8"
-            transform="translate(-1.6 -1.6)"
-          />
-        </g>
+    <svg viewBox={`0 0 ${end} 200`} className={classes.fill} overflow="visible">
+      <g fill="none" strokeLinecap="round">
+        <path d={d} stroke="#050506" strokeWidth="6.5" />
+        <path d={d} stroke="#241418" strokeWidth="3" transform="translate(-1 -1)" />
+        <path
+          d={d}
+          stroke="#ff5a6a"
+          strokeOpacity="0.45"
+          strokeWidth="0.8"
+          transform="translate(-1.8 -1.8)"
+        />
+      </g>
+    </svg>
+  );
+}
+
+/** The braided 12V cable, plugged into the middle of the card's top and running down its face. */
+function GpuCable() {
+  return (
+    <svg viewBox="0 0 14 64" className={classes.fill}>
+      {[0, 1, 2, 3, 4, 5].map((i) => (
+        <path
+          key={i}
+          d={`M${2 + i * 2} 0V12C${2 + i * 2} 30 ${3 + i * 1.6} 44 ${3 + i * 1.6} 64`}
+          fill="none"
+          stroke={i % 2 ? '#0d0d10' : '#2a2a30'}
+          strokeWidth="1.7"
+        />
       ))}
     </svg>
   );
 }
 
-/** The braided 12V cable rising from the top of the card and back into the wall. */
-function GpuCable() {
+/**
+ * The face of Josh's TUF RTX 5090, 17em by 4.4em at 10 units an em: an open metal frame with
+ * angled struts over the fin stack, the GEFORCE RTX plate, and the lit TUF badge on the end.
+ */
+function GpuFace() {
   return (
-    <svg viewBox="0 0 60 34" className={classes.fill}>
-      {[0, 1, 2, 3, 4, 5].map((i) => (
+    <svg viewBox="0 0 170 44" className={classes.fill} preserveAspectRatio="none">
+      <rect width="170" height="44" fill="#0c0c0f" />
+      {/* The fin stack, seen through the frame. */}
+      <path
+        d={Array.from({ length: 64 }, (_, i) => `M${4 + i * 2} 6V40`).join('')}
+        stroke="#2c2c33"
+        strokeWidth="0.8"
+      />
+      <g fill="url(#pc-frame)">
+        <rect width="170" height="4" />
+        <rect y="40" width="170" height="4" />
+        <path d="M0 0H26L48 26H40V44H0V36H22V18L8 4H0Z" />
+        <path d="M56 4L76 26H86L106 4H96L81 21L66 4Z" />
+        <path d="M106 4H134V10H106Z" />
+        <path d="M40 26H140V44H40Z" />
+      </g>
+      {/* The little row of chevrons along the top right. */}
+      <path
+        d="M108 5L112 9L116 5ZM117 5L121 9L125 5ZM126 5L130 9L134 5Z"
+        fill="#0c0c0f"
+        opacity="0.9"
+      />
+      <text x="48" y="38.5" className={classes.rtx}>
+        GEFORCE RTX
+      </text>
+      <path
+        d="M104 36L108 30H112L108 36ZM112 36L116 30H120L116 36ZM120 36L124 30H128L124 36Z"
+        fill="#8d8f96"
+      />
+      {/* The TUF end: a dark block with the shield badge and its corner lights. */}
+      <rect x="140" width="30" height="44" fill="#15151a" />
+      <rect x="140" width="30" height="44" fill="none" stroke="#3a3b42" strokeWidth="1" />
+      <g className={classes.rainbow} transform="translate(155 4) scale(0.8) translate(-152 0)">
         <path
-          key={i}
-          d={`M${6 + i * 1.2} 34C${6 + i * 1.2} 16 30 ${12 + i * 1.2} 60 ${12 + i * 1.2}`}
-          fill="none"
-          stroke={i % 2 ? '#0a0a0c' : '#1e1e23'}
-          strokeWidth="1.3"
+          d="M144 14H160V22L152 29L144 22ZM148 17V22L152 25L156 22V17H153V22H151V17Z"
+          fill="url(#pc-rainbow-x)"
+          fillRule="evenodd"
         />
-      ))}
+        <path
+          d="M144 14H160V22L152 29L144 22Z"
+          fill="url(#pc-rainbow-x)"
+          opacity="0.45"
+          filter="url(#pc-bloom)"
+        />
+        <path
+          d="M139 8l3 2M165 8l-3 2M139 30l3 -2M165 30l-3 -2"
+          stroke="url(#pc-rainbow-x)"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+        />
+        {[150, 154, 158, 162, 166].map((x) => (
+          <circle key={x} cx={x} cy="37" r="1.1" fill="url(#pc-rainbow-x)" />
+        ))}
+      </g>
+    </svg>
+  );
+}
+
+/** The card's top, its backplate cut away in angled windows, with the cable's plug in the middle. */
+function GpuTop() {
+  return (
+    <svg viewBox="0 0 170 70" className={classes.fill} preserveAspectRatio="none">
+      <rect width="170" height="70" fill="url(#pc-frame)" />
+      <path
+        d="M30 10H70L60 34H24ZM80 10H120L132 30H90ZM140 10H162V40L146 30ZM30 44H90L84 60H24Z"
+        fill="#0b0b0e"
+      />
+      <rect x="72" y="2" width="14" height="6" rx="1" fill="#050506" />
     </svg>
   );
 }
@@ -347,16 +434,16 @@ export function BuildReduxTower() {
             className={classes.alloy}
             faces={{ front: null, right: null, bottom: null, top: null }}
           />
-          {[12.7, 13.5].map((x) => (
+          {[12.6, 13.5].map((x) => (
             <Box
               key={x}
               at={[x, 3.8, -9.3]}
-              size={[0.34, 6.6, 1.3]}
+              size={[0.42, 6.6, 1.3]}
               className={classes.ram}
               faces={{
-                front: null,
-                right: <span className={`${classes.ramLight} ${classes.rainbow}`} />,
-                top: <span className={`${classes.ramTop} ${classes.rainbow}`} />,
+                front: <span className={`${classes.ramLight} ${classes.rainbow}`} />,
+                right: null,
+                top: null,
               }}
             />
           ))}
@@ -372,27 +459,21 @@ export function BuildReduxTower() {
             }}
           />
 
-          {/* The RTX 5090, standing out from the board towards the glass. */}
-          <div className={`${classes.plane} ${classes.gpuCable}`}>
-            <GpuCable />
-          </div>
+          {/* The RTX 5090: long, thick and low, just above the shroud, its cable down the face. */}
           <Box
-            at={[4, 12.4, -4.2]}
-            size={[12.6, 2.4, 6.4]}
+            at={[2.4, 13.8, -2.6]}
+            size={[17, 4.4, 7]}
             className={classes.gpu}
             faces={{
-              front: (
-                <>
-                  <span className={`${classes.gpuEdge} ${classes.rainbow}`} />
-                  <span className={classes.rtx}>GEFORCE RTX</span>
-                  <span className={`${classes.gpuBadge} ${classes.rainbow}`} />
-                </>
-              ),
+              front: <GpuFace />,
               right: null,
-              top: <span className={`${classes.gpuTopEdge} ${classes.rainbow}`} />,
+              top: <GpuTop />,
               bottom: null,
             }}
           />
+          <div className={`${classes.plane} ${classes.gpuCable}`}>
+            <GpuCable />
+          </div>
 
           {/* Three fans on the back wall beside the board, facing out through the glass. */}
           {[1.9, 7.5, 13.1].map((y, i) => (
@@ -415,8 +496,12 @@ export function BuildReduxTower() {
           {[3.3, 8.5, 13.7].map((x) => (
             <Fan key={x} at={[x, 2.5, -3.1]} size={5} turn="down" />
           ))}
-          <div className={`${classes.plane} ${classes.tubes}`}>
-            <Tubes />
+          {/* Two tubes off the pump's left side, round under it and up into either end of the tank. */}
+          <div className={`${classes.plane} ${classes.tube} ${classes.tubeNear}`}>
+            <Tube length={13.07} from={78} />
+          </div>
+          <div className={`${classes.plane} ${classes.tube} ${classes.tubeFar}`}>
+            <Tube length={11.44} from={90} />
           </div>
 
           {/* The exhaust, high on the far end wall. */}
