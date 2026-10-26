@@ -14,7 +14,7 @@ This is a personal, non-commercial showcase: no rates, booking or sales. It runs
 | UI       | Mantine, with a custom dark console theme                 |
 | Motion   | GSAP ScrollTrigger for scroll scrubbing, Motion for UI    |
 | API      | Node + Express 5, deployed as one Vercel function         |
-| Database | MongoDB Atlas with Mongoose (contact inbox)               |
+| Email    | Resend: the contact form emails each message to Josh      |
 | Music    | SoundCloud Widget API, driven by the profile in `site.ts` |
 | Hosting  | Vercel Hobby                                              |
 | CI       | GitHub Actions: format, lint, type check, tests and build |
@@ -50,4 +50,5 @@ npm run dev      # site on http://localhost:5173, API on http://localhost:3001
 ## Deploy
 
 Import this repo into Vercel. Every pull request gets a preview URL, and merges to `main` deploy
-to production. Secrets go in Vercel's environment variables; see `.env.example` for the names.
+to production. Secrets go in Vercel's environment variables; see `.env.example` for the names. The contact
+form needs `RESEND_API_KEY` and `CONTACT_TO` before it can send.

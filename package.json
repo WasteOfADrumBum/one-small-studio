@@ -31,7 +31,6 @@
     "@tabler/icons-react": "^3.49.0",
     "express": "^5.2.1",
     "gsap": "^3.15.0",
-    "mongoose": "^9.11.1",
     "motion": "^14.0.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",

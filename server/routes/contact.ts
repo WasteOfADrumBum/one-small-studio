@@ -1,10 +1,30 @@
 import { createHash } from 'node:crypto';
 import { Router } from 'express';
 import { contactSchema } from '../../src/lib/contact.js';
-import { connectDb, hasDatabase } from '../db.js';
-import { MessageModel } from '../models/message.js';
+import { hasMail, sendContactEmail } from '../mail.js';
 
 const MAX_PER_HOUR = 3;
+const HOUR = 3_600_000;
+
+/**
+ * Recent sends per sender, keyed by a hash of their IP, never the IP itself. It lives in the
+ * function's memory, so it is best effort: a cold start forgets it. That is enough to stop one
+ * person flooding the inbox from a hobby site.
+ */
+const recent = new Map<string, number[]>();
+
+function underLimit(key: string, now = Date.now()): boolean {
+  const sends = (recent.get(key) ?? []).filter((t) => now - t < HOUR);
+  if (sends.length >= MAX_PER_HOUR) {
+    recent.set(key, sends);
+    return false;
+  }
+  recent.set(key, [...sends, now]);
+  return true;
+}
+
+/** Forgets every sender; for tests. */
+export const resetRateLimit = () => recent.clear();
 
 export const contact = Router();
 
@@ -17,22 +37,17 @@ contact.post('/', async (req, res) => {
   // Bots fill the hidden field; answer as if it worked so they don't adapt.
   if (website) return res.status(201).json({ ok: true });
 
-  if (!hasDatabase()) {
-    return res.status(503).json({ error: 'The inbox is not connected yet.' });
+  if (!hasMail()) {
+    return res.status(503).json({ error: 'The talkback line is not connected yet.' });
   }
 
-  await connectDb();
-  const ipHash = createHash('sha256')
+  const sender = createHash('sha256')
     .update(req.ip ?? 'unknown')
     .digest('hex');
-  const recent = await MessageModel.countDocuments({
-    ipHash,
-    createdAt: { $gt: new Date(Date.now() - 3_600_000) },
-  });
-  if (recent >= MAX_PER_HOUR) {
+  if (!underLimit(sender)) {
     return res.status(429).json({ error: 'That is a lot of messages. Try again in an hour.' });
   }
 
-  await MessageModel.create({ name, email, reason, body: message, ipHash });
+  await sendContactEmail({ name, email, reason, message });
   res.status(201).json({ ok: true });
 });
