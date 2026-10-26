@@ -3,13 +3,21 @@
  *
  * Every item is drawn as a rack-mounted module, whatever it really is. `size` is its height in rack
  * units (U) and `kind` picks the faceplate style that suggests its category. Real rack gear (the
- * Carvin, the Focusrite pair, the Boss) is drawn as itself under a nameplate, and its `size`
+ * Carvins, the Focusrite pair, the Boss, the Alesis) is drawn as itself under a nameplate, and its `size`
  * counts both. Both are presentation only.
  */
 export type RackSize = 1 | 2 | 3 | 4 | 5 | 6;
 
 export type GearKind =
-  'daw' | 'interface' | 'amp-head' | 'speaker-cab' | 'effects' | 'drum' | 'cymbals' | 'drum-module';
+  | 'daw'
+  | 'interface'
+  | 'amp-head'
+  | 'bass-amp'
+  | 'speaker-cab'
+  | 'effects'
+  | 'drum'
+  | 'cymbals'
+  | 'drum-module';
 
 export type GearItem = {
   brand: string;
@@ -19,6 +27,8 @@ export type GearItem = {
   kind: GearKind;
   /** Faceplate finish; decorative. */
   finish?: 'black' | 'silver';
+  /** A half-rack unit: half the rack's width, side by side with the next one. */
+  half?: boolean;
 };
 
 export type GearGroup = {
@@ -51,7 +61,8 @@ export const gear: GearGroup[] = [
         brand: 'Pearl',
         model: 'Acoustic kits',
         note: 'Live and studio workhorse',
-        size: 2,
+        size: 4,
+        half: true,
         kind: 'drum',
         finish: 'black',
       },
@@ -59,7 +70,8 @@ export const gear: GearGroup[] = [
         brand: 'Ludwig',
         model: 'Acoustic kits',
         note: 'The classic rock and punk sound',
-        size: 2,
+        size: 4,
+        half: true,
         kind: 'drum',
         finish: 'silver',
       },
@@ -68,13 +80,14 @@ export const gear: GearGroup[] = [
         model: 'Cymbals',
         note: 'Crashes, rides and hats across every kit',
         size: 2,
+        half: true,
         kind: 'cymbals',
       },
       {
         brand: 'Alesis',
         model: 'Electronic drums',
         note: 'Quiet practice and MIDI programming at home',
-        size: 2,
+        size: 3,
         kind: 'drum-module',
       },
     ],
@@ -104,6 +117,13 @@ export const gear: GearGroup[] = [
         note: 'Speaker cabs behind the Carvins',
         size: 2,
         kind: 'speaker-cab',
+      },
+      {
+        brand: 'Carvin',
+        model: 'BX1600',
+        note: 'The bass rig: dual mono power with a 12AX7 preamp',
+        size: 4,
+        kind: 'bass-amp',
       },
     ],
   },
