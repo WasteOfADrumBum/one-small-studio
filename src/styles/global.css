@@ -133,6 +133,32 @@ body::after {
   box-sizing: border-box;
 }
 
+/* The footer's "Pause page animations" switch holds every looping animation where it is. */
+:root[data-motion='paused'] *,
+:root[data-motion='paused'] *::before,
+:root[data-motion='paused'] *::after {
+  animation-play-state: paused !important;
+}
+
+/* Keyboard users can jump past the transport bar and the console's controls. */
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 200;
+  padding: 8px 14px;
+  border-radius: 4px;
+  background: var(--oss-panel-raised);
+  color: var(--oss-text);
+  font-weight: 600;
+  text-decoration: none;
+  translate: 0 -200%;
+}
+
+.skip-link:focus-visible {
+  translate: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

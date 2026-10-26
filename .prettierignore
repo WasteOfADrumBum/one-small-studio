@@ -1,3 +1,5 @@
 dist/
 .vercel/
 package-lock.json
+test-results
+playwright-report

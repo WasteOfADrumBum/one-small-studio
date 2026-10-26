@@ -12,6 +12,9 @@ export function App() {
   return (
     <PowerProvider>
       <PlayerProvider>
+        <a href="#story" className="skip-link">
+          Skip to the story
+        </a>
         <TransportBar />
         <main>
           <Hero />

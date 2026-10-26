@@ -79,8 +79,14 @@ export function TransportBar() {
 
       {site.soundcloud && (
         <Tooltip label="Open my SoundCloud">
-          <Anchor href={site.soundcloud} target="_blank" rel="noreferrer" className={classes.sc}>
-            <IconBrandSoundcloud size={26} aria-label="SoundCloud" />
+          <Anchor
+            href={site.soundcloud}
+            target="_blank"
+            rel="noreferrer"
+            className={classes.sc}
+            aria-label="My SoundCloud (opens in a new tab)"
+          >
+            <IconBrandSoundcloud size={26} aria-hidden="true" />
           </Anchor>
         </Tooltip>
       )}
