@@ -113,6 +113,11 @@
   inset: 0;
 }
 
+.face[data-face='back'] {
+  inset: 0;
+  transform: translateZ(calc(var(--d) * -1));
+}
+
 .face[data-face='left'],
 .face[data-face='right'] {
   top: 0;
@@ -175,14 +180,9 @@
 
 /* ---- Fans: a frame with depth, its edges ringed in light like the render's fans ---- */
 
-.fan > .face:not([data-face='front']) {
-  background: linear-gradient(90deg, #121215 0 18%, #ff3a4c 18% 24%, #121215 24%);
-  box-shadow: 0 0 0.3em rgb(255 42 64 / 0.35);
-}
-
-.fan > .face[data-face='top'],
-.fan > .face[data-face='bottom'] {
-  background: linear-gradient(180deg, #121215 0 18%, #ff3a4c 18% 24%, #121215 24%);
+/* Round fans: nothing on a face spills past its circle but the brackets. */
+.fan > .face {
+  overflow: visible;
 }
 
 /* ---- Board parts ---- */
@@ -218,6 +218,10 @@
   background: linear-gradient(180deg, #6a6c73, #3a3b41);
 }
 
+.gpuCable > svg {
+  overflow: visible;
+}
+
 .ram > .face {
   overflow: visible;
   background: linear-gradient(180deg, #1a1a1f, #0b0b0e);
@@ -236,13 +240,16 @@
 }
 
 .pump > .face[data-face='front'] {
+  overflow: visible;
   display: grid;
   place-items: center;
   border-radius: 0.5em;
   background: radial-gradient(circle at 40% 35%, #26262c, #0c0c0f 70%);
   box-shadow:
-    inset 0 0 0 0.08em #35353b,
-    0 0 1.2em rgb(255 42 64 / 0.35);
+    inset 0 0 0 0.08em #ff3a4c,
+    inset 0 0 0.6em rgb(255 42 64 / 0.6),
+    0 0 0.4em 0.1em rgb(255 42 64 / 0.9),
+    0 0 1.6em 0.3em rgb(255 42 64 / 0.5);
 }
 
 .pumpLogo {
@@ -275,8 +282,8 @@
 
 .gpuCable {
   top: 13.8em;
-  left: 11.6em;
-  width: 1.4em;
+  left: 10.6em;
+  width: 3em;
   height: 6.4em;
   transform: translateZ(-2.45em);
 }
@@ -293,8 +300,8 @@
   box-shadow: inset 0 0.06em 0 rgb(255 255 255 / 0.18);
 }
 
-/* Each tube runs in a plane turned to follow the line from the pump's side to its end of the
-   tank: the near one to the end by the glass, the far one to the end by the back wall. */
+/* Each tube's run is in a plane turned to follow the line from the pump's side to the foot of
+   its riser: the near one ends by the glass, the far one by the back wall. */
 .tube {
   top: 0;
   left: 8.2em;
@@ -310,6 +317,16 @@
 .tubeFar {
   width: 11.44em;
   transform: translateZ(-9.4em) rotateY(-5deg);
+}
+
+/* The risers climb across the depth of the case, under the tank. */
+.risers {
+  top: 0;
+  left: 19.6em;
+  width: 6.4em;
+  height: 20em;
+  transform-origin: 0 0;
+  transform: translateZ(-2.4em) rotateY(90deg);
 }
 
 /* ---- Outside: the shroud, the glass and the riser ---- */

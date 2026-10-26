@@ -25,22 +25,16 @@ function ReduxLogo({ className }: { className?: string }) {
   );
 }
 
-/** The R drawn in light, edge by edge, like the badge on the pump cap. */
+/** The R lit red through the pump cap, its facets in brighter and darker reds. */
 function ReduxLogoLit({ className }: { className?: string }) {
-  const edges = Object.values(reduxFacets).join(' ');
+  const all = Object.values(reduxFacets).join(' ');
   return (
     <svg viewBox="-6 -6 52 76" className={className}>
-      <path d={edges} fill="#ff2a40" fillOpacity="0.12" />
-      <path
-        d={edges}
-        fill="none"
-        stroke="#ff2a40"
-        strokeWidth="6"
-        strokeLinejoin="round"
-        opacity="0.55"
-        filter="url(#pc-bloom)"
-      />
-      <path d={edges} fill="none" stroke="#ffb3bb" strokeWidth="2.2" strokeLinejoin="round" />
+      <path d={all} fill="#ff2a40" opacity="0.6" filter="url(#pc-bloom)" />
+      <path d={reduxFacets.roof} fill="#ff7a86" />
+      <path d={reduxFacets.stem} fill="#e0283c" />
+      <path d={reduxFacets.bowl} fill="#b81a2e" />
+      <path d={reduxFacets.leg} fill="#f04052" />
     </svg>
   );
 }
@@ -48,17 +42,33 @@ function ReduxLogoLit({ className }: { className?: string }) {
 const blades = Array.from({ length: 7 }, (_, i) => (i * 360) / 7);
 
 /**
- * A 120mm fan's face in a 100x100 box: frame corners, curved blades lit red from the hub out, and
- * the double light ring round the rim like the render's fans. Spins one way or the other.
+ * The four mounting brackets that hold a round fan's frame: a lug with a screw hole at each corner,
+ * on an arm running in from the ring, so the frame reads as a circle crossed by an X.
+ */
+function FanBrackets({ fill }: { fill: string }) {
+  return (
+    <g fill={fill}>
+      {[45, 135, 225, 315].map((turn) => (
+        <path key={turn} d="M38 -9L58 -6A6 6 0 0 1 58 6L38 9Z" transform={`rotate(${turn})`} />
+      ))}
+      {[45, 135, 225, 315].map((turn) => (
+        <circle key={turn} cx="57" cy="0" r="2.2" fill="#030304" transform={`rotate(${turn})`} />
+      ))}
+    </g>
+  );
+}
+
+/**
+ * A 120mm fan's face, round in a 100x100 box with only its brackets reaching the corners: curved
+ * blades lit red from the hub out and the double light ring round the rim like Josh's fans. Spins
+ * one way or the other.
  */
 function FanFace({ reverse = false }: { reverse?: boolean }) {
   return (
-    <svg viewBox="-50 -50 100 100" className={classes.fill}>
-      <rect x="-50" y="-50" width="100" height="100" rx="8" fill="url(#pc-housing)" />
-      {[-41, 41].map((x) =>
-        [-41, 41].map((y) => <circle key={`${x}${y}`} cx={x} cy={y} r="3" fill="#050506" />),
-      )}
-      <circle r="47" fill="url(#pc-well)" />
+    <svg viewBox="-50 -50 100 100" className={classes.fill} overflow="visible">
+      <FanBrackets fill="url(#pc-housing)" />
+      <circle r="49" fill="#141417" />
+      <circle r="46" fill="url(#pc-well)" />
       <g className={classes.rotor} data-reverse={reverse || undefined}>
         <circle r="44" fill="none" />
         {blades.map((turn) => (
@@ -83,7 +93,7 @@ function FanFace({ reverse = false }: { reverse?: boolean }) {
           opacity="0.45"
           filter="url(#pc-bloom)"
         />
-        <circle r="47.5" fill="none" stroke="#ffd6db" strokeWidth="1.2" opacity="0.85" />
+        <circle r="48" fill="none" stroke="#ffd6db" strokeWidth="1.2" opacity="0.85" />
         <circle r="45" fill="none" stroke="#ff4a5c" strokeWidth="2.4" />
         <circle
           r="16"
@@ -99,7 +109,28 @@ function FanFace({ reverse = false }: { reverse?: boolean }) {
   );
 }
 
-type Face = 'front' | 'right' | 'left' | 'top' | 'bottom';
+/** The back of a fan's frame: its brackets and a second light ring, a frame's depth behind. */
+function FanBack() {
+  return (
+    <svg viewBox="-50 -50 100 100" className={classes.fill} overflow="visible">
+      <FanBrackets fill="#0e0e11" />
+      <circle r="47" fill="none" stroke="#141417" strokeWidth="4" />
+      <g className={classes.glow}>
+        <circle
+          r="46"
+          fill="none"
+          stroke="#ff2a40"
+          strokeWidth="7"
+          opacity="0.4"
+          filter="url(#pc-bloom)"
+        />
+        <circle r="46" fill="none" stroke="#ff4a5c" strokeWidth="2" />
+      </g>
+    </svg>
+  );
+}
+
+type Face = 'front' | 'back' | 'right' | 'left' | 'top' | 'bottom';
 
 type BoxProps = {
   /** Top-left-front corner, in em: x along the glass front, y down, z back from the glass. */
@@ -136,7 +167,7 @@ function Box({ at: [x, y, z], size: [w, h, d], turn, className, faces }: BoxProp
   );
 }
 
-/** A fan with its frame's thickness and the light ring running round the frame's edge. */
+/** A round fan with its frame's depth: the lit face, and a second ring and brackets behind it. */
 function Fan({
   at,
   size,
@@ -149,13 +180,7 @@ function Fan({
       size={[size, size, size * 0.2]}
       turn={turn}
       className={classes.fan}
-      faces={{
-        front: <FanFace reverse={reverse} />,
-        left: null,
-        right: null,
-        top: null,
-        bottom: null,
-      }}
+      faces={{ back: <FanBack />, front: <FanFace reverse={reverse} /> }}
     />
   );
 }
@@ -279,40 +304,64 @@ function EndWall() {
   );
 }
 
+/** A tube's dark sleeve with a red highlight along its upper edge, so it reads as round. */
+function TubeStroke({ d }: { d: string }) {
+  return (
+    <g fill="none" strokeLinecap="round">
+      <path d={d} stroke="#050506" strokeWidth="6.5" />
+      <path d={d} stroke="#241418" strokeWidth="3" transform="translate(-1 -1)" />
+      <path
+        d={d}
+        stroke="#ff5a6a"
+        strokeOpacity="0.45"
+        strokeWidth="0.8"
+        transform="translate(-1.8 -1.8)"
+      />
+    </g>
+  );
+}
+
 /**
- * One coolant tube, drawn in a plane that runs from the pump's left side to one end of the
- * radiator's tank, at 10 units an em: out of the side of the pump, down and round under it, along
- * above the card, then straight up into the tank. `length` is the plane's run in em; `from` is
- * the height it leaves the pump at, in units down from the top of the case.
+ * The first part of one coolant tube, in a plane running from the pump's left side to the foot
+ * of the risers, at 10 units an em: out of the side of the pump, down and round under it, along
+ * above the card, then turning up. `length` is the plane's run in em; `from` is the height it
+ * leaves the pump at, in units down from the top of the case.
  */
-function Tube({ length, from }: { length: number; from: number }) {
+function TubeRun({ length, from }: { length: number; from: number }) {
   const end = length * 10;
-  const d = `M0 ${from}C-16 ${from} -18 128 6 128H${end - 22}C${end - 4} 128 ${end} 116 ${end} 98V14`;
   return (
     <svg viewBox={`0 0 ${end} 200`} className={classes.fill} overflow="visible">
-      <g fill="none" strokeLinecap="round">
-        <path d={d} stroke="#050506" strokeWidth="6.5" />
-        <path d={d} stroke="#241418" strokeWidth="3" transform="translate(-1 -1)" />
-        <path
-          d={d}
-          stroke="#ff5a6a"
-          strokeOpacity="0.45"
-          strokeWidth="0.8"
-          transform="translate(-1.8 -1.8)"
-        />
-      </g>
+      <TubeStroke
+        d={`M0 ${from}C-16 ${from} -18 128 6 128H${end - 22}C${end - 4} 128 ${end} 122 ${end} 112`}
+      />
     </svg>
   );
 }
 
-/** The braided 12V cable, plugged into the middle of the card's top and running down its face. */
+/**
+ * The two tubes rising to the tank, in a plane across the case's depth: each climbs from the end
+ * of its run to the opposite end of the tank, so they cross on the way up, in and out.
+ */
+function TubeRisers() {
+  return (
+    <svg viewBox="0 0 64 200" className={classes.fill} overflow="visible">
+      <TubeStroke d="M60 112C60 70 6 66 6 14" />
+      <TubeStroke d="M6 112C6 70 60 66 60 14" />
+    </svg>
+  );
+}
+
+/**
+ * The braided 12V cable: over the top edge of the card from its plug, then down the face, bowing
+ * out and curling away to the left as it drops into the shroud.
+ */
 function GpuCable() {
   return (
-    <svg viewBox="0 0 14 64" className={classes.fill}>
+    <svg viewBox="0 0 30 64" className={classes.fill} overflow="visible">
       {[0, 1, 2, 3, 4, 5].map((i) => (
         <path
           key={i}
-          d={`M${2 + i * 2} 0V12C${2 + i * 2} 30 ${3 + i * 1.6} 44 ${3 + i * 1.6} 64`}
+          d={`M${14 + i * 1.8} 0C${14 + i * 1.8} 14 ${18 + i * 1.6} 24 ${14 + i * 1.5} 40S${2 + i * 1.4} 56 ${-2 + i * 1.4} 66`}
           fill="none"
           stroke={i % 2 ? '#0d0d10' : '#2a2a30'}
           strokeWidth="1.7"
@@ -323,22 +372,23 @@ function GpuCable() {
 }
 
 /**
- * The face of Josh's TUF RTX 5090, 17em by 4.4em at 10 units an em: an open metal frame with
+ * The face of Josh's TUF RTX 5090, 18.4em by 4.4em at 10 units an em (from -14): an open metal frame with
  * angled struts over the fin stack, the GEFORCE RTX plate, and the lit TUF badge on the end.
  */
 function GpuFace() {
   return (
-    <svg viewBox="0 0 170 44" className={classes.fill} preserveAspectRatio="none">
-      <rect width="170" height="44" fill="#0c0c0f" />
+    <svg viewBox="-14 0 184 44" className={classes.fill} preserveAspectRatio="none">
+      <rect x="-14" width="184" height="44" fill="#0c0c0f" />
       {/* The fin stack, seen through the frame. */}
       <path
-        d={Array.from({ length: 64 }, (_, i) => `M${4 + i * 2} 6V40`).join('')}
+        d={Array.from({ length: 71 }, (_, i) => `M${-10 + i * 2} 6V40`).join('')}
         stroke="#2c2c33"
         strokeWidth="0.8"
       />
       <g fill="url(#pc-frame)">
-        <rect width="170" height="4" />
-        <rect y="40" width="170" height="4" />
+        <rect x="-14" width="184" height="4" />
+        <rect x="-14" y="40" width="184" height="4" />
+        <rect x="-14" width="4" height="44" />
         <path d="M0 0H26L48 26H40V44H0V36H22V18L8 4H0Z" />
         <path d="M56 4L76 26H86L106 4H96L81 21L66 4Z" />
         <path d="M106 4H134V10H106Z" />
@@ -389,13 +439,13 @@ function GpuFace() {
 /** The card's top, its backplate cut away in angled windows, with the cable's plug in the middle. */
 function GpuTop() {
   return (
-    <svg viewBox="0 0 170 70" className={classes.fill} preserveAspectRatio="none">
-      <rect width="170" height="70" fill="url(#pc-frame)" />
+    <svg viewBox="-14 0 184 70" className={classes.fill} preserveAspectRatio="none">
+      <rect x="-14" width="184" height="70" fill="url(#pc-frame)" />
       <path
         d="M30 10H70L60 34H24ZM80 10H120L132 30H90ZM140 10H162V40L146 30ZM30 44H90L84 60H24Z"
         fill="#0b0b0e"
       />
-      <rect x="72" y="2" width="14" height="6" rx="1" fill="#050506" />
+      <rect x="96" y="2" width="14" height="6" rx="1" fill="#050506" />
     </svg>
   );
 }
@@ -461,8 +511,8 @@ export function BuildReduxTower() {
 
           {/* The RTX 5090: long, thick and low, just above the shroud, its cable down the face. */}
           <Box
-            at={[2.4, 13.8, -2.6]}
-            size={[17, 4.4, 7]}
+            at={[1, 13.8, -2.6]}
+            size={[18.4, 4.4, 7]}
             className={classes.gpu}
             faces={{
               front: <GpuFace />,
@@ -482,8 +532,8 @@ export function BuildReduxTower() {
 
           {/* The 360mm radiator under the roof, its end tank and its three fans hanging below. */}
           <Box
-            at={[3, 0.35, -2.5]}
-            size={[15.8, 1.15, 6.3]}
+            at={[2, 0.35, -2.4]}
+            size={[17, 1.15, 6.6]}
             className={classes.radiator}
             faces={{ front: null, bottom: null }}
           />
@@ -493,19 +543,22 @@ export function BuildReduxTower() {
             className={classes.tank}
             faces={{ front: null, right: null, bottom: null }}
           />
-          {[3.3, 8.5, 13.7].map((x) => (
-            <Fan key={x} at={[x, 2.5, -3.1]} size={5} turn="down" />
+          {[2.3, 7.95, 13.6].map((x) => (
+            <Fan key={x} at={[x, 2.6, -2.8]} size={5.5} turn="down" />
           ))}
-          {/* Two tubes off the pump's left side, round under it and up into either end of the tank. */}
+          {/* Two tubes off the pump's left side, round under it, crossing as they climb to the tank. */}
           <div className={`${classes.plane} ${classes.tube} ${classes.tubeNear}`}>
-            <Tube length={13.07} from={78} />
+            <TubeRun length={13.07} from={78} />
           </div>
           <div className={`${classes.plane} ${classes.tube} ${classes.tubeFar}`}>
-            <Tube length={11.44} from={90} />
+            <TubeRun length={11.44} from={90} />
+          </div>
+          <div className={`${classes.plane} ${classes.risers}`}>
+            <TubeRisers />
           </div>
 
           {/* The exhaust, high on the far end wall. */}
-          <Fan at={[1.3, 4.6, -3.1]} size={5} turn="end" reverse />
+          <Fan at={[1.4, 4.2, -2.8]} size={5.5} turn="end" reverse />
 
           {/* PSU shroud, then the glass front and left side. */}
           <Box
