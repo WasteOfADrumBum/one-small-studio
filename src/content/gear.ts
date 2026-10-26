@@ -1,5 +1,5 @@
 /**
- * The Studio gear, in three rack cabinets. The admin will take this list over in a later phase.
+ * The Studio gear, in two rack cabinets. The admin will take this list over in a later phase.
  *
  * Every item is drawn as a rack-mounted module, whatever it really is. `size` is its height in rack
  * units (U) and `kind` picks the faceplate style that suggests its category. Real rack gear (the
@@ -30,7 +30,7 @@ export type GearGroup = {
 
 export const gear: GearGroup[] = [
   {
-    name: 'Recording',
+    name: 'Recording and drums',
     power: 'furman',
     items: [
       {
@@ -47,40 +47,6 @@ export const gear: GearGroup[] = [
         size: 3,
         kind: 'interface',
       },
-    ],
-  },
-  {
-    name: 'Amps and effects',
-    power: 'livewire',
-    // In the order of the real guitar rack, top to bottom.
-    items: [
-      {
-        brand: 'Boss',
-        model: 'Effects',
-        note: 'Pedals for everything from ska upstrokes to metal',
-        size: 3,
-        kind: 'effects',
-      },
-      {
-        brand: 'Carvin',
-        model: 'V3M',
-        note: 'The go-to head, plus a lot of other Carvin amps over the years',
-        size: 5,
-        kind: 'amp-head',
-      },
-      {
-        brand: 'Avatar',
-        model: 'Cabinets',
-        note: 'Speaker cabs behind the Carvins',
-        size: 3,
-        kind: 'speaker-cab',
-      },
-    ],
-  },
-  {
-    name: 'Drums',
-    power: 'furman',
-    items: [
       {
         brand: 'Pearl',
         model: 'Acoustic kits',
@@ -110,6 +76,34 @@ export const gear: GearGroup[] = [
         note: 'Quiet practice and MIDI programming at home',
         size: 2,
         kind: 'drum-module',
+      },
+    ],
+  },
+  {
+    name: 'Amps and effects',
+    power: 'livewire',
+    // In the order of the real guitar rack, top to bottom.
+    items: [
+      {
+        brand: 'Boss',
+        model: 'Effects',
+        note: 'Pedals for everything from ska upstrokes to metal',
+        size: 3,
+        kind: 'effects',
+      },
+      {
+        brand: 'Carvin',
+        model: 'V3M',
+        note: 'The go-to head, plus a lot of other Carvin amps over the years',
+        size: 5,
+        kind: 'amp-head',
+      },
+      {
+        brand: 'Avatar',
+        model: 'Cabinets',
+        note: 'Speaker cabs behind the Carvins',
+        size: 3,
+        kind: 'speaker-cab',
       },
     ],
   },

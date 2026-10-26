@@ -2,9 +2,12 @@ import { useId } from 'react';
 import classes from './CarvinV3M.module.css';
 
 /*
- * A Carvin V3M head drawn straight on, laid out from photos of the real amp: the grey vented
- * shell with its V3 cutout and the tubes glowing through, and the black front panel with
- * channels 3, 2 and 1 left to right. Coordinates are in the photo's pixel space.
+ * The Carvin V3M as it sits in the guitar rack, 4U in all, laid out from photos. The head is drawn
+ * straight on from photos of the amp: the grey vented shell with its V3 cutout and the tubes
+ * glowing through, and the black front panel with channels 3, 2 and 1 left to right. In the rack
+ * it sits back on two black brackets, so the slotted 2U grid panel in front covers the shell and
+ * only the panel shows below it. The head is in its own photo's pixel space, the rack in the rack
+ * photo's.
  */
 
 /** Knob centre x and pointer angle (degrees from twelve o'clock), top row then bottom row. */
@@ -94,7 +97,7 @@ function Channel({ n, from, to }: { n: number; from: number; to: number }) {
   );
 }
 
-export function CarvinV3M() {
+function Head() {
   const id = useId();
   const shell = `${id}shell`;
   const panel = `${id}panel`;
@@ -103,12 +106,7 @@ export function CarvinV3M() {
   const halo = `${id}halo`;
 
   return (
-    <svg
-      className={classes.amp}
-      viewBox="120 505 1370 600"
-      role="img"
-      aria-label="Carvin V3M amp head"
-    >
+    <g className={classes.amp}>
       <defs>
         <linearGradient id={shell} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#e9ebee" />
@@ -283,6 +281,68 @@ export function CarvinV3M() {
       <text x="1380" y="1062" className={classes.model}>
         V3M
       </text>
+    </g>
+  );
+}
+
+/** Grid panel slots: six columns of five, as x and y of each slot's top left. */
+const GRID_X = [140, 362, 586, 810, 1035, 1260];
+const GRID_Y = [64, 103, 144, 185, 226];
+
+export function CarvinV3M() {
+  const id = useId();
+  const holes = `${id}holes`;
+  const carpet = `${id}carpet`;
+
+  return (
+    <svg
+      className={classes.rack}
+      viewBox="40 20 1540 575"
+      role="img"
+      aria-label="Carvin V3M amp head, set back in the rack under a slotted grid panel"
+    >
+      <defs>
+        <mask id={holes}>
+          <rect x="-400" y="-400" width="2420" height="688" fill="#fff" />
+          {GRID_X.map((x) =>
+            GRID_Y.map((y) => (
+              <rect key={`${x}-${y}`} x={x} y={y} width="205" height="19" rx="9.5" />
+            )),
+          )}
+        </mask>
+        <linearGradient id={carpet} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#141416" />
+          <stop offset="0.3" stopColor="#2a2a2d" />
+          <stop offset="1" stopColor="#323236" />
+        </linearGradient>
+      </defs>
+
+      {/* The rack's carpeted floor and the shadow at the back. */}
+      <rect x="-400" y="-400" width="2420" height="1400" className={classes.recess} />
+      <rect x="-400" y="470" width="2420" height="530" fill={`url(#${carpet})`} />
+
+      {/* The head, scaled from its own photo to sit between the brackets. */}
+      <g transform="translate(150.4 -356.9) scale(0.797)">
+        <Head />
+      </g>
+
+      {/* Behind the grid the shell is in shadow. */}
+      <rect x="-400" y="-400" width="2420" height="688" className={classes.shade} />
+
+      {/* The two black brackets the head rests on. */}
+      <rect x="58" y="288" width="198" height="258" rx="14" className={classes.bracketBlock} />
+      <rect x="1331" y="288" width="198" height="258" rx="14" className={classes.bracketBlock} />
+
+      {/* The slotted grid panel in front, the shell and its valves showing through the slots. */}
+      <rect
+        x="-400"
+        y="-400"
+        width="2420"
+        height="688"
+        mask={`url(#${holes})`}
+        className={classes.gridPanel}
+      />
+      <line x1="-400" y1="287" x2="2020" y2="287" className={classes.gridEdge} />
     </svg>
   );
 }

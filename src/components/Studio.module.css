@@ -8,11 +8,11 @@
   );
 }
 
-/* Three cabinets side by side on desktop; two over one on tablets; stacked on phones. */
+/* Two cabinets side by side, stacked on phones. */
 .row {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: stretch;
   /* Room between cases for the side panels the viewer can see. */
   gap: 24px;
@@ -37,26 +37,9 @@
   pointer-events: none;
 }
 
-@media (max-width: $mantine-breakpoint-md) {
-  .row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    row-gap: 48px;
-  }
-
-  .row > :last-child:nth-child(odd) {
-    grid-column: 1 / -1;
-    justify-self: center;
-    width: calc(50% - 12px);
-  }
-}
-
 @media (max-width: 40em) {
   .row {
     grid-template-columns: minmax(0, 1fr);
     row-gap: 40px;
-  }
-
-  .row > :last-child:nth-child(odd) {
-    width: 100%;
   }
 }

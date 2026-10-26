@@ -116,10 +116,7 @@ function Mount({
 const MOUNTED: Partial<
   Record<GearItem['kind'], { device: string; size: RackSize; draw: ReactNode }[]>
 > = {
-  'amp-head': [
-    { device: 'grid', size: 2, draw: <span className={classes.grid} /> },
-    { device: 'carvin', size: 2, draw: <CarvinV3M /> },
-  ],
+  'amp-head': [{ device: 'carvin', size: 4, draw: <CarvinV3M /> }],
   effects: [{ device: 'gtpro', size: 2, draw: <BossGtPro /> }],
   interface: [
     { device: 'scarlett', size: 1, draw: <Scarlett18i20 /> },

@@ -1,9 +1,8 @@
-/* The Boss GT-Pro: charcoal panel, silver preamp section, blue-lit effect keys. */
+/* The Boss GT-Pro: grey brushed panel, silver inset, black key blocks, Arial silkscreen. */
 .gt {
   display: block;
   width: 100%;
-  height: auto;
-  max-height: 100%;
+  height: 100%;
 }
 
 .gt text {
@@ -12,41 +11,74 @@
   text-anchor: middle;
 }
 
-.edge {
-  stroke: rgb(255 255 255 / 0.12);
-  stroke-width: 1;
+.white {
+  font-size: 19px;
+  fill: #f2f2f2;
 }
 
-.t {
-  font-size: 4.2px;
-  fill: #d8dade;
+.dark,
+.darkStart {
+  font-size: 19px;
+  fill: #141416;
 }
 
-.dark {
-  font-size: 4.2px;
-  fill: #1b1c20;
+.gt .darkStart {
+  font-size: 16px;
+  text-anchor: start;
 }
 
-.well {
-  fill: #1e1f23;
-  stroke: #4a4c52;
-  stroke-width: 0.6;
+.darkSmall {
+  font-size: 13px;
+  fill: #141416;
 }
 
-.skirt {
-  fill: #0a0a0c;
+.bar {
+  fill: #141416;
 }
 
-.index {
-  stroke: #f2f2f2;
-  stroke-width: 1.4;
-  stroke-linecap: round;
+.barText {
+  font-size: 19px;
+  fill: #f2f2f2;
 }
 
-.jackNut {
-  fill: #a9acb2;
-  stroke: #1a1a1d;
-  stroke-width: 1;
+.customBox {
+  fill: none;
+  stroke: #141416;
+  stroke-width: 2;
+}
+
+.soloBox {
+  fill: none;
+  stroke: #141416;
+  stroke-width: 2.5;
+}
+
+.silverEdge {
+  fill: none;
+  stroke: #7d8086;
+  stroke-width: 2;
+}
+
+.screw {
+  fill: #c9cbcf;
+  stroke: #6e7177;
+  stroke-width: 2;
+}
+
+.screwHead {
+  fill: #8d9096;
+}
+
+.blueNut {
+  fill: #3d7fd9;
+  stroke: #12305c;
+  stroke-width: 4;
+}
+
+.chromeNut {
+  fill: #a8abb0;
+  stroke: #3a3b3f;
+  stroke-width: 4;
 }
 
 .hole {
@@ -54,90 +86,151 @@
 }
 
 .peak {
-  fill: #ff2a2a;
+  fill: #ff3030;
+  fill-opacity: 0.35;
+}
+
+/* Knobs: a black knurled skirt, its tick ring, and a brushed silver cap with a black line. */
+.tick {
+  stroke: #0d0d0f;
+  stroke-width: 5;
+}
+
+.knobShadow {
+  fill: rgb(0 0 0 / 0.45);
+}
+
+.skirt {
+  fill: #121214;
+}
+
+.knurl {
+  fill: none;
+  stroke: #3a3b40;
+  stroke-width: 5;
+  stroke-dasharray: 4 5;
+}
+
+.index {
+  stroke: #0b0b0c;
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.dial {
+  fill: #0d0d0f;
+}
+
+.display {
+  fill: #0a0a0d;
+  stroke: #000;
+  stroke-width: 3;
+}
+
+.digits {
+  font-family: var(--mantine-font-family-monospace) !important;
+  font-size: 104px;
+  letter-spacing: 6px;
+  fill: #ff2a1a;
+  fill-opacity: 0.85;
 }
 
 .lcd {
-  fill: #0b0c0e;
-  stroke: #5c5f65;
-  stroke-width: 0.8;
-}
-
-/* The bank number in red seven-segment style, and the patch name in white. */
-.digit {
-  font-family: 'Courier New', monospace !important;
-  font-size: 26px;
-  font-style: italic;
-  fill: #ff2a2a;
+  fill: #1f2fa0;
 }
 
 .lcdText {
-  font-family: 'Courier New', monospace !important;
-  font-size: 10px;
-  fill: #e6f0ff;
+  font-family: var(--mantine-font-family-monospace) !important;
+  font-size: 30px;
+  fill: #d8e2ff;
+  text-anchor: start !important;
+}
+
+.block {
+  fill: #18181b;
 }
 
 .key {
-  fill: #303136;
-  stroke: #0b0b0d;
-  stroke-width: 0.8;
+  fill: #1e1f22;
+  stroke: #050506;
+  stroke-width: 3;
 }
 
-.fxLed {
-  fill: #1a2233;
+.keyLamp {
+  fill: #3a3b40;
 }
 
-.fxLed[data-lit] {
-  fill: #3d8bff;
-  filter: drop-shadow(0 0 1.5px #3d8bff);
+.jump {
+  fill: none;
+  stroke: #f2f2f2;
+  stroke-width: 2.5;
+}
+
+.logoBox {
+  fill: none;
+  stroke: #e9e9eb;
+  stroke-width: 4;
+}
+
+.logoMark {
+  fill: none;
+  stroke: #e9e9eb;
+  stroke-width: 5;
 }
 
 .boss {
   font-family: 'Arial Black', Arial, sans-serif !important;
-  font-size: 11px;
-  font-weight: 900;
-  font-style: italic;
-  fill: #f2f2f2;
+  font-size: 54px;
+  font-weight: 900 !important;
+  letter-spacing: 3px;
+  fill: #ececee;
 }
 
 .model {
   font-family: 'Arial Black', Arial, sans-serif !important;
-  font-size: 13px;
-  font-weight: 900;
-  font-style: italic;
-  fill: #f2f2f2;
+  font-size: 84px;
+  font-weight: 900 !important;
+  fill: #dcdde0;
+}
+
+.tagline {
+  font-size: 17px;
+  fill: #dcdde0;
+}
+
+.bezel {
+  fill: #0e0e10;
+  stroke: #2b2c30;
+  stroke-width: 3;
 }
 
 .rocker {
   fill: #050506;
-  stroke: #4a4c52;
-  stroke-width: 1;
 }
 
 .rockerFace {
-  fill: #1f2024;
+  fill: #2a2b2f;
 }
 
 .cosm {
-  fill: #1a1a1d;
-  stroke: #9a9da3;
-  stroke-width: 0.6;
+  fill: #0e0e10;
 }
 
 .cosmText {
-  font-size: 6px;
+  font-family: 'Arial Black', Arial, sans-serif !important;
+  font-size: 22px;
   font-style: italic;
+  font-weight: 900 !important;
   fill: #f2f2f2;
 }
 
-/* Unplugged: the display and the effect lamps go dark. */
-:global([data-power='off']) .digit,
+/* Unplugged: the display and the peak lamp go dark. */
+:global([data-power='off']) .digits,
 :global([data-power='off']) .lcdText,
 :global([data-power='off']) .peak {
-  fill-opacity: 0.08;
+  fill-opacity: 0.06;
 }
 
-:global([data-power='off']) .fxLed[data-lit] {
-  fill: #1a2233;
-  filter: none;
+:global([data-power='off']) .lcd {
+  fill: #0b0d22;
 }

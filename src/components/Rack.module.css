@@ -334,42 +334,20 @@
   padding: 3px 0;
 }
 
-/* The slotted grid vent over the Carvin: six columns of five long slots, the rack showing through. */
-.unit[data-device='grid'] {
-  --plate: linear-gradient(180deg, #121214 0%, #0b0b0c 100%);
-}
-
-.grid {
-  flex: 1;
-  align-self: stretch;
-  margin: 4% 2%;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0 2%,
-    #2b2c30 2% 14.6%,
-    transparent 14.6% 16.67%
-  );
-  mask: repeating-linear-gradient(180deg, #000 0 11%, transparent 11% 20%);
-  filter: drop-shadow(0 1px 0 rgb(255 255 255 / 0.08));
-}
-
-/* The Carvin head sits on black rack brackets, which show as a strip either side of it. */
+/* The Carvin sits back in the rack under its grid panel, all drawn edge to edge. */
 .unit[data-device='carvin'] {
-  --plate: linear-gradient(180deg, #131315 0%, #0a0a0b 100%);
+  --plate: #111113;
 }
 
-.unit[data-device='carvin'] .face {
-  /* A bracket bolt top and bottom on each side. */
-  --bolt: radial-gradient(circle, #6b6d73 0 2px, #2a2b2f 2.5px 3.5px, transparent 4px);
-  background:
-    var(--bolt) 6px 10px / 9px 9px no-repeat,
-    var(--bolt) 6px calc(100% - 10px) / 9px 9px no-repeat,
-    var(--bolt) calc(100% - 6px) 10px / 9px 9px no-repeat,
-    var(--bolt) calc(100% - 6px) calc(100% - 10px) / 9px 9px no-repeat;
+/* The GT-Pro's grey panel runs out to its rack ears. */
+.unit[data-device='gtpro'] {
+  --plate: linear-gradient(135deg, #5a5c61 0%, #64676d 60%, #575a5f 100%);
 }
 
-.unit[data-device='carvin'] .face > svg {
-  width: min(100%, calc((var(--size) * var(--u) - 12px) * 2.28));
+.unit[data-device='carvin'] .face,
+.unit[data-device='gtpro'] .face {
+  padding: 0;
+  align-items: stretch;
 }
 
 .unit[data-device='scarlett'] {

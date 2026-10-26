@@ -1,10 +1,37 @@
 /* The Carvin V3M head: grey shell, black front panel, Arial-style silkscreen. */
-.amp {
+.rack {
   display: block;
   width: 100%;
-  height: auto;
-  overflow: visible;
+  height: 100%;
+}
+
+.recess {
+  fill: #232326;
+}
+
+.shade {
+  fill: rgb(0 0 0 / 0.38);
+}
+
+.amp {
   filter: drop-shadow(0 3px 3px rgb(0 0 0 / 0.75));
+}
+
+.bracketBlock {
+  fill: #141416;
+  stroke: #36373c;
+  stroke-width: 2;
+}
+
+.gridPanel {
+  fill: #0e0e10;
+  stroke: rgb(255 255 255 / 0.08);
+  stroke-width: 2;
+}
+
+.gridEdge {
+  stroke: rgb(255 255 255 / 0.1);
+  stroke-width: 2;
 }
 
 .amp text {

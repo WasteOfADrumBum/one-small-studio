@@ -6,7 +6,7 @@ import classes from './Studio.module.css';
 const heights = gear.map((group) => group.items.reduce((sum, item) => sum + item.size, 0));
 const tallest = Math.max(...heights);
 
-/** Section 3, "The Studio": the gear, racked in three cabinets standing side by side. */
+/** Section 3, "The Studio": the gear, racked in two cabinets standing side by side. */
 export function Studio() {
   return (
     <section id="studio" className={classes.studio} aria-labelledby="studio-title">
