@@ -86,10 +86,9 @@ export const eras: Era[] = [
   {
     lane: 'Stage',
     title: 'Volunteer sound',
-    start: 2017,
+    start: 2023,
     end: 2025,
-    estimate: true,
-    body: 'Kept mixing live sound as a volunteer after the touring stopped, up until 2025.',
+    body: 'Kept mixing live sound as a volunteer from 2023 up until last year.',
   },
 ];
 
