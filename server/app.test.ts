@@ -142,14 +142,15 @@ describe('API', () => {
       expect(fetchMock).toHaveBeenCalledTimes(3);
     });
 
-    it('hides mail failures behind a generic 500', async () => {
+    it('hides mail failures behind a friendly 502, logging the cause', async () => {
       connect();
       const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
       fetchMock.mockResolvedValue(new Response('secret account detail', { status: 403 }));
       const res = await post(valid);
-      expect(res.status).toBe(500);
+      expect(res.status).toBe(502);
+      expect(res.body.error).toMatch(/try again/i);
       expect(JSON.stringify(res.body)).not.toContain('secret');
-      expect(spy).toHaveBeenCalled();
+      expect(spy).toHaveBeenCalledWith('Talkback email failed:', expect.any(Error));
     });
   });
 });
