@@ -48,6 +48,14 @@ contact.post('/', async (req, res) => {
     return res.status(429).json({ error: 'That is a lot of messages. Try again in an hour.' });
   }
 
-  await sendContactEmail({ name, email, reason, message });
+  try {
+    await sendContactEmail({ name, email, reason, message });
+  } catch (err) {
+    // Resend's answer (bad key, unverified recipient, outage) goes to Vercel's logs, not the visitor.
+    console.error('Talkback email failed:', err);
+    return res.status(502).json({
+      error: "The message didn't go through on my end. Please try again in a bit.",
+    });
+  }
   res.status(201).json({ ok: true });
 });
