@@ -1,23 +1,21 @@
-<!-- generated from .engineering/state.json (revision 3) -->
+<!-- generated from .engineering/state.json (revision 4) -->
 
 # Handoff: one-small-studio
 
 Read this, then **verify against GitHub** (branch head, open PRs, CI) before continuing. Nothing below is independently verified.
 
-- Checkpoint: revision 3, `ckpt-0003-9310334`, 2026-11-02T18:25:00Z by Claude (claude.ai project thread 'Make Studio share card image')
-- Branch: `claude/project-thread-3pyuj4` off main `9310334`; open PR #22
+- Checkpoint: revision 4, `ckpt-0004-6268635`, 2026-11-02T22:25:00Z by Claude (claude.ai project thread 'Make Studio share card image')
 - Written by: an agent commit (hand-edited by the schema; the hub CLI was not reachable)
 - Uncommitted work outside this checkpoint: **none**
 - Roadmap: [ROADMAP.md](../ROADMAP.md) · Acceptance record: [docs/release/studio-release-acceptance.md](../docs/release/studio-release-acceptance.md)
 
 ## Continue with
 
-PR #22 (share card) awaits Josh's review and merge. Otherwise the Studio release is live; next work comes from ROADMAP.md on a fresh branch off main.
+The Studio release is approved, live and its checks are owner-reported done; the new share card (PR #22) is merged. Next work comes from ROADMAP.md on a fresh branch off main.
 
 ## Unfinished
 
-- Post-release checks A and B (optional, Josh)
-- PR #22 share card: review and merge (Josh)
+_none recorded_
 
 ## Blockers
 

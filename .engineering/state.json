@@ -1,22 +1,23 @@
 {
   "stateVersion": 1,
-  "revision": 3,
-  "checkpointId": "ckpt-0003-9310334",
+  "revision": 4,
+  "checkpointId": "ckpt-0004-6268635",
   "projectId": "one-small-studio",
   "repository": "https://github.com/WasteOfADrumBum/one-small-studio",
   "hub": "https://github.com/WasteOfADrumBum/one-small-engineering",
   "recorded": {
-    "branch": "claude/project-thread-3pyuj4",
-    "commit": "9310334",
-    "recordedAt": "2026-11-02T18:25:00Z"
+    "branch": "main",
+    "commit": "6268635",
+    "recordedAt": "2026-11-02T22:25:00Z"
   },
   "development": {
     "milestone": "Studio release",
-    "activeTask": "Share card (Open Graph/Twitter image) redrawn as a rack faceplate",
-    "workingBranch": "claude/project-thread-3pyuj4",
-    "activePr": "#22",
+    "activeTask": null,
+    "workingBranch": null,
+    "activePr": null,
     "lastCompleted": [
-      "Share card: public/og-image.png redrawn from scripts/og-image/card.html (npm run og:image); twitter:* tags added; src/lib/share-card.test.ts (PR #22, open)",
+      "Share card: public/og-image.png redrawn from scripts/og-image/card.html (npm run og:image); twitter:* tags added; src/lib/share-card.test.ts (PR #22, merged as 6268635)",
+      "Owner-reported (Joshua Small, project thread, 2026-11-02 18:15 UTC): 'A and B were tested' (live headers check and screen reader check); no failures reported. Recorded in the acceptance record (PR #21)",
       "PR #19 merged as 0c958b5; CI run #69 on main green; production deployment dpl_4EpPA6p9NuYWViELPgydN18L1EVr READY, no runtime errors in its first hour (agent-observed)",
       "Owner-reported (Joshua Small, project thread, 2026-11-02 18:08 UTC): 'I accept these risks and approve the Studio release.' Recorded in docs/release/studio-release-acceptance.md",
       "Verified GitHub: main b701805, CI run #67 green, no open PRs; production deployment dpl_CGx5ftNFpkhRbt41CG7e73zW3Jd4 built from b701805",
@@ -26,7 +27,7 @@
       "Docs: docs/DEPLOYMENT.md, release evidence, acceptance record, ROADMAP.md (linked from README)"
     ],
     "inProgress": [],
-    "nextAction": "Josh reviews and merges PR #22; after deploy, re-scrape https://studio.onesmall.company/ in a share debugger to refresh cached previews"
+    "nextAction": "Future work from ROADMAP.md on a fresh branch off main; re-scrape https://studio.onesmall.company/ in a share debugger if link previews still show the old card"
   },
   "decisions": {
     "made": [
@@ -78,18 +79,17 @@
       }
     ],
     "unverifiedChanges": [
-      "Production headers (HSTS, CSP, cache-control) on the live domain: not checked (sandbox cannot reach it; Josh's check A not reported)",
-      "Real screen readers: not checked (Josh's check B not reported)",
+      "Production headers and screen reader behavior: owner-reported tested by Joshua Small (2026-11-02); not run or observed by an agent",
       "Owner-reported (Joshua Small, 2026-11-02): music plays in production; contact emails arrive",
       "New share card as rendered by Facebook/X/Slack/iMessage: not checked (sandbox cannot reach the live site)"
     ]
   },
   "handoff": {
     "lastAgent": "Claude (claude.ai project thread 'Make Studio share card image')",
-    "checkpointedAt": "2026-11-02T18:25:00Z",
-    "unfinished": ["Post-release checks A and B (optional, Josh)"],
+    "checkpointedAt": "2026-11-02T22:25:00Z",
+    "unfinished": [],
     "blockers": [],
-    "continuation": "PR #22 (share card) awaits Josh's review and merge. Otherwise the Studio release is live; next work comes from ROADMAP.md on a fresh branch off main.",
+    "continuation": "The Studio release is approved, live and its checks are owner-reported done; the new share card (PR #22) is merged. Next work comes from ROADMAP.md on a fresh branch off main.",
     "uncommittedWorkOutsideCheckpoint": "none",
     "persistedBy": "agent-commit"
   },
