@@ -15,9 +15,9 @@ Evidence: [studio-release-evidence.md](studio-release-evidence.md). Setup and ro
 | 3   | Zero axe WCAG 2.2 A/AA violations, desktop and phone | `e2e/accessibility.spec.ts`                     | Met (automated)          |
 | 4   | Music plays in production                            | Josh, project thread, 2026-11-02                | Owner-reported           |
 | 5   | Contact emails arrive                                | Josh, project thread, 2026-11-02                | Owner-reported           |
-| 6   | Production headers present after deploy              | Check A below                                   | Not reported             |
+| 6   | Production headers present after deploy              | Josh, project thread, 2026-11-02 18:15 UTC      | Owner-reported: tested   |
 | 7   | Player falls back cleanly when SoundCloud is down    | `e2e/resilience.spec.ts`                        | Met (automated, stubbed) |
-| 8   | Screen reader spot check                             | Check B below                                   | Not reported             |
+| 8   | Screen reader spot check                             | Josh, project thread, 2026-11-02 18:15 UTC      | Owner-reported: tested   |
 | 9   | Accepted risks acknowledged                          | Josh, project thread, 2026-11-02                | Owner-reported: accepted |
 | 10  | Release approval                                     | Josh, project thread, 2026-11-02                | Owner-reported: approved |
 
@@ -64,5 +64,6 @@ Released as production deployment `dpl_4EpPA6p9NuYWViELPgydN18L1EVr` (READY), bu
 `0c958b5` (merge of PR #19). Vercel reported no runtime errors in the hour after it went live
 (agent-observed, 2026-11-02).
 
-Checks A (live headers) and B (screen reader) had not been reported when Josh approved. They
-remain worth doing, and any problem they find is follow-up work, not a reopened release.
+Checks A (live headers) and B (screen reader) had not been reported when Josh approved. Josh then
+reported them in the same thread, 2026-11-02 18:15 UTC: _"A and B were tested"_. No failures were
+reported. The agent did not run or observe either check.
