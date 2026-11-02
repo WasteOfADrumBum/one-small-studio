@@ -49,6 +49,13 @@ npm run dev      # site on http://localhost:5173, API on http://localhost:3001
 
 ## Deploy
 
-Import this repo into Vercel. Every pull request gets a preview URL, and merges to `main` deploy
-to production. Secrets go in Vercel's environment variables; see `.env.example` for the names. The contact
-form needs `RESEND_API_KEY` and `CONTACT_TO` before it can send.
+Merges to `main` deploy to production on Vercel (`https://studio.onesmall.company/`); every pull
+request gets a protected preview. Setup, environment variables, security headers, monitoring and
+rollback are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). The contact form needs `RESEND_API_KEY`
+and `CONTACT_TO` in Vercel's Production environment; see `.env.example`.
+
+## Release and roadmap
+
+- Release evidence: [docs/release/studio-release-evidence.md](docs/release/studio-release-evidence.md)
+- Acceptance record for sign-off: [docs/release/studio-release-acceptance.md](docs/release/studio-release-acceptance.md)
+- Future work: [ROADMAP.md](ROADMAP.md)

@@ -1,41 +1,100 @@
 {
   "stateVersion": 1,
-  "revision": 0,
-  "checkpointId": "init-0000000",
+  "revision": 1,
+  "checkpointId": "ckpt-0001-f49229f",
   "projectId": "one-small-studio",
   "repository": "https://github.com/WasteOfADrumBum/one-small-studio",
   "hub": "https://github.com/WasteOfADrumBum/one-small-engineering",
   "recorded": {
-    "branch": "main",
-    "commit": null,
-    "recordedAt": null
+    "branch": "claude/project-thread-kuu29p",
+    "commit": "f49229f",
+    "recordedAt": "2026-11-02T17:30:00Z"
   },
   "development": {
-    "milestone": null,
-    "activeTask": null,
-    "workingBranch": null,
+    "milestone": "Studio release",
+    "activeTask": "Close the Studio release (release PR open for Joshua Small's review)",
+    "workingBranch": "claude/project-thread-kuu29p",
     "activePr": null,
-    "lastCompleted": [],
+    "lastCompleted": [
+      "Verified GitHub: main b701805, CI run #67 green, no open PRs; production deployment dpl_CGx5ftNFpkhRbt41CG7e73zW3Jd4 built from b701805",
+      "Reconciled launch (PR #13), npm audit (PR #16) and XSS/CSP (PR #17) audits; see docs/release/studio-release-evidence.md",
+      "Fixed: API 400/413 for malformed/oversized bodies; Resend and browser timeouts; player first-load watchdog; canonical/OG/robots/sitemap on studio.onesmall.company; minimatch advisory",
+      "Added: asset/API cache headers, footer privacy note, WCAG 2.2 axe + resilience/keyboard/reduced-motion e2e tests",
+      "Docs: docs/DEPLOYMENT.md, release evidence, acceptance record, ROADMAP.md (linked from README)"
+    ],
     "inProgress": [],
-    "nextAction": null
+    "nextAction": "Joshua Small reviews and merges the release PR, runs checks A-C in docs/release/studio-release-acceptance.md, and signs off there. Future work: ROADMAP.md"
   },
   "decisions": {
-    "made": [],
-    "constraints": [],
-    "unresolved": []
+    "made": [
+      "No MongoDB: contact messages are emailed through Resend (Josh, PR #14)",
+      "No admin page; content lives in code (Josh, 2026-10-26)",
+      "Canonical public address is https://studio.onesmall.company/ (agent, this release; vercel.app address is behind Vercel Authentication)"
+    ],
+    "constraints": [
+      "Free tiers only; no paid services or billing changes",
+      "No redesign, new music or commercial features in the Studio release",
+      "Any new third-party host must be added to the CSP in vercel.json",
+      "Production redeploys and release approval belong to Joshua Small",
+      "Roadmap: ROADMAP.md"
+    ],
+    "unresolved": ["Whether one-small-studio.vercel.app should be public (ROADMAP item 3)"]
   },
   "verification": {
-    "testsRun": [],
-    "unverifiedChanges": []
+    "testsRun": [
+      {
+        "command": "npm run format:check",
+        "result": "pass",
+        "at": "2026-11-02T17:30:00Z"
+      },
+      {
+        "command": "npm run lint",
+        "result": "pass",
+        "at": "2026-11-02T17:30:00Z"
+      },
+      {
+        "command": "npm run check",
+        "result": "pass",
+        "at": "2026-11-02T17:30:00Z"
+      },
+      {
+        "command": "npm test",
+        "result": "pass (45)",
+        "at": "2026-11-02T17:30:00Z"
+      },
+      {
+        "command": "npm run build",
+        "result": "pass",
+        "at": "2026-11-02T17:30:00Z"
+      },
+      {
+        "command": "npm run test:e2e",
+        "result": "pass (47 passed, 5 skipped)",
+        "at": "2026-11-02T17:30:00Z"
+      },
+      {
+        "command": "npm audit",
+        "result": "0 vulnerabilities",
+        "at": "2026-11-02T17:30:00Z"
+      }
+    ],
+    "unverifiedChanges": [
+      "Production headers (HSTS, CSP, cache-control) on the live domain: sandbox cannot reach it",
+      "Real SoundCloud and real screen readers: owner-reported playback only",
+      "Owner-reported (Joshua Small, 2026-11-02): music plays in production; contact emails arrive"
+    ]
   },
   "handoff": {
-    "lastAgent": null,
-    "checkpointedAt": null,
-    "unfinished": [],
-    "blockers": [],
-    "continuation": null,
-    "uncommittedWorkOutsideCheckpoint": "unknown",
-    "persistedBy": "github-api"
+    "lastAgent": "Claude (claude.ai project thread 'Close Studio release')",
+    "checkpointedAt": "2026-11-02T17:30:00Z",
+    "unfinished": [
+      "Release PR review/merge and production deploy (Josh)",
+      "Acceptance checks A-C and sign-off (Josh)"
+    ],
+    "blockers": ["Release approval belongs to Joshua Small"],
+    "continuation": "Read docs/release/studio-release-acceptance.md. If Josh reports a failed check, fix on a fresh branch off main. Otherwise take the next item from ROADMAP.md.",
+    "uncommittedWorkOutsideCheckpoint": "none",
+    "persistedBy": "agent-commit"
   },
   "provenance": {
     "claims": "agent_reported",

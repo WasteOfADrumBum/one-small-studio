@@ -152,5 +152,32 @@ describe('API', () => {
       expect(JSON.stringify(res.body)).not.toContain('secret');
       expect(spy).toHaveBeenCalledWith('Talkback email failed:', expect.any(Error));
     });
+
+    it('answers a stalled or unreachable Resend with the same 502', async () => {
+      connect();
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      fetchMock.mockRejectedValue(new DOMException('The operation timed out.', 'TimeoutError'));
+      const res = await post(valid);
+      expect(res.status).toBe(502);
+      expect(fetchMock.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal);
+    });
+
+    it('answers malformed JSON with a 400, not a logged crash', async () => {
+      const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const res = await request(app)
+        .post('/api/contact')
+        .set('Host', 'studio.test')
+        .set('Origin', ORIGIN)
+        .set('Content-Type', 'application/json')
+        .send('{"name": ');
+      expect(res.status).toBe(400);
+      expect(res.body).toEqual({ error: 'That request could not be read.' });
+      expect(spy).not.toHaveBeenCalled();
+    });
+
+    it('refuses a body far larger than any real message', async () => {
+      const res = await post({ ...valid, message: 'x'.repeat(20_000) });
+      expect(res.status).toBe(413);
+    });
   });
 });

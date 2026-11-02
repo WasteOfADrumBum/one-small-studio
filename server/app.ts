@@ -18,7 +18,8 @@ export const app = express();
 app.disable('x-powered-by');
 // Vercel sits in front of the function, so trust its forwarded client IP.
 app.set('trust proxy', true);
-app.use(express.json({ limit: '1mb' }));
+// A talkback message is a few kilobytes at most (see contactSchema); refuse anything far bigger.
+app.use(express.json({ limit: '16kb' }));
 
 // CSRF: JSON calls that change data must come from this site's own pages.
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -41,6 +42,12 @@ app.use('/api', (_req, res) => {
 // Express 5 forwards rejected async handlers here. It needs all four parameters to see an error handler.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+  // The body parser flags its own client errors (malformed JSON 400, too large 413); answer those
+  // as the visitor's mistake instead of logging them as a crash.
+  const status = (err as { status?: unknown })?.status;
+  if (typeof status === 'number' && status >= 400 && status < 500) {
+    return res.status(status).json({ error: 'That request could not be read.' });
+  }
   console.error(err);
   res.status(500).json({ error: 'Something went wrong on my end.' });
 });

@@ -1,9 +1,9 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from './fixtures';
 
-test('has no WCAG 2.1 AA violations axe can detect', async ({ site }) => {
+test('has no WCAG 2.2 AA violations axe can detect', async ({ site }) => {
   const results = await new AxeBuilder({ page: site })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa'])
     .analyze();
   expect(
     results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(', ')}`),
@@ -32,4 +32,20 @@ test('lets visitors pause the looping animations', async ({ site }) => {
   );
   await site.reload();
   await expect(site.locator('html')).toHaveAttribute('data-motion', 'paused');
+});
+
+test('has no WCAG 2.2 AA violations with reduced motion and SoundCloud down', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.route(/soundcloud\.com/, (r) => r.abort());
+  await page.goto('/');
+  await page
+    .getByText('SoundCloud is not answering right now.')
+    .first()
+    .waitFor({ state: 'attached' });
+  const results = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa'])
+    .analyze();
+  expect(
+    results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(', ')}`),
+  ).toEqual([]);
 });

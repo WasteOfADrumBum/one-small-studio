@@ -1,6 +1,8 @@
 import { contactReasons, type ContactInput } from '../src/lib/contact.js';
 
 const RESEND_URL = 'https://api.resend.com/emails';
+/** Give up on Resend well inside the function's time limit, so the visitor gets an answer. */
+const SEND_TIMEOUT_MS = 8000;
 
 /**
  * Where talkback messages go. All three come from Vercel's environment variables, so the inbox
@@ -38,6 +40,7 @@ export async function sendContactEmail(message: Omit<ContactInput, 'website'>): 
       subject: `Talkback: ${reason} from ${name}`,
       text: `${message.message}\n\n-- \n${name} <${message.email}>\nSent from the One Small Studio talkback form.`,
     }),
+    signal: AbortSignal.timeout(SEND_TIMEOUT_MS),
   });
   if (!res.ok) throw new Error(`Resend answered ${res.status}: ${await res.text()}`);
 }

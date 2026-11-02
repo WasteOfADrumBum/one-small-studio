@@ -5,10 +5,13 @@ import react from '@vitejs/plugin-react';
 
 /** The security headers Vercel sends (vercel.json), so `vite preview` and the e2e tests run under the same policy. */
 const vercel = JSON.parse(readFileSync(new URL('./vercel.json', import.meta.url), 'utf8')) as {
-  headers: { headers: { key: string; value: string }[] }[];
+  headers: { source: string; headers: { key: string; value: string }[] }[];
 };
 const securityHeaders = Object.fromEntries(
-  vercel.headers.flatMap((rule) => rule.headers).map((h) => [h.key, h.value]),
+  vercel.headers
+    .filter((rule) => rule.source === '/(.*)')
+    .flatMap((rule) => rule.headers)
+    .map((h) => [h.key, h.value]),
 );
 
 export default defineConfig({
