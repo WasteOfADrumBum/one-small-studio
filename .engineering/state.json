@@ -1,41 +1,93 @@
 {
   "stateVersion": 1,
-  "revision": 0,
-  "checkpointId": "init-0000000",
+  "revision": 1,
+  "checkpointId": "closeout-2026-11-02-studio",
   "projectId": "one-small-studio",
   "repository": "https://github.com/WasteOfADrumBum/one-small-studio",
   "hub": "https://github.com/WasteOfADrumBum/one-small-engineering",
   "recorded": {
     "branch": "main",
-    "commit": null,
-    "recordedAt": null
+    "commit": "b701805ef331941cb8d4869b0e2369f9d9526b2b",
+    "recordedAt": "2026-11-02T17:04:39Z"
   },
   "development": {
-    "milestone": null,
-    "activeTask": null,
-    "workingBranch": null,
+    "milestone": "1.0.0 first accepted release of the live site (scope draft awaiting owner approval)",
+    "activeTask": {
+      "id": "studio-1.0.0-acceptance",
+      "title": "Owner acceptance of Studio 1.0.0 under the hub Showcase Definition of Done"
+    },
+    "workingBranch": "claude/closeout-roadmap",
     "activePr": null,
-    "lastCompleted": [],
+    "lastCompleted": [
+      "Contact email through Resend (#14, #15), accessibility and e2e tests (#13), high npm advisories resolved (#16), CSP and security headers (#17), continuity contract (#18)",
+      "Branch claude/closeout-roadmap: docs/release-scope-1.0.0.md draft, ROADMAP.md, README rollback and release links, CI token limited to contents: read",
+      "Owner reported (Joshua Small, project chat 2026-11-02): contact emails arrive and music plays. Owner reported 2026-10-31 that documentation at d6854de looks good. Recorded as owner-reported evidence in the hub acceptance record; not gate verifications"
+    ],
     "inProgress": [],
-    "nextAction": null
+    "nextAction": "Owner: review and merge the closeout PR (approves docs/release-scope-1.0.0.md), then record gate verifications with verify:record in the hub as listed in docs/acceptance/closeout-2026-11-02.md. Future optional work is in ROADMAP.md and never reopens 1.0.0."
   },
   "decisions": {
-    "made": [],
-    "constraints": [],
-    "unresolved": []
+    "made": [
+      {
+        "id": "studio-version-1-0-0",
+        "summary": "Proposed 1.0.0 as the first release name for the site already live at studio.onesmall.company; no new features in scope. Owner approval pending.",
+        "decidedBy": "agent",
+        "humanRef": null,
+        "recordedAt": "2026-11-02T17:10:00Z"
+      }
+    ],
+    "constraints": [
+      "Release approval, tags and gate verification belong to Joshua Small.",
+      "Enhancements live in ROADMAP.md and never block or reopen an accepted release.",
+      "Secrets (RESEND_API_KEY, CONTACT_TO) stay in Vercel environment variables."
+    ],
+    "unresolved": [
+      "Owner approval of the 1.0.0 scope draft.",
+      "11 moderate dev-only advisories; production audit clean."
+    ]
   },
   "verification": {
-    "testsRun": [],
-    "unverifiedChanges": []
+    "testsRun": [
+      {
+        "command": "npm run format:check, lint, check (tsc)",
+        "result": "pass",
+        "commit": "b701805ef331941cb8d4869b0e2369f9d9526b2b",
+        "at": "2026-11-02T17:12:00Z",
+        "ciRunUrl": null
+      },
+      {
+        "command": "npm test (40 tests)",
+        "result": "pass",
+        "commit": "b701805ef331941cb8d4869b0e2369f9d9526b2b",
+        "at": "2026-11-02T17:12:00Z",
+        "ciRunUrl": null
+      },
+      {
+        "command": "npm audit --omit=dev",
+        "result": "pass",
+        "commit": "b701805ef331941cb8d4869b0e2369f9d9526b2b",
+        "at": "2026-11-02T17:00:00Z",
+        "ciRunUrl": null
+      }
+    ],
+    "unverifiedChanges": [
+      "Playwright e2e and accessibility suite not re-run locally in this session; CI runs it on the PR.",
+      "No manual keyboard, screen-reader or responsive pass recorded by the verifier yet."
+    ]
   },
   "handoff": {
-    "lastAgent": null,
-    "checkpointedAt": null,
-    "unfinished": [],
-    "blockers": [],
-    "continuation": null,
-    "uncommittedWorkOutsideCheckpoint": "unknown",
-    "persistedBy": "github-api"
+    "lastAgent": {
+      "tool": "Claude Code",
+      "model": null
+    },
+    "checkpointedAt": "2026-11-02T17:04:39Z",
+    "unfinished": ["Owner scope approval and gate verifications (hub acceptance record)."],
+    "blockers": [
+      "scope-document-missing stays open in the hub until the owner approves the scope."
+    ],
+    "continuation": "Read docs/release-scope-1.0.0.md and ROADMAP.md, then the hub acceptance record docs/acceptance/closeout-2026-11-02.md. Do not add roadmap items to 1.0.0.",
+    "uncommittedWorkOutsideCheckpoint": "none",
+    "persistedBy": "local-file"
   },
   "provenance": {
     "claims": "agent_reported",

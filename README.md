@@ -52,3 +52,18 @@ npm run dev      # site on http://localhost:5173, API on http://localhost:3001
 Import this repo into Vercel. Every pull request gets a preview URL, and merges to `main` deploy
 to production. Secrets go in Vercel's environment variables; see `.env.example` for the names. The contact
 form needs `RESEND_API_KEY` and `CONTACT_TO` before it can send.
+
+To roll back, promote the previous production deployment in Vercel (Deployments, the
+deployment, Promote to Production) or revert the merge on `main`. Production is
+[studio.onesmall.company](https://studio.onesmall.company); `one-small-studio.vercel.app` is also
+attached to the Vercel project.
+
+## Release and roadmap
+
+- Release scope: [docs/release-scope-1.0.0.md](docs/release-scope-1.0.0.md) (draft until the owner
+  approves it).
+- Future work: [ROADMAP.md](ROADMAP.md). Roadmap items are optional and never reopen a completed
+  release.
+- Release status, gates and evidence live in the
+  [One Small Engineering hub](https://github.com/WasteOfADrumBum/one-small-engineering) registry;
+  development state for agents lives in [.engineering/](.engineering/STATUS.md).
