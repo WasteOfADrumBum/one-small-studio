@@ -1,25 +1,25 @@
 # Studio release: acceptance record
 
-For Joshua Small's review. The agent has not approved anything and cannot. Each line below is
-filled in by Josh; "owner-reported" items are already recorded from his own words.
+Joshua Small's review of the Studio release. The agent has not approved anything and cannot.
+"Owner-reported" items are recorded from Josh's own words in the project thread.
 
 Evidence: [studio-release-evidence.md](studio-release-evidence.md). Setup and rollback:
 [../DEPLOYMENT.md](../DEPLOYMENT.md).
 
 ## Release gates
 
-| #   | Gate                                                 | Evidence                         | Status                   |
-| --- | ---------------------------------------------------- | -------------------------------- | ------------------------ |
-| 1   | CI green on the release PR                           | GitHub Actions                   | Pending CI               |
-| 2   | No high or critical `npm audit` advisories           | `npm audit`: 0                   | Met (automated)          |
-| 3   | Zero axe WCAG 2.2 A/AA violations, desktop and phone | `e2e/accessibility.spec.ts`      | Met (automated)          |
-| 4   | Music plays in production                            | Josh, project thread, 2026-11-02 | Owner-reported           |
-| 5   | Contact emails arrive                                | Josh, project thread, 2026-11-02 | Owner-reported           |
-| 6   | Production headers present after deploy              | Check A below                    | Open: Josh               |
-| 7   | Player falls back cleanly when SoundCloud is down    | `e2e/resilience.spec.ts`         | Met (automated, stubbed) |
-| 8   | Screen reader spot check                             | Check B below                    | Open: Josh               |
-| 9   | Accepted risks acknowledged                          | List below                       | Open: Josh               |
-| 10  | Release approval                                     | Josh's sign-off below            | Open: Josh               |
+| #   | Gate                                                 | Evidence                                        | Status                   |
+| --- | ---------------------------------------------------- | ----------------------------------------------- | ------------------------ |
+| 1   | CI green on the release PR                           | CI runs #68 (PR #19), #69 (`main` at `0c958b5`) | Met (automated)          |
+| 2   | No high or critical `npm audit` advisories           | `npm audit`: 0                                  | Met (automated)          |
+| 3   | Zero axe WCAG 2.2 A/AA violations, desktop and phone | `e2e/accessibility.spec.ts`                     | Met (automated)          |
+| 4   | Music plays in production                            | Josh, project thread, 2026-11-02                | Owner-reported           |
+| 5   | Contact emails arrive                                | Josh, project thread, 2026-11-02                | Owner-reported           |
+| 6   | Production headers present after deploy              | Check A below                                   | Not reported             |
+| 7   | Player falls back cleanly when SoundCloud is down    | `e2e/resilience.spec.ts`                        | Met (automated, stubbed) |
+| 8   | Screen reader spot check                             | Check B below                                   | Not reported             |
+| 9   | Accepted risks acknowledged                          | Josh, project thread, 2026-11-02                | Owner-reported: accepted |
+| 10  | Release approval                                     | Josh, project thread, 2026-11-02                | Owner-reported: approved |
 
 ## Checks for Josh
 
@@ -45,17 +45,24 @@ should use `studio.onesmall.company`; nothing else to do.
 
 ## Accepted risks (acknowledge or reject)
 
-- [ ] The private SoundCloud sets' secret tokens are readable in the public repo and in every
+- [x] The private SoundCloud sets' secret tokens are readable in the public repo and in every
       visitor's browser. Unavoidable while the site plays them.
-- [ ] The talkback rate limit lives in function memory and resets on cold starts; Resend's free
+- [x] The talkback rate limit lives in function memory and resets on cold starts; Resend's free
       cap of 100 a day is the backstop.
-- [ ] One 824 KB JavaScript file (about 260 KB compressed). Fine for a showcase; splitting it is on
+- [x] One 824 KB JavaScript file (about 260 KB compressed). Fine for a showcase; splitting it is on
       the roadmap.
-- [ ] No uptime alerting beyond Vercel's deployment emails and the logs (free tier only).
+- [x] No uptime alerting beyond Vercel's deployment emails and the logs (free tier only).
 
 ## Sign-off
 
-- [ ] Accepted for release, with the gates above met. Name: ________ Date: ________
+- [x] Accepted for release. Recorded from Joshua Small's own message in the project thread
+      "Close Studio release", 2026-11-02 18:08 UTC: _"I accept these risks and approve the Studio
+      release."_ The agent recorded these words and did not approve anything itself. The risk boxes
+      above are ticked on the strength of the same message.
 
-Josh can sign by ticking these boxes in a commit, or by approving the release PR with a comment
-"Accepted for release". Either way the record of approval is his, not the agent's.
+Released as production deployment `dpl_4EpPA6p9NuYWViELPgydN18L1EVr` (READY), built from `main` at
+`0c958b5` (merge of PR #19). Vercel reported no runtime errors in the hour after it went live
+(agent-observed, 2026-11-02).
+
+Checks A (live headers) and B (screen reader) had not been reported when Josh approved. They
+remain worth doing, and any problem they find is follow-up work, not a reopened release.

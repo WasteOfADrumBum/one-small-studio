@@ -11,7 +11,9 @@ Priority: **P1** worth doing next, **P2** nice to have, **P3** only if a need sh
 
 ## Release blockers
 
-None open in code. The remaining items are Josh's checks and sign-off in the acceptance record.
+None. Joshua Small approved the Studio release on 2026-11-02; see the acceptance record. Two
+post-release checks were not reported at approval and are still worth doing: live response headers
+(check A) and a screen reader pass (check B). Treat any problem they find as a P1 fix.
 
 ## Enhancements
 
