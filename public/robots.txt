@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://one-small-studio.vercel.app/sitemap.xml
+Sitemap: https://studio.onesmall.company/sitemap.xml

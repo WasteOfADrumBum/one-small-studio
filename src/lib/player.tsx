@@ -48,6 +48,9 @@ const PlayerContext = createContext<Player | null>(null);
 
 const first = releases[0];
 
+/** How long to wait for SoundCloud's widget before telling the visitor it is not answering. */
+export const WIDGET_TIMEOUT_MS = 15000;
+
 /**
  * One hidden SoundCloud widget, shared by the top transport bar, the console and the Catalog. It
  * starts with the first release loaded; picking another in the Catalog swaps the widget over to it,
@@ -132,6 +135,11 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     if (!first?.playerUrl || !frame.current) return;
     const iframe = frame.current;
     let cancelled = false;
+    // A blocked or very slow SoundCloud never sends READY: after a while, say so and offer the
+    // SoundCloud link instead of leaving the player on "Loading". A late READY still recovers.
+    later(() => {
+      if (!cancelled && loadId.current === 0 && settled.current !== 0) setStatus('error');
+    }, WIDGET_TIMEOUT_MS);
 
     loadWidgetApi()
       .then((SC) => {
@@ -183,7 +191,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     // If the widget never answers, say so instead of leaving Play greyed out.
     later(() => {
       if (thisLoad === loadId.current && settled.current !== thisLoad) setStatus('error');
-    }, 15000);
+    }, WIDGET_TIMEOUT_MS);
   };
 
   const play = useCallback((index?: number) => {

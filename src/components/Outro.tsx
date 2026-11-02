@@ -45,7 +45,21 @@ export function Outro() {
           >
             {motionPaused ? 'Play page animations' : 'Pause page animations'}
           </Button>
-          <Text size="xs" c="dimmed" mt="md">
+          <Text size="xs" c="dimmed" mt="md" maw={560} id="privacy">
+            Privacy: this site sets no cookies and runs no analytics of its own. The music plays
+            through SoundCloud&apos;s embedded player, which follows{' '}
+            <Anchor
+              href="https://soundcloud.com/pages/privacy"
+              target="_blank"
+              rel="noreferrer"
+              inherit
+            >
+              SoundCloud&apos;s privacy policy
+            </Anchor>
+            . Talkback messages are emailed to me through Resend and used only to reply. The site is
+            hosted on Vercel, which keeps standard request logs.
+          </Text>
+          <Text size="xs" c="dimmed">
             © {new Date().getFullYear()} {site.owner}
           </Text>
         </Stack>

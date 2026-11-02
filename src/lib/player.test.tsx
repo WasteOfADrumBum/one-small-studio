@@ -2,7 +2,7 @@
 import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { releases } from '@/content/releases';
-import { PlayerProvider, usePlayer } from './player';
+import { PlayerProvider, usePlayer, WIDGET_TIMEOUT_MS } from './player';
 import type { ScWidget } from './soundcloud';
 
 /** A stand-in for the SoundCloud widget, so the player can be driven without the network. */
@@ -147,6 +147,24 @@ describe('PlayerProvider', () => {
     act(() => screen.getByText('load').click());
     act(() => vi.advanceTimersByTime(15_000));
     expect(text('status')).toBe('error');
+  });
+
+  it('gives up on a first album that never answers, and recovers if it does later', async () => {
+    vi.useFakeTimers();
+    await mount();
+    expect(text('status')).toBe('loading');
+    act(() => vi.advanceTimersByTime(WIDGET_TIMEOUT_MS));
+    expect(text('status')).toBe('error');
+    act(() => fake.fire('ready'));
+    expect(text('status')).toBe('ready');
+  });
+
+  it('does not time out once the first album is ready', async () => {
+    vi.useFakeTimers();
+    await mount();
+    act(() => fake.fire('ready'));
+    act(() => vi.advanceTimersByTime(WIDGET_TIMEOUT_MS * 2));
+    expect(text('status')).toBe('ready');
   });
 
   it('reports an error when the widget does', async () => {

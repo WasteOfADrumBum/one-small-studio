@@ -36,6 +36,8 @@ export function Contact() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(parsed.data),
+        // On a stalled connection, stop waiting and say so rather than spinning forever.
+        signal: AbortSignal.timeout(20000),
       });
       if (res.ok) {
         setValues(empty);
