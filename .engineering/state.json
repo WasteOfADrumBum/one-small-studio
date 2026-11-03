@@ -1,14 +1,18 @@
 {
   "stateVersion": 1,
-  "revision": 4,
-  "checkpointId": "ckpt-0004-6268635",
+  "revision": 5,
+  "checkpointId": "ckpt-0005-contract-v1-shape",
   "projectId": "one-small-studio",
   "repository": "https://github.com/WasteOfADrumBum/one-small-studio",
   "hub": "https://github.com/WasteOfADrumBum/one-small-engineering",
+  "provenance": {
+    "claims": "agent_reported",
+    "independentVerification": "none"
+  },
   "recorded": {
     "branch": "main",
-    "commit": "6268635",
-    "recordedAt": "2026-11-02T22:25:00Z"
+    "commit": "4c46d0deacc5651235685e705bca97c9ef45cc14",
+    "recordedAt": "2026-11-02T23:10:00Z"
   },
   "development": {
     "milestone": "Studio release",
@@ -16,6 +20,7 @@
     "workingBranch": null,
     "activePr": null,
     "lastCompleted": [
+      "PR #21 merged by Joshua Small as 4c46d0d: acceptance record shows checks A (headers) and B (screen reader) as owner-reported tested",
       "Share card: public/og-image.png redrawn from scripts/og-image/card.html (npm run og:image); twitter:* tags added; src/lib/share-card.test.ts (PR #22, merged as 6268635)",
       "Owner-reported (Joshua Small, project thread, 2026-11-02 18:15 UTC): 'A and B were tested' (live headers check and screen reader check); no failures reported. Recorded in the acceptance record (PR #21)",
       "PR #19 merged as 0c958b5; CI run #69 on main green; production deployment dpl_4EpPA6p9NuYWViELPgydN18L1EVr READY, no runtime errors in its first hour (agent-observed)",
@@ -27,14 +32,38 @@
       "Docs: docs/DEPLOYMENT.md, release evidence, acceptance record, ROADMAP.md (linked from README)"
     ],
     "inProgress": [],
-    "nextAction": "Future work from ROADMAP.md on a fresh branch off main; re-scrape https://studio.onesmall.company/ in a share debugger if link previews still show the old card"
+    "nextAction": "Owner: choose the release version number. Then optional work from ROADMAP.md on a fresh branch off main."
   },
   "decisions": {
     "made": [
-      "No MongoDB: contact messages are emailed through Resend (Josh, PR #14)",
-      "No admin page; content lives in code (Josh, 2026-10-26)",
-      "Canonical public address is https://studio.onesmall.company/ (agent, this release; vercel.app address is behind Vercel Authentication)",
-      "Studio release approved by Joshua Small, 2026-11-02 (owner-reported; recorded by the agent, not approved by it)"
+      {
+        "id": "no-mongodb",
+        "summary": "No MongoDB: contact messages are emailed through Resend",
+        "decidedBy": "human",
+        "humanRef": "Joshua Small, PR #14",
+        "recordedAt": "2026-11-02T00:00:00Z"
+      },
+      {
+        "id": "no-admin-page",
+        "summary": "No admin page; content lives in code",
+        "decidedBy": "human",
+        "humanRef": "Joshua Small, 2026-10-26",
+        "recordedAt": "2026-10-26T00:00:00Z"
+      },
+      {
+        "id": "canonical-address",
+        "summary": "Canonical public address is https://studio.onesmall.company/ (the vercel.app address is behind Vercel Authentication)",
+        "decidedBy": "agent",
+        "humanRef": null,
+        "recordedAt": "2026-11-02T00:00:00Z"
+      },
+      {
+        "id": "release-approved",
+        "summary": "Studio release approved by Joshua Small (owner-reported; recorded by the agent, not approved by it)",
+        "decidedBy": "human",
+        "humanRef": "Joshua Small, project thread \"Close Studio release\", 2026-11-02 18:08 UTC",
+        "recordedAt": "2026-11-02T18:08:00Z"
+      }
     ],
     "constraints": [
       "Free tiers only; no paid services or billing changes",
@@ -43,39 +72,61 @@
       "Production redeploys and release approval belong to Joshua Small",
       "Roadmap: ROADMAP.md"
     ],
-    "unresolved": ["Whether one-small-studio.vercel.app should be public (ROADMAP item 3)"]
+    "unresolved": [
+      "Whether one-small-studio.vercel.app should be public (ROADMAP item 3)",
+      "Release version number (owner decision)"
+    ]
   },
   "verification": {
     "testsRun": [
       {
         "command": "npm run format:check",
         "result": "pass",
-        "at": "2026-11-02T18:25:00Z"
+        "commit": null,
+        "at": "2026-11-02T18:25:00Z",
+        "ciRunUrl": null
       },
       {
         "command": "npm run lint",
         "result": "pass",
-        "at": "2026-11-02T18:25:00Z"
+        "commit": null,
+        "at": "2026-11-02T18:25:00Z",
+        "ciRunUrl": null
       },
       {
         "command": "npm run check",
         "result": "pass",
-        "at": "2026-11-02T18:25:00Z"
+        "commit": null,
+        "at": "2026-11-02T18:25:00Z",
+        "ciRunUrl": null
       },
       {
-        "command": "npm test",
-        "result": "pass (47)",
-        "at": "2026-11-02T18:25:00Z"
+        "command": "npm test (47)",
+        "result": "pass",
+        "commit": null,
+        "at": "2026-11-02T18:25:00Z",
+        "ciRunUrl": null
       },
       {
         "command": "npm run build",
         "result": "pass",
-        "at": "2026-11-02T18:25:00Z"
+        "commit": null,
+        "at": "2026-11-02T18:25:00Z",
+        "ciRunUrl": null
       },
       {
-        "command": "npm run test:e2e",
-        "result": "pass (43 passed, 5 skipped)",
-        "at": "2026-11-02T18:25:00Z"
+        "command": "npm run test:e2e (43 passed, 5 skipped)",
+        "result": "pass",
+        "commit": null,
+        "at": "2026-11-02T18:25:00Z",
+        "ciRunUrl": null
+      },
+      {
+        "command": "GitHub CI on main (push)",
+        "result": "pass",
+        "commit": "4c46d0deacc5651235685e705bca97c9ef45cc14",
+        "at": "2026-11-02T22:53:00Z",
+        "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/41540926857"
       }
     ],
     "unverifiedChanges": [
@@ -85,16 +136,15 @@
     ]
   },
   "handoff": {
-    "lastAgent": "Claude (claude.ai project thread 'Make Studio share card image')",
-    "checkpointedAt": "2026-11-02T22:25:00Z",
+    "lastAgent": {
+      "tool": "Claude Code",
+      "model": null
+    },
+    "checkpointedAt": "2026-11-02T23:10:00Z",
     "unfinished": [],
-    "blockers": [],
-    "continuation": "The Studio release is approved, live and its checks are owner-reported done; the new share card (PR #22) is merged. Next work comes from ROADMAP.md on a fresh branch off main.",
+    "blockers": ["Release version number not chosen (owner)"],
+    "continuation": "The Studio release is approved, live and its checks are owner-reported done; the new share card (PR #22) is merged. Next work comes from ROADMAP.md on a fresh branch off main. Checkpoint re-recorded in the continuity contract v1 shape (the previous revision failed hub validation and showed as invalid in the hub aggregate); content carried over, nothing new claimed.",
     "uncommittedWorkOutsideCheckpoint": "none",
-    "persistedBy": "agent-commit"
-  },
-  "provenance": {
-    "claims": "agent_reported",
-    "independentVerification": "none"
+    "persistedBy": "local-file"
   }
 }
