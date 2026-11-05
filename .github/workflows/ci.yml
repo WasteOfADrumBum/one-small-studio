@@ -159,7 +159,7 @@ jobs:
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
       # Before npm ci, so the scan covers the repository and not node_modules.
       - name: Secrets in the candidate tree (gitleaks)
-        run: gitleaks dir --redact --no-banner --exit-code 1 .
+        run: gitleaks dir --config .gitleaks.toml --redact --verbose --no-banner --exit-code 1 .
       - name: Workflow syntax and expressions (actionlint)
         run: actionlint -color
       - name: Dangerous workflow patterns (zizmor)
