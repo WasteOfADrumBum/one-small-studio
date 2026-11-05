@@ -26,6 +26,12 @@ function underLimit(key: string, now = Date.now()): boolean {
 /** Forgets every sender; for tests. */
 export const resetRateLimit = () => recent.clear();
 
+/**
+ * 201 means Resend accepted the email for delivery. Whether it reached the inbox is only known
+ * in Resend's dashboard, so the API never claims more than "accepted".
+ */
+const ACCEPTED = { ok: true, delivery: 'accepted' } as const;
+
 export const contact = Router();
 
 contact.post('/', async (req, res) => {
@@ -34,8 +40,8 @@ contact.post('/', async (req, res) => {
     return res.status(400).json({ error: 'invalid', issues: parsed.error.issues });
   }
   const { name, email, reason, message, website } = parsed.data;
-  // Bots fill the hidden field; answer as if it worked so they don't adapt.
-  if (website) return res.status(201).json({ ok: true });
+  // Bots fill the hidden field; answer exactly as a real send does so they don't adapt.
+  if (website) return res.status(201).json(ACCEPTED);
 
   if (!hasMail()) {
     return res.status(503).json({ error: 'The talkback line is not connected yet.' });
@@ -57,5 +63,5 @@ contact.post('/', async (req, res) => {
       error: "The message didn't go through on my end. Please try again in a bit.",
     });
   }
-  res.status(201).json({ ok: true });
+  res.status(201).json(ACCEPTED);
 });

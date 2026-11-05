@@ -13,14 +13,21 @@
     "dev:api": "tsx watch server/dev.ts",
     "build": "vite build",
     "preview": "vite preview",
+    "preview:prod": "tsx server/preview.ts",
     "check": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test",
+    "e2e": "playwright test",
+    "test:e2e": "npm run build && playwright test --project=desktop --project=phone",
+    "test:e2e:all": "npm run build && playwright test",
     "og:image": "node scripts/og-image/render.mjs",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "budgets": "node scripts/check-budgets.mjs",
+    "smoke": "node scripts/smoke/smoke.mjs",
+    "smoke:browser": "playwright test --config playwright.smoke.config.ts",
+    "verify": "npm run format:check && npm run lint && npm run check && npm test && npm run build && npm run budgets && npm run e2e -- --project=desktop --project=phone"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

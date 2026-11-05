@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath, URL } from 'node:url';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 
 /** The security headers Vercel sends (vercel.json), so `vite preview` and the e2e tests run under the same policy. */
@@ -14,8 +14,28 @@ const securityHeaders = Object.fromEntries(
     .map((h) => [h.key, h.value]),
 );
 
+/**
+ * Writes dist/version.json with the commit the build came from, so the production smoke check can
+ * wait until the live site serves the commit that was just deployed. Vercel sets
+ * VERCEL_GIT_COMMIT_SHA during its build; CI sets GITHUB_SHA.
+ */
+function buildVersion(): Plugin {
+  const sha = process.env.VERCEL_GIT_COMMIT_SHA || process.env.GITHUB_SHA || null;
+  return {
+    name: 'oss-build-version',
+    apply: 'build',
+    generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: 'version.json',
+        source: `${JSON.stringify({ service: 'one-small-studio', commit: sha })}\n`,
+      });
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), buildVersion()],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },

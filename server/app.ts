@@ -1,4 +1,5 @@
 import express, { type NextFunction, type Request, type Response } from 'express';
+import { hasMail } from './mail.js';
 import { contact } from './routes/contact.js';
 
 const MUTATING = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
@@ -16,8 +17,10 @@ function originHost(origin: string | undefined): string | null {
 export const app = express();
 
 app.disable('x-powered-by');
-// Vercel sits in front of the function, so trust its forwarded client IP.
-app.set('trust proxy', true);
+// Vercel sits in front of the function and overwrites X-Forwarded-For with the client's address.
+// Trust exactly that one hop: with `true`, Express would believe the leftmost entry, which a
+// client can write itself to dodge the rate limit wherever a proxy appends instead of replacing.
+app.set('trust proxy', 1);
 // A talkback message is a few kilobytes at most (see contactSchema); refuse anything far bigger.
 app.use(express.json({ limit: '16kb' }));
 
@@ -30,7 +33,15 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, service: 'one-small-studio', time: new Date().toISOString() });
+  res.json({
+    ok: true,
+    service: 'one-small-studio',
+    time: new Date().toISOString(),
+    // Lets the production smoke check confirm which commit the function runs and that the talkback
+    // line has its settings, without sending a message. Says whether mail is set up, never how.
+    commit: process.env.VERCEL_GIT_COMMIT_SHA || null,
+    contact: hasMail() ? 'configured' : 'not-configured',
+  });
 });
 
 app.use('/api/contact', contact);

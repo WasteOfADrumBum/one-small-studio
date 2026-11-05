@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import { Alert, Button, Select, SimpleGrid, Textarea, TextInput } from '@mantine/core';
 import { IconCheck, IconSend } from '@tabler/icons-react';
 import { contactReasons, contactSchema, type ContactInput } from '@/lib/contact';
@@ -16,6 +16,7 @@ export function Contact() {
   const [errors, setErrors] = useState<Errors>({});
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'failed'>('idle');
   const [failure, setFailure] = useState('');
+  const form = useRef<HTMLFormElement>(null);
 
   const set = <K extends keyof ContactInput>(key: K, value: ContactInput[K]) =>
     setValues((v) => ({ ...v, [key]: value }));
@@ -27,7 +28,12 @@ export function Contact() {
       const next: Errors = {};
       for (const issue of parsed.error.issues)
         next[issue.path[0] as keyof ContactInput] ??= issue.message;
-      return setErrors(next);
+      setErrors(next);
+      // Take keyboard and screen reader users straight to the first field that needs fixing; its
+      // error is read with it through aria-describedby.
+      const first = (['name', 'email', 'message'] as const).find((k) => next[k]);
+      if (first) form.current?.querySelector<HTMLElement>(`[data-field="${first}"]`)?.focus();
+      return;
     }
     setErrors({});
     setState('sending');
@@ -90,7 +96,7 @@ export function Contact() {
               Thanks for reaching out. I&apos;ll get back to you at the email you gave.
             </Alert>
           ) : (
-            <form onSubmit={onSubmit} noValidate className={classes.form}>
+            <form ref={form} onSubmit={onSubmit} noValidate className={classes.form}>
               <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
                 <TextInput
                   label="Name"
@@ -98,6 +104,7 @@ export function Contact() {
                   onChange={(e) => set('name', e.currentTarget.value)}
                   error={errors.name}
                   autoComplete="name"
+                  data-field="name"
                   required
                 />
                 <TextInput
@@ -107,6 +114,7 @@ export function Contact() {
                   onChange={(e) => set('email', e.currentTarget.value)}
                   error={errors.email}
                   autoComplete="email"
+                  data-field="email"
                   required
                 />
                 <Select
@@ -124,6 +132,7 @@ export function Contact() {
                 error={errors.message}
                 minRows={5}
                 autosize
+                data-field="message"
                 required
               />
               {/* Honeypot for bots; people never see it. */}
