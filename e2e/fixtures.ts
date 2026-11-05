@@ -64,7 +64,10 @@ export async function stubSoundCloud(page: Page, opts: StubOptions = {}) {
   await page.route(/w\.soundcloud\.com\/player\/\?/, (r) =>
     r.fulfill({ body: '<html></html>', contentType: 'text/html' }),
   );
-  await page.route(/soundcloud\.com\/oembed/, (r) => r.fulfill({ status: 404, body: '' }));
+  await page.route(
+    (url) => url.hostname === 'soundcloud.com' && url.pathname === '/oembed',
+    (r) => r.fulfill({ status: 404, body: '' }),
+  );
 }
 
 /** Waits until the player has its tracklist. */

@@ -18,7 +18,10 @@ test('the site runs without errors when SoundCloud is unreachable, and offers th
   baseURL,
 }) => {
   const errors = watchErrors(page, baseURL!);
-  await page.route(/soundcloud\.com|sndcdn\.com/, (r) => r.abort());
+  await page.route(
+    (url) => /(^|\.)(soundcloud\.com|sndcdn\.com)$/.test(url.hostname),
+    (r) => r.abort(),
+  );
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName('One Small Studio');
   await expect(

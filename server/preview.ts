@@ -15,7 +15,7 @@
  * whatever X-Forwarded-For the test sends (Vercel overwrites it). The production smoke check
  * (scripts/smoke) covers those on the real deployment.
  */
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { installMailSink, sinkMails } from './testing/mail-sink.js';
@@ -62,10 +62,13 @@ server.use((req, res, next) =>
 // Vercel's own cache headers come from vercel.json, so keep express.static from adding its own.
 server.use(express.static(dist, { cacheControl: false, index: 'index.html', redirect: false }));
 
+// Read once at start-up: the fallback answers from memory rather than touching the disk per request.
+const indexHtml = readFileSync(`${dist}index.html`, 'utf8');
+
 server.use((req, res) => {
   const target =
     req.method === 'GET' || req.method === 'HEAD' ? rewriteFor(config, req.path) : null;
-  if (target === '/index.html') return res.sendFile(`${dist}index.html`);
+  if (target === '/index.html') return res.type('html').send(indexHtml);
   res.status(404).type('text/plain').send('The page could not be found');
 });
 

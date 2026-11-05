@@ -243,7 +243,7 @@ const summary = [
   '| --- | --- | --- | --- |',
   ...results.map(
     (r) =>
-      `| ${r.ok ? 'ok' : r.kind === 'external' ? 'warn' : '**fail**'} | ${r.kind} | ${r.name} | ${r.detail.replace(/\|/g, '\\|')} |`,
+      `| ${r.ok ? 'ok' : r.kind === 'external' ? 'warn' : '**fail**'} | ${r.kind} | ${r.name} | ${r.detail.replace(/\\/g, '\\\\').replace(/\|/g, '\\|')} |`,
   ),
 ].join('\n');
 if (process.env.GITHUB_STEP_SUMMARY)

@@ -30,7 +30,10 @@ raw.describe('when SoundCloud is unavailable', () => {
     await page.route(/w\.soundcloud\.com\/player\/\?/, (r) =>
       r.fulfill({ body: '<html></html>', contentType: 'text/html' }),
     );
-    await page.route(/soundcloud\.com\/oembed/, (r) => r.fulfill({ status: 404, body: '' }));
+    await page.route(
+      (url) => url.hostname === 'soundcloud.com' && url.pathname === '/oembed',
+      (r) => r.fulfill({ status: 404, body: '' }),
+    );
     await page.goto('/');
     const bar = page.getByRole('banner').first();
     await expect(bar.getByText(/^Loading /)).toBeVisible();
@@ -133,7 +136,10 @@ raw.describe('slow or broken SoundCloud pieces', () => {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
     await stubSoundCloud(page);
-    await page.route(/soundcloud\.com\/oembed/, (r) => r.abort());
+    await page.route(
+      (url) => url.hostname === 'soundcloud.com' && url.pathname === '/oembed',
+      (r) => r.abort(),
+    );
     await page.goto('/');
     await playerReady(page);
     const shelf = page.locator('#catalog').getByRole('list', { name: 'Releases' });
