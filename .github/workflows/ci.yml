@@ -210,26 +210,16 @@ jobs:
     needs: [static, unit, browser, cross-browser, security, codeql]
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    permissions: {}
+    permissions:
+      contents: read
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: scripts/ci
       - name: Check every job's result
         env:
           NEEDS: ${{ toJSON(needs) }}
-          EVENT: ${{ github.event_name }}
           FORK: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
-        run: |
-          node --input-type=module -e '
-            const needs = JSON.parse(process.env.NEEDS);
-            const forkPr = process.env.FORK === "true";
-            const expected = ["static", "unit", "browser", "cross-browser", "security", "codeql"];
-            let ok = true;
-            for (const job of expected) {
-              const result = needs[job]?.result ?? "missing";
-              const allowed = result === "success" || (job === "codeql" && forkPr && result === "skipped");
-              console.log(`${allowed ? "ok  " : "FAIL"} ${job}: ${result}`);
-              ok &&= allowed;
-            }
-            const extra = Object.keys(needs).filter((j) => !expected.includes(j));
-            if (extra.length) { console.log(`FAIL unexpected jobs: ${extra}`); ok = false; }
-            if (!ok) process.exit(1);
-          '
+        # The decision lives in scripts/ci/gate.mjs, unit-tested in scripts/ci/gate.test.ts.
+        run: node scripts/ci/gate.mjs

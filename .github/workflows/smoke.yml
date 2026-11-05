@@ -5,8 +5,9 @@
 # - Every six hours, as detection: it finds problems, it does not prevent them.
 # - On demand (Actions > Production smoke > Run workflow).
 #
-# It never sends a talkback message or touches SoundCloud accounts. It holds no secrets; the only
-# write permission is issues: write in the notify jobs, to open or close one tracking issue.
+# It never sends a talkback message or touches SoundCloud accounts. It uses no repository secrets,
+# only the run's own token: read-only in the smoke job, and issues: write in the notify jobs, to
+# open or close one tracking issue.
 name: Production smoke
 
 on:
@@ -62,8 +63,6 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          # Full history, so the script can tell a newer deployment from a stale one.
-          fetch-depth: 0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
@@ -72,6 +71,9 @@ jobs:
       - name: HTTP checks (pages, headers, assets, API, metadata)
         id: http
         run: npm run smoke
+        env:
+          # Read-only (contents: read): used only to ask GitHub whether a live commit is newer.
+          GH_TOKEN: ${{ github.token }}
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Browser checks
@@ -145,8 +147,10 @@ jobs:
     steps:
       - run: |
           set -euo pipefail
-          for n in $(gh issue list --label production-smoke --state open --json number,labels \
-            --jq '.[] | "\(.number) \([.labels[].name] | index("production-smoke-readiness") != null)"' | tr ' ' ':'); do
+          # Assigned first, so a failed lookup fails the step instead of looping over nothing.
+          issues=$(gh issue list --label production-smoke --state open --json number,labels \
+            --jq '.[] | "\(.number):\([.labels[].name] | index("production-smoke-readiness") != null)"')
+          for n in $issues; do
             num=${n%%:*}; readiness=${n##*:}
             if [ "$readiness" = "true" ] && [ -z "$CHECKED_SHA" ]; then
               echo "Leaving #$num open: it is about a commit not going live, and this run checked no commit."

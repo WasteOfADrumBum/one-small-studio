@@ -75,18 +75,31 @@ const assert = (cond, message) => {
 };
 
 /**
- * True when `newer` is a later commit on the same history as `older` (both validated 40-hex SHAs,
- * passed as arguments, never through a shell). Needs the history: the workflow checks out with
- * fetch-depth 0. Any git error means "cannot tell", which counts as not newer.
+ * True when `newer` is a later commit on the same history as `older` (both validated 40-hex SHAs).
+ * In the workflow this asks GitHub's compare API, which knows commits pushed after this run
+ * started; locally it asks git. Any error means "cannot tell", which counts as not newer.
  */
-const isDescendant = (older, newer) => {
+async function isDescendant(older, newer) {
+  const repo = process.env.GITHUB_REPOSITORY;
+  const token = process.env.GH_TOKEN;
+  if (repo && token) {
+    try {
+      const res = await fetch(`https://api.github.com/repos/${repo}/compare/${older}...${newer}`, {
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
+        signal: AbortSignal.timeout(15_000),
+      });
+      return res.ok && (await res.json()).status === 'ahead';
+    } catch {
+      return false;
+    }
+  }
   try {
     execFileSync('git', ['merge-base', '--is-ancestor', older, newer], { stdio: 'ignore' });
     return true;
   } catch {
     return false;
   }
-};
+}
 
 // The commit production is checked at: the expected one, or a newer deployment that replaced it
 // while this run waited (that deployment gets its own smoke run).
@@ -104,7 +117,7 @@ await check('app', 'production serves the expected commit', async () => {
         seen = String(commit);
         if (!expectedSha) return `serving ${seen}`;
         if (commit === expectedSha) return `serving ${seen}`;
-        if (/^[0-9a-f]{40}$/.test(seen) && isDescendant(expectedSha, seen)) {
+        if (/^[0-9a-f]{40}$/.test(seen) && (await isDescendant(expectedSha, seen))) {
           liveSha = seen;
           return `superseded: serving newer ${seen}, which has its own smoke run`;
         }
