@@ -26,9 +26,11 @@ on:
 
 permissions: {}
 
-# One smoke at a time; a newer deployment waits rather than racing the previous check.
+# Deployment checks queue behind each other (a newer deployment waits rather than racing the
+# previous check). Scheduled and manual runs have their own queue, so they can never replace a
+# pending deployment check.
 concurrency:
-  group: production-smoke
+  group: production-smoke-${{ github.event_name == 'deployment_status' && 'deploy' || 'other' }}
   cancel-in-progress: false
 
 jobs:
@@ -47,6 +49,8 @@ jobs:
     timeout-minutes: 20
     permissions:
       contents: read
+    outputs:
+      readiness_failed: ${{ steps.http.outputs.readiness_failed }}
     env:
       CI: 'true'
       # Fixed: the URL in the deployment event is never fetched.
@@ -58,12 +62,15 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # Full history, so the script can tell a newer deployment from a stale one.
+          fetch-depth: 0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
       - name: HTTP checks (pages, headers, assets, API, metadata)
+        id: http
         run: npm run smoke
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
@@ -81,7 +88,10 @@ jobs:
           if-no-files-found: ignore
 
   # One open issue tracks a failing production; later failures comment on it instead of opening
-  # more, so a long outage is one notification thread, not one per run.
+  # more, so a long outage is one notification thread, not one per run. When the failure is only
+  # "the merged commit never went live", the issue also gets the production-smoke-readiness label,
+  # and only a run that checked a specific commit can close it (a scheduled pass proves nothing
+  # about whether the merge went live).
   notify-failure:
     name: Open or update the smoke issue
     needs: smoke
@@ -95,22 +105,28 @@ jobs:
       GH_REPO: ${{ github.repository }}
       RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
       TRIGGER: ${{ github.event_name }}
-      SHA: ${{ github.event.deployment.sha || github.sha }}
+      SHA: ${{ github.event.deployment.sha || inputs.expected_sha || github.sha }}
+      READINESS: ${{ needs.smoke.outputs.readiness_failed }}
     steps:
       - run: |
+          set -euo pipefail
           gh label create production-smoke --color B60205 \
             --description "Production smoke check is failing" 2>/dev/null || true
+          gh label create production-smoke-readiness --color FBCA04 \
+            --description "A merged commit did not go live" 2>/dev/null || true
           body="Production smoke failed (${TRIGGER}, commit ${SHA}). Run: ${RUN_URL}"
-          open=$(gh issue list --label production-smoke --state open --json number \
-            --jq '.[0].number' 2>/dev/null || true)
+          open=$(gh issue list --label production-smoke --state open --json number --jq '.[0].number // empty')
           if [ -n "$open" ]; then
             gh issue comment "$open" --body "$body"
           else
-            gh issue create --label production-smoke \
+            open=$(gh issue create --label production-smoke \
               --title "Production smoke check is failing" \
               --body "$body
 
-          Triage: docs/ci/README.md#when-the-production-smoke-fails. This issue closes itself when a later smoke passes."
+          Triage: docs/ci/README.md#when-the-production-smoke-fails. This issue closes itself when a later smoke passes." | sed 's#.*/##')
+          fi
+          if [ "$READINESS" = "true" ]; then
+            gh issue edit "$open" --add-label production-smoke-readiness
           fi
 
   notify-recovery:
@@ -125,10 +141,16 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
       RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      CHECKED_SHA: ${{ github.event.deployment.sha || inputs.expected_sha }}
     steps:
       - run: |
-          open=$(gh issue list --label production-smoke --state open --json number \
-            --jq '.[].number' 2>/dev/null || true)
-          for n in $open; do
-            gh issue close "$n" --comment "Production smoke passed again: ${RUN_URL}"
+          set -euo pipefail
+          for n in $(gh issue list --label production-smoke --state open --json number,labels \
+            --jq '.[] | "\(.number) \([.labels[].name] | index("production-smoke-readiness") != null)"' | tr ' ' ':'); do
+            num=${n%%:*}; readiness=${n##*:}
+            if [ "$readiness" = "true" ] && [ -z "$CHECKED_SHA" ]; then
+              echo "Leaving #$num open: it is about a commit not going live, and this run checked no commit."
+              continue
+            fi
+            gh issue close "$num" --comment "Production smoke passed again: ${RUN_URL}"
           done

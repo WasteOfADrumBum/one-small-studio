@@ -11,6 +11,7 @@
  * Results are "app" checks (fail the run) or "external" checks (SoundCloud; reported as warnings,
  * because an outage there is not a broken deployment). Exit code 1 means an app check failed.
  */
+import { execFileSync } from 'node:child_process';
 import { appendFileSync } from 'node:fs';
 
 const PRODUCTION = 'https://studio.onesmall.company';
@@ -73,6 +74,24 @@ const assert = (cond, message) => {
   if (!cond) throw new Error(message);
 };
 
+/**
+ * True when `newer` is a later commit on the same history as `older` (both validated 40-hex SHAs,
+ * passed as arguments, never through a shell). Needs the history: the workflow checks out with
+ * fetch-depth 0. Any git error means "cannot tell", which counts as not newer.
+ */
+const isDescendant = (older, newer) => {
+  try {
+    execFileSync('git', ['merge-base', '--is-ancestor', older, newer], { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+// The commit production is checked at: the expected one, or a newer deployment that replaced it
+// while this run waited (that deployment gets its own smoke run).
+let liveSha = expectedSha;
+
 // 1. Readiness: production serves the expected build.
 await check('app', 'production serves the expected commit', async () => {
   const deadline = Date.now() + waitSeconds * 1000;
@@ -85,6 +104,10 @@ await check('app', 'production serves the expected commit', async () => {
         seen = String(commit);
         if (!expectedSha) return `serving ${seen}`;
         if (commit === expectedSha) return `serving ${seen}`;
+        if (/^[0-9a-f]{40}$/.test(seen) && isDescendant(expectedSha, seen)) {
+          liveSha = seen;
+          return `superseded: serving newer ${seen}, which has its own smoke run`;
+        }
       } else {
         seen = `HTTP ${res.status}`;
       }
@@ -197,8 +220,8 @@ await check('app', 'API health, commit and talkback wiring', async () => {
   const body = await res.json();
   assert(body.ok === true && body.service === 'one-small-studio', 'health body');
   if (isProduction) assert(body.contact === 'configured', `talkback ${body.contact}`);
-  if (expectedSha && body.commit !== null) {
-    assert(body.commit === expectedSha, `function runs ${body.commit}`);
+  if (liveSha && body.commit !== null) {
+    assert(body.commit === liveSha, `function runs ${body.commit}`);
   }
   return `commit ${body.commit ?? 'not reported'}, talkback ${body.contact}`;
 });
@@ -238,6 +261,11 @@ await check('external', 'SoundCloud widget script is reachable', async () => {
 
 // Report.
 const failed = results.filter((r) => !r.ok && r.kind === 'app');
+// Lets the workflow tell "the merge never went live" apart from other failures.
+if (process.env.GITHUB_OUTPUT) {
+  const readinessFailed = failed.some((r) => r.name === 'production serves the expected commit');
+  appendFileSync(process.env.GITHUB_OUTPUT, `readiness_failed=${readinessFailed}\n`);
+}
 const warned = results.filter((r) => !r.ok && r.kind === 'external');
 const summary = [
   `### Smoke check: ${base.origin}${expectedSha ? ` at ${expectedSha.slice(0, 7)}` : ''}`,

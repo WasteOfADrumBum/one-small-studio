@@ -13,9 +13,11 @@ on:
 permissions: {}
 
 concurrency:
-  group: ci-${{ github.event.pull_request.number || github.ref }}
-  # A new push to a PR makes the old run pointless. Runs on main are never cancelled: each merge
-  # commit needs its own result, because Vercel waits for it before serving that commit.
+  # PRs share one group per PR, so a new push cancels the old run. Every other run (push to main,
+  # merge queue, dispatch) gets a group of its own commit, so no run there is ever cancelled or
+  # replaced while pending: each merge commit needs its own gate result, because Vercel's
+  # Deployment Checks wait for it before serving that commit.
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:

@@ -5,6 +5,14 @@ import { defineConfig, devices } from '@playwright/test';
  * never submits the talkback form, and never presses play. No retries, so a flaky production
  * page shows up as a failure. Run: `npm run smoke:browser` (SMOKE_URL overrides the address).
  */
+// The same allowlist as scripts/smoke/smoke.mjs: production, or a local preview with SMOKE_LOCAL=1.
+const target = new URL(process.env.SMOKE_URL || 'https://studio.onesmall.company');
+const local =
+  process.env.SMOKE_LOCAL === '1' && ['localhost', '127.0.0.1'].includes(target.hostname);
+if (!local && (target.protocol !== 'https:' || target.host !== 'studio.onesmall.company')) {
+  throw new Error(`Refusing to smoke-test ${target.origin}: not a trusted production address.`);
+}
+
 export default defineConfig({
   testDir: 'scripts/smoke',
   testMatch: /\.spec\.ts$/,
@@ -14,7 +22,7 @@ export default defineConfig({
     ? [['github'], ['list'], ['html', { open: 'never', outputFolder: 'playwright-smoke-report' }]]
     : [['list']],
   use: {
-    baseURL: process.env.SMOKE_URL || 'https://studio.onesmall.company',
+    baseURL: target.origin,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },

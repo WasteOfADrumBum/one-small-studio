@@ -90,7 +90,8 @@ by `vercel[bot]`), every 6 hours, and manual dispatch with an optional commit SH
 the fixed address `https://studio.onesmall.company`; the URL in the event is never fetched, and
 the script refuses any other host.
 
-It waits (up to 10 minutes) until `/version.json` reports the expected commit, then checks: page
+It waits (up to 10 minutes) until `/version.json` reports the expected commit (or a newer commit
+on the same history, meaning a later deployment replaced it; that one gets its own run), then checks: page
 and title, security headers and HSTS, HTTP→HTTPS redirect, canonical/OG/Twitter metadata, every
 built asset's status, type and caching, robots/sitemap/share image/icon, the SPA fallback,
 `/api/health` (commit and talkback wiring), the JSON 404, an invalid talkback POST (400, rejected
@@ -104,7 +105,11 @@ App failures fail the run. SoundCloud being unreachable is an **external warning
 ### When the production smoke fails
 
 A failing run opens one issue labelled `production-smoke` (later failures comment on it; a later
-passing run closes it). GitHub notifies the repository owner of new issues by default.
+passing run closes it). When the failure is that a merged commit never went live, the issue also
+gets `production-smoke-readiness`, and only a run that checked a specific commit (a deployment
+event or a dispatch with a SHA) closes it; a scheduled pass does not. GitHub notifies the
+repository owner of new issues by default. Deployment checks and scheduled or manual runs queue
+separately, so a scheduled run can never replace a pending deployment check.
 
 1. Open the run from the issue; the job summary lists each check.
 2. App check failed right after a deploy: roll back (below), then fix forward with a PR.

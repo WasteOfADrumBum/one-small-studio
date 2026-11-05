@@ -46,7 +46,10 @@ export default defineConfig({
   webServer: {
     command: 'npx tsx server/preview.ts',
     url: 'http://localhost:4173/api/health',
-    reuseExistingServer: !CI,
+    // Never reuse a server already on the port: it could be `vite preview` proxying /api to a dev
+    // API with real Resend keys, and the talkback tests would then send real email. Only this
+    // command's server swaps the provider for the in-process sink.
+    reuseExistingServer: false,
     stdout: 'pipe',
     timeout: 30_000,
   },
