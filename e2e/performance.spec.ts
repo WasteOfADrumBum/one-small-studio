@@ -43,10 +43,10 @@ raw.describe('loading', () => {
       await page.goto('/');
       await playerReady(page);
       // Web Vitals call CLS under 0.1 good. Measured 0.021 (desktop) and 0.045 (Pixel 7) on
-    // 2026-11-05, so the gate is the published threshold rather than a tight, flaky one.
+      // 2026-11-05, so the gate is the published threshold rather than a tight, flaky one.
       const cls = await layoutShift(page);
-    console.log(`layout shift: ${cls.toFixed(4)}`);
-    expect(cls).toBeLessThan(0.1);
+      console.log(`layout shift: ${cls.toFixed(4)}`);
+      expect(cls).toBeLessThan(0.1);
     },
   );
 
