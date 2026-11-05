@@ -38,6 +38,8 @@ describe('vercel.json as the test server reads it', () => {
         .map((d) => d.trim())
         .find((d) => d.startsWith(`${name} `)) ?? '';
     expect(directive('script-src')).toBe("script-src 'self' https://w.soundcloud.com");
+    // Production keeps this; only the HTTP-only test server (server/preview.ts) drops it.
+    expect(csp.split(';').map((d) => d.trim())).toContain('upgrade-insecure-requests');
     expect(csp).not.toMatch(/unsafe-eval|'unsafe-inline'[^;]*script|\*\s|data:[^;]*script/);
     expect(directive('frame-src')).toBe('frame-src https://w.soundcloud.com');
     expect(directive('connect-src')).toBe("connect-src 'self' https://soundcloud.com");

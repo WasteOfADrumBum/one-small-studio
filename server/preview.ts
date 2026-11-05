@@ -40,7 +40,20 @@ const server = express();
 server.disable('x-powered-by');
 
 server.use((req, res, next) => {
-  res.set(headersFor(config, req.path));
+  const headers = headersFor(config, req.path);
+  // This server is plain HTTP on localhost. WebKit applies upgrade-insecure-requests even to
+  // localhost, so every asset would be rewritten to https://localhost and fail. Production keeps
+  // the directive (asserted in vercel-config.test.ts and by the production smoke); only this
+  // HTTP-only stand-in drops it, alongside HSTS, which browsers ignore over HTTP anyway.
+  const csp = headers['content-security-policy'];
+  if (csp) {
+    headers['content-security-policy'] = csp
+      .split(';')
+      .map((d) => d.trim())
+      .filter((d) => d && d !== 'upgrade-insecure-requests')
+      .join('; ');
+  }
+  res.set(headers);
   next();
 });
 

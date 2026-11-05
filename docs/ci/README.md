@@ -46,7 +46,8 @@ mail settings with dummy values so no real email can be sent even with real keys
 silently drift from the config.
 
 Known differences from production (covered by the production smoke instead): no HTTPS, HSTS or
-HTTP→HTTPS redirect; no compression; one long-lived process (Vercel's cold starts reset the
+HTTP→HTTPS redirect, and the CSP's `upgrade-insecure-requests` is dropped (WebKit would otherwise
+rewrite every localhost asset to HTTPS; the unit tests and the smoke assert production keeps it); no compression; one long-lived process (Vercel's cold starts reset the
 in-memory rate limit); the client address is whatever `X-Forwarded-For` a test sends (Vercel
 overwrites that header with the real client address).
 

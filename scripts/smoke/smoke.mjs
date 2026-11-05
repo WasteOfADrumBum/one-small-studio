@@ -117,6 +117,9 @@ await check('app', 'security headers are present', async () => {
   assert(csp.includes("frame-ancestors 'none'"), 'CSP frame-ancestors missing');
   assert(csp.includes("object-src 'none'"), 'CSP object-src missing');
   assert(!/unsafe-eval/.test(csp), 'CSP allows unsafe-eval');
+  if (base.protocol === 'https:') {
+    assert(csp.includes('upgrade-insecure-requests'), 'CSP upgrade-insecure-requests missing');
+  }
   assert(h('x-content-type-options') === 'nosniff', 'X-Content-Type-Options');
   assert(h('x-frame-options') === 'DENY', 'X-Frame-Options');
   assert(h('referrer-policy') === 'strict-origin-when-cross-origin', 'Referrer-Policy');
