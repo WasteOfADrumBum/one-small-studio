@@ -38,7 +38,13 @@ export function RecordSleeve({
       </span>
       <span className={classes.cover}>
         {artwork ? (
-          <img src={artwork} alt={`${title} cover art`} className={classes.art} />
+          <img
+            src={artwork}
+            alt={`${title} cover art`}
+            className={classes.art}
+            loading="lazy"
+            decoding="async"
+          />
         ) : (
           <span className={classes.blank}>
             <span>{title}</span>

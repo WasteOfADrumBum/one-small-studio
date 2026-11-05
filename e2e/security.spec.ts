@@ -12,7 +12,7 @@ test.describe('content security policy', () => {
     expect(headers['x-frame-options']).toBe('DENY');
   });
 
-  test('the site runs with no policy violations', async ({ page, site }) => {
+  test('the site runs with no policy violations @critical', async ({ page, site }) => {
     const violations: string[] = [];
     page.on('console', (msg) => {
       if (/Content Security Policy/i.test(msg.text())) violations.push(msg.text());
