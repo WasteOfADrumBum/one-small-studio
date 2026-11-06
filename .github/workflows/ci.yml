@@ -70,6 +70,14 @@ jobs:
     name: Build and browser tests (Chromium ${{ matrix.project }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # Playwright's own image already holds the browsers and every system library they need, so no
+    # job downloads a browser or runs apt (both hung on GitHub's runners: runs 42097707310,
+    # 42137086921, 42262920215). The tag must match @playwright/test in package.json; a unit test
+    # checks that, and the digest pins the exact image. --user 1001 is the runner's own user, which
+    # owns the workspace and lets Firefox run.
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+      options: --user 1001 --ipc=host
     permissions:
       contents: read
     strategy:
@@ -87,18 +95,6 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run budgets
-      - name: Install Chromium
-        # Browser and apt downloads have hung on GitHub's runners (runs 42097707310, 42137086921).
-        # Each attempt gets 6 minutes. Before the retry, wait (up to 2 minutes) for any apt-get the
-        # first attempt left behind, which would otherwise hold the dpkg lock. A second failure
-        # fails the job.
-        run: |
-          for attempt in 1 2; do
-            timeout 360 npx playwright install --with-deps chromium && exit 0
-            echo "::warning title=Browser install::attempt $attempt failed or timed out"
-            for _ in $(seq 24); do pgrep -x 'apt-get|dpkg' >/dev/null || break; sleep 5; done
-          done
-          exit 1
       - name: Browser, API integration and accessibility tests
         run: npm run e2e -- --project="$PROJECT"
         env:
@@ -118,16 +114,20 @@ jobs:
     name: Critical journeys (${{ matrix.project }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # Playwright's own image already holds the browsers and every system library they need, so no
+    # job downloads a browser or runs apt (both hung on GitHub's runners: runs 42097707310,
+    # 42137086921, 42262920215). The tag must match @playwright/test in package.json; a unit test
+    # checks that, and the digest pins the exact image. --user 1001 is the runner's own user, which
+    # owns the workspace and lets Firefox run.
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+      options: --user 1001 --ipc=host
     permissions:
       contents: read
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - project: firefox
-            browser: firefox
-          - project: webkit-phone
-            browser: webkit
+        project: [firefox, webkit-phone]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -138,20 +138,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - name: Install ${{ matrix.browser }}
-        # Browser and apt downloads have hung on GitHub's runners (runs 42097707310, 42137086921).
-        # Each attempt gets 6 minutes. Before the retry, wait (up to 2 minutes) for any apt-get the
-        # first attempt left behind, which would otherwise hold the dpkg lock. A second failure
-        # fails the job.
-        run: |
-          for attempt in 1 2; do
-            timeout 360 npx playwright install --with-deps "$BROWSER" && exit 0
-            echo "::warning title=Browser install::attempt $attempt failed or timed out"
-            for _ in $(seq 24); do pgrep -x 'apt-get|dpkg' >/dev/null || break; sleep 5; done
-          done
-          exit 1
-        env:
-          BROWSER: ${{ matrix.browser }}
       - name: Critical journeys
         run: npm run e2e -- --project="$PROJECT"
         env:
