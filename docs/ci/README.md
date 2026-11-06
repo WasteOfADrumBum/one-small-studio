@@ -70,10 +70,10 @@ external warning) or that audio plays on a device (manual).
 
 |                        | Before (run #79, `b017cfe`)                                | After (this PR, final run)                                               |
 | ---------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------ |
-| Wall clock             | 1m43s, one job                                             | see requirements-evidence.md                                             |
+| Wall clock             | 1m43s, one job                                             | 2m32s, nine parallel jobs (run #87)                                      |
 | Time to a lint failure | ~20s into a 1m38s job, but reported only when the job ends | static job alone                                                         |
 | Duplicate work         | `vite build` twice (CI step + Playwright webServer)        | built once per browser job (build is ~2s; moving an artifact costs more) |
-| Browser suite          | 48s incl. a rebuild                                        | see requirements-evidence.md                                             |
+| Browser suite          | 48s incl. a rebuild                                        | split into desktop and phone jobs that run side by side                  |
 
 ## Production
 

@@ -110,7 +110,7 @@ of the category in proportion. BLOCKED and FAIL earn nothing.
 
 ## Evidence
 
-Bound to PR #24 at its final head (`HEAD_SHA`, CI run [RUN_NUM](RUN_URL)) unless a row says
+Bound to PR #24 at `101b9de` (CI run [#87](https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42137739498), all jobs and gate green) unless a row says
 otherwise. Post-merge rows are filled in after the merge, in the follow-up record. "Local" means the
 agent ran it in the development container; Firefox and WebKit run only in CI.
 
@@ -157,13 +157,13 @@ agent ran it in the development container; Firefox and WebKit run only in CI.
 
 ### Timing
 
-|                        | Before (run #79, `b017cfe`)         | After (run RUN_NUM)                                                                                                     |
+|                        | Before (run #79, `b017cfe`)         | After (run #87, `101b9de`)                                                                                              |
 | ---------------------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Wall clock             | 1m43s, one job                      | WALL                                                                                                                    |
+| Wall clock             | 1m43s, one job                      | 2m32s, nine jobs in parallel                                                                                            |
 | Tests run              | 43 browser (Chromium only), 47 unit | 134 Chromium (125 run, 9 skipped by design) + 10 critical each in Firefox and WebKit, 75 unit, plus security and CodeQL |
 | Time to a lint failure | reported when the 1m38s job ends    | about 20 s (static job)                                                                                                 |
 | Duplicate build        | `vite build` twice                  | once per browser job                                                                                                    |
-| Longest job            | 1m38s                               | LONGEST                                                                                                                 |
+| Longest job            | 1m38s                               | a Chromium suite, within the 2m32s                                                                                      |
 
 The extra time buys three browsers, the real API path, accessibility states and security scans; it
 stays under the 5-minute target.
