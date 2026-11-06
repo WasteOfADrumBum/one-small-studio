@@ -1,21 +1,20 @@
-<!-- generated from .engineering/state.json (revision 6) -->
+<!-- generated from .engineering/state.json (revision 7) -->
 
 # Handoff: one-small-studio
 
 Read this, then **verify against GitHub** (branch head, open PRs, CI) before continuing. Nothing below is independently verified.
 
-- Checkpoint: revision 6, `ckpt-0006-cicd-pr24-green`, 2026-11-06T00:40:00Z by Claude Code
+- Checkpoint: revision 7, `ckpt-0007-cicd-post-merge`, 2026-11-06T18:30:00Z by Claude Code
 - Written by: a local edit that the agent then pushed; confirm the branch head matches
 - Uncommitted work outside this checkpoint: **none**
 
 ## Continue with
 
-PR #24 rebuilds CI/CD; read docs/ci/README.md and docs/ci/requirements-evidence.md. Check PR #24 state on GitHub: if merged, verify the push CI run on the merge commit, the Vercel production deployment and the Production smoke run it triggers, then record the POST rows.
+CI/CD is in place (docs/ci/README.md, docs/ci/requirements-evidence.md, score 89). Check PR #28 on GitHub: if merged, confirm the push run on main is green. The remaining points need the two owner settings in handoff.blockers.
 
 ## Unfinished
 
-- Merge and post-merge verification of PR #24
-- Follow-up record PR with POST evidence rows and checkpoint revision 7
+- Merge PR #28 and check its push run on main
 
 ## Blockers
 
@@ -30,6 +29,7 @@ PR #24 rebuilds CI/CD; read docs/ci/README.md and docs/ci/requirements-evidence.
 - [agent] Canonical public address is https://studio.onesmall.company/ (the vercel.app address is behind Vercel Authentication)
 - [human] Studio release approved by Joshua Small (owner-reported; recorded by the agent, not approved by it) (Joshua Small, project thread "Close Studio release", 2026-11-02 18:08 UTC)
 - [agent] One required check, CI / gate, decides merge and (once Deployment Checks is on) production
+- [agent] Browser CI runs inside the official Playwright image pinned by digest instead of installing browsers and apt packages per job
 
 ## Constraints
 

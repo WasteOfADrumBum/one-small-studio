@@ -1,7 +1,7 @@
 {
   "stateVersion": 1,
-  "revision": 6,
-  "checkpointId": "ckpt-0006-cicd-pr24-green",
+  "revision": 7,
+  "checkpointId": "ckpt-0007-cicd-post-merge",
   "projectId": "one-small-studio",
   "repository": "https://github.com/WasteOfADrumBum/one-small-studio",
   "hub": "https://github.com/WasteOfADrumBum/one-small-engineering",
@@ -11,28 +11,28 @@
   },
   "recorded": {
     "branch": "claude/project-thread-wp6cz1",
-    "commit": "3926a6d9e35a28e1f93183dd9439c68f110e85fb",
-    "recordedAt": "2026-11-06T00:40:00Z"
+    "commit": "c4137a8288ef20516ce59317ee84c8ff636004e3",
+    "recordedAt": "2026-11-06T18:30:00Z"
   },
   "development": {
     "milestone": "CI/CD to an evidence-backed standard",
-    "activeTask": "PR #24: rebuild CI/CD (parallel jobs + gate, Firefox/WebKit, real-API contact tests, security scans, production smoke)",
+    "activeTask": "PR #28: browser CI in the pinned Playwright image, plus the post-merge CI/CD evidence",
     "workingBranch": "claude/project-thread-wp6cz1",
-    "activePr": 24,
+    "activePr": 28,
     "lastCompleted": [
-      "PR #24 opened on claude/project-thread-wp6cz1 (fresh from main b017cfe). CI split into static, unit, Chromium desktop and phone, Firefox and WebKit critical journeys, security (gitleaks, actionlint, zizmor, npm audit, signatures), CodeQL and one gate job",
-      "Browser tests now run the real Express app over HTTP (server/preview.ts emulates vercel.json; Resend replaced by an in-process sink)",
-      "Production smoke workflow (deployment_status from vercel[bot], every 6 h, dispatch) with one tracking issue; preview events observed and correctly skipped",
-      "Independent review by a separate agent, two passes: no high findings; all medium and low findings fixed",
-      "Requirements, evidence and score: docs/ci/requirements-evidence.md; exceptions: docs/ci/exceptions.md",
+      "PR #24 merged by Joshua Small as ad79b90 (2026-11-06 17:34 UTC): parallel CI with one gate, Firefox/WebKit critical journeys, real-API browser tests, security scans, CodeQL, production smoke",
+      "Production deployment dpl_4wTowxZNhSNuX6xEPfEyiUuwTXR6 from ad79b90 READY; no runtime errors in the following hour (Vercel MCP)",
+      "Production smoke from the deployment event passed: 13 ok, 0 failed; browser 4 passed (run 42262992396). First scheduled run passed (42270297999)",
+      "Failure path observed: dispatch with a never-live SHA opened issue #29 with the readiness label (42265174080); a passing dispatch closed it (42265321855)",
+      "Push CI on ad79b90: attempt 1 failed in Install Chromium (apt hung, no test ran), attempt 2 green (42262920215)",
+      "PR #28: browser, cross-browser and smoke jobs run in mcr.microsoft.com/playwright:v1.63.0-noble pinned by digest; scripts/ci/playwright-image.test.ts keeps it matched to package.json; CI green (42265165091)",
+      "Score recorded in docs/ci/requirements-evidence.md: 89/100; remaining 11 are two owner settings",
       "PR #21 merged by Joshua Small as 4c46d0d: acceptance record shows checks A (headers) and B (screen reader) as owner-reported tested",
       "Share card: public/og-image.png redrawn from scripts/og-image/card.html (npm run og:image); twitter:* tags added; src/lib/share-card.test.ts (PR #22, merged as 6268635)",
       "Owner-reported (Joshua Small, project thread, 2026-11-02 18:15 UTC): 'A and B were tested' (live headers check and screen reader check); no failures reported. Recorded in the acceptance record (PR #21)"
     ],
-    "inProgress": [
-      "Merge PR #24 once the gate is green, then verify the push run on main, the Vercel production deployment and the production smoke, and test the failure issue once"
-    ],
-    "nextAction": "Merge PR #24 after its gate passes; then post-merge verification and a follow-up record PR (docs/ci/requirements-evidence.md POST rows, checkpoint revision 7). Owner: turn on Vercel Deployment Checks for gate and add a main ruleset (docs/ci/README.md)."
+    "inProgress": ["PR #28 waiting for its gate on the evidence commit, then merge"],
+    "nextAction": "Merge PR #28 after its gate passes; check its push run on main. Owner: turn on Vercel Deployment Checks for gate and add a main ruleset (docs/ci/README.md)."
   },
   "decisions": {
     "made": [
@@ -70,6 +70,13 @@
         "decidedBy": "agent",
         "humanRef": null,
         "recordedAt": "2026-11-05T19:30:00Z"
+      },
+      {
+        "id": "playwright-image",
+        "summary": "Browser CI runs inside the official Playwright image pinned by digest instead of installing browsers and apt packages per job",
+        "decidedBy": "agent",
+        "humanRef": null,
+        "recordedAt": "2026-11-06T17:47:00Z"
       }
     ],
     "constraints": [
@@ -88,44 +95,64 @@
   "verification": {
     "testsRun": [
       {
-        "command": "npm run format:check && npm run lint && npm run check",
+        "command": "npm run format:check (prettier) && npm run lint && tsc --noEmit",
         "result": "pass",
-        "commit": null,
-        "at": "2026-11-06T00:30:00Z",
+        "commit": "1f8a7e74162040401ab90f867c46022af5a2673d",
+        "at": "2026-11-06T17:47:00Z",
         "ciRunUrl": null
       },
       {
-        "command": "npm test (75)",
+        "command": "vitest run scripts/ci (10, incl. playwright-image)",
         "result": "pass",
-        "commit": null,
-        "at": "2026-11-06T00:30:00Z",
+        "commit": "1f8a7e74162040401ab90f867c46022af5a2673d",
+        "at": "2026-11-06T17:47:26Z",
         "ciRunUrl": null
       },
       {
-        "command": "Playwright Chromium desktop + phone (125 passed, 9 skipped), local",
+        "command": "GitHub CI on PR #28 (all jobs + gate)",
         "result": "pass",
-        "commit": null,
-        "at": "2026-11-05T19:40:00Z",
-        "ciRunUrl": null
+        "commit": "1f8a7e74162040401ab90f867c46022af5a2673d",
+        "at": "2026-11-06T17:52:47Z",
+        "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42265165091"
       },
       {
-        "command": "npm run smoke and smoke:browser against local server/preview.ts",
-        "result": "pass (11 ok, 1 external warning; 4 browser)",
-        "commit": null,
-        "at": "2026-11-06T00:15:00Z",
-        "ciRunUrl": null
+        "command": "GitHub CI push on main ad79b90",
+        "result": "attempt 1 fail (browser install), attempt 2 pass",
+        "commit": "ad79b90a0d44c4f79d9396ff07b063892d6310f3",
+        "at": "2026-11-06T17:58:00Z",
+        "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42262920215"
       },
       {
-        "command": "GitHub CI on PR #24 (all jobs + gate)",
+        "command": "Production smoke (deployment_status)",
+        "result": "pass (13 ok; 4 browser)",
+        "commit": "ad79b90a0d44c4f79d9396ff07b063892d6310f3",
+        "at": "2026-11-06T17:37:28Z",
+        "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42262992396"
+      },
+      {
+        "command": "Production smoke (dispatch, never-live SHA, expected failure)",
+        "result": "fail as intended; issue #29 opened",
+        "commit": "ad79b90a0d44c4f79d9396ff07b063892d6310f3",
+        "at": "2026-11-06T17:50:16Z",
+        "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42265174080"
+      },
+      {
+        "command": "Production smoke (dispatch, ad79b90)",
+        "result": "pass; issue #29 closed",
+        "commit": "ad79b90a0d44c4f79d9396ff07b063892d6310f3",
+        "at": "2026-11-06T17:51:41Z",
+        "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42265321855"
+      },
+      {
+        "command": "Production smoke (schedule)",
         "result": "pass",
-        "commit": "eb6e3555345352f8658d70b27b2e2410ba36fba3",
-        "at": "2026-11-06T00:26:39Z",
-        "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42136248751"
+        "commit": "ad79b90a0d44c4f79d9396ff07b063892d6310f3",
+        "at": "2026-11-06T18:24:00Z",
+        "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42270297999"
       }
     ],
     "unverifiedChanges": [
-      "Production smoke has not yet run against production (sandbox cannot reach the site; first run comes from the merge deployment)",
-      "Failure-issue notification path not yet observed",
+      "Email delivery of the smoke issue depends on the owner's GitHub notification settings; only the issue itself was observed",
       "Firefox and WebKit run only in CI; not run locally",
       "Production headers and screen reader behavior: owner-reported tested by Joshua Small (2026-11-02); not run or observed by an agent",
       "Owner-reported (Joshua Small, 2026-11-02): music plays in production; contact emails arrive"
@@ -136,17 +163,14 @@
       "tool": "Claude Code",
       "model": null
     },
-    "checkpointedAt": "2026-11-06T00:40:00Z",
-    "unfinished": [
-      "Merge and post-merge verification of PR #24",
-      "Follow-up record PR with POST evidence rows and checkpoint revision 7"
-    ],
+    "checkpointedAt": "2026-11-06T18:30:00Z",
+    "unfinished": ["Merge PR #28 and check its push run on main"],
     "blockers": [
       "Vercel Deployment Checks for gate: dashboard-only, owner (B1)",
       "main ruleset (require PR + gate, block force push/deletion): no tool in this environment can create it, owner (E1, E2)",
       "Release version number not chosen (owner)"
     ],
-    "continuation": "PR #24 rebuilds CI/CD; read docs/ci/README.md and docs/ci/requirements-evidence.md. Check PR #24 state on GitHub: if merged, verify the push CI run on the merge commit, the Vercel production deployment and the Production smoke run it triggers, then record the POST rows.",
+    "continuation": "CI/CD is in place (docs/ci/README.md, docs/ci/requirements-evidence.md, score 89). Check PR #28 on GitHub: if merged, confirm the push run on main is green. The remaining points need the two owner settings in handoff.blockers.",
     "uncommittedWorkOutsideCheckpoint": "none",
     "persistedBy": "local-file"
   }
