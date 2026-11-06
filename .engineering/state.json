@@ -25,14 +25,14 @@
       "Production smoke from the deployment event passed: 13 ok, 0 failed; browser 4 passed (run 42262992396). First scheduled run passed (42270297999)",
       "Failure path observed: dispatch with a never-live SHA opened issue #29 with the readiness label (42265174080); a passing dispatch closed it (42265321855)",
       "Push CI on ad79b90: attempt 1 failed in Install Chromium (apt hung, no test ran), attempt 2 green (42262920215)",
-      "PR #28: browser, cross-browser and smoke jobs run in mcr.microsoft.com/playwright:v1.63.0-noble pinned by digest; scripts/ci/playwright-image.test.ts keeps it matched to package.json; CI green (42265165091)",
+      "PR #28: browser, cross-browser and smoke jobs run in mcr.microsoft.com/playwright:v1.63.0-noble pinned by digest; scripts/ci/playwright-image.test.ts keeps it matched to package.json. CI jobs green in the container (42265165091); smoke job green in the container from a dispatch on the PR branch against production (42270867413)",
       "Score recorded in docs/ci/requirements-evidence.md: 89/100; remaining 11 are two owner settings",
       "PR #21 merged by Joshua Small as 4c46d0d: acceptance record shows checks A (headers) and B (screen reader) as owner-reported tested",
       "Share card: public/og-image.png redrawn from scripts/og-image/card.html (npm run og:image); twitter:* tags added; src/lib/share-card.test.ts (PR #22, merged as 6268635)",
       "Owner-reported (Joshua Small, project thread, 2026-11-02 18:15 UTC): 'A and B were tested' (live headers check and screen reader check); no failures reported. Recorded in the acceptance record (PR #21)"
     ],
     "inProgress": ["PR #28 waiting for its gate on the evidence commit, then merge"],
-    "nextAction": "Merge PR #28 after its gate passes; check its push run on main. Owner: turn on Vercel Deployment Checks for gate and add a main ruleset (docs/ci/README.md)."
+    "nextAction": "Merge PR #28 after its gate passes; check its push run on main and the deployment smoke. Owner: turn on Vercel Deployment Checks for gate and add a main ruleset (docs/ci/README.md)."
   },
   "decisions": {
     "made": [
@@ -149,6 +149,13 @@
         "commit": "ad79b90a0d44c4f79d9396ff07b063892d6310f3",
         "at": "2026-11-06T18:24:00Z",
         "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42270297999"
+      },
+      {
+        "command": "Production smoke (dispatch from PR #28 branch, inside the Playwright container)",
+        "result": "pass",
+        "commit": "9ad513aebf6607d2e259496f380f6dd40b2ec6a8",
+        "at": "2026-11-06T18:28:31Z",
+        "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42270867413"
       }
     ],
     "unverifiedChanges": [
@@ -164,13 +171,15 @@
       "model": null
     },
     "checkpointedAt": "2026-11-06T18:30:00Z",
-    "unfinished": ["Merge PR #28 and check its push run on main"],
+    "unfinished": [
+      "Merge PR #28, then check its push run on main and the first Production smoke run from the merge deployment"
+    ],
     "blockers": [
       "Vercel Deployment Checks for gate: dashboard-only, owner (B1)",
       "main ruleset (require PR + gate, block force push/deletion): no tool in this environment can create it, owner (E1, E2)",
       "Release version number not chosen (owner)"
     ],
-    "continuation": "CI/CD is in place (docs/ci/README.md, docs/ci/requirements-evidence.md, score 89). Check PR #28 on GitHub: if merged, confirm the push run on main is green. The remaining points need the two owner settings in handoff.blockers.",
+    "continuation": "CI/CD is in place (docs/ci/README.md, docs/ci/requirements-evidence.md, score 89). Check PR #28 on GitHub: if merged, confirm the push run on main and the Production smoke run from that deployment are green. The remaining points need the two owner settings in handoff.blockers.",
     "uncommittedWorkOutsideCheckpoint": "none",
     "persistedBy": "local-file"
   }

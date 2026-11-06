@@ -10,11 +10,11 @@ Read this, then **verify against GitHub** (branch head, open PRs, CI) before con
 
 ## Continue with
 
-CI/CD is in place (docs/ci/README.md, docs/ci/requirements-evidence.md, score 89). Check PR #28 on GitHub: if merged, confirm the push run on main is green. The remaining points need the two owner settings in handoff.blockers.
+CI/CD is in place (docs/ci/README.md, docs/ci/requirements-evidence.md, score 89). Check PR #28 on GitHub: if merged, confirm the push run on main and the Production smoke run from that deployment are green. The remaining points need the two owner settings in handoff.blockers.
 
 ## Unfinished
 
-- Merge PR #28 and check its push run on main
+- Merge PR #28, then check its push run on main and the first Production smoke run from the merge deployment
 
 ## Blockers
 

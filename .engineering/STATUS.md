@@ -12,7 +12,7 @@ All values are **agent-reported**, not independently verified. Check GitHub befo
 
 ## Next action
 
-Merge PR #28 after its gate passes; check its push run on main. Owner: turn on Vercel Deployment Checks for gate and add a main ruleset (docs/ci/README.md).
+Merge PR #28 after its gate passes; check its push run on main and the deployment smoke. Owner: turn on Vercel Deployment Checks for gate and add a main ruleset (docs/ci/README.md).
 
 ## Completed
 
@@ -21,7 +21,7 @@ Merge PR #28 after its gate passes; check its push run on main. Owner: turn on V
 - Production smoke from the deployment event passed: 13 ok, 0 failed; browser 4 passed (run 42262992396). First scheduled run passed (42270297999)
 - Failure path observed: dispatch with a never-live SHA opened issue #29 with the readiness label (42265174080); a passing dispatch closed it (42265321855)
 - Push CI on ad79b90: attempt 1 failed in Install Chromium (apt hung, no test ran), attempt 2 green (42262920215)
-- PR #28: browser, cross-browser and smoke jobs run in mcr.microsoft.com/playwright:v1.63.0-noble pinned by digest; scripts/ci/playwright-image.test.ts keeps it matched to package.json; CI green (42265165091)
+- PR #28: browser, cross-browser and smoke jobs run in mcr.microsoft.com/playwright:v1.63.0-noble pinned by digest; scripts/ci/playwright-image.test.ts keeps it matched to package.json. CI jobs green in the container (42265165091); smoke job green in the container from a dispatch on the PR branch against production (42270867413)
 - Score recorded in docs/ci/requirements-evidence.md: 89/100; remaining 11 are two owner settings
 - PR #21 merged by Joshua Small as 4c46d0d: acceptance record shows checks A (headers) and B (screen reader) as owner-reported tested
 - Share card: public/og-image.png redrawn from scripts/og-image/card.html (npm run og:image); twitter:* tags added; src/lib/share-card.test.ts (PR #22, merged as 6268635)
@@ -41,6 +41,7 @@ Merge PR #28 after its gate passes; check its push run on main. Owner: turn on V
 - `Production smoke (dispatch, never-live SHA, expected failure)`: fail as intended; issue #29 opened at `ad79b90`, 2026-11-06T17:50:16Z
 - `Production smoke (dispatch, ad79b90)`: pass; issue #29 closed at `ad79b90`, 2026-11-06T17:51:41Z
 - `Production smoke (schedule)`: pass at `ad79b90`, 2026-11-06T18:24:00Z
+- `Production smoke (dispatch from PR #28 branch, inside the Playwright container)`: pass at `9ad513a`, 2026-11-06T18:28:31Z
 
 ## Unverified changes
 
