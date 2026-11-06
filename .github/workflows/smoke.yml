@@ -75,7 +75,14 @@ jobs:
           # Read-only (contents: read): used only to ask GitHub whether a live commit is newer.
           GH_TOKEN: ${{ github.token }}
       - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+        # The browser download has hung for 15 minutes on GitHub's runners. Each
+        # attempt gets 4 minutes and there is one retry; a second failure fails the job.
+        run: |
+          for attempt in 1 2; do
+            timeout 240 npx playwright install --with-deps chromium && exit 0
+            echo "::warning title=Browser install::attempt $attempt failed or timed out"
+          done
+          exit 1
       - name: Browser checks
         run: npm run smoke:browser
       - name: Keep the report and traces

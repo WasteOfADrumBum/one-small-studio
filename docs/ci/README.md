@@ -57,6 +57,8 @@ external warning) or that audio plays on a device (manual).
 
 ### Flakes, retries and diagnostics
 
+- Browser downloads (infrastructure, not tests) get 4 minutes and one retry, with a warning on
+  the run; a download once hung for 15 minutes and cancelled both cross-browser jobs.
 - CI retries a failed test once to classify it, and `failOnFlakyTests` fails the run when a test
   only passed on retry. Flakes are reported, never absorbed.
 - On failure the job uploads `playwright-report/` and `test-results/` (traces, screenshots, error

@@ -84,7 +84,14 @@ jobs:
       - run: npm run build
       - run: npm run budgets
       - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+        # The browser download has hung for 15 minutes on GitHub's runners (run 42097707310). Each
+        # attempt gets 4 minutes and there is one retry; a second failure fails the job.
+        run: |
+          for attempt in 1 2; do
+            timeout 240 npx playwright install --with-deps chromium && exit 0
+            echo "::warning title=Browser install::attempt $attempt failed or timed out"
+          done
+          exit 1
       - name: Browser, API integration and accessibility tests
         run: npm run e2e -- --project=desktop --project=phone
       - name: Keep the report, traces and screenshots
@@ -123,7 +130,14 @@ jobs:
       - run: npm ci
       - run: npm run build
       - name: Install ${{ matrix.browser }}
-        run: npx playwright install --with-deps "$BROWSER"
+        # The browser download has hung for 15 minutes on GitHub's runners (run 42097707310). Each
+        # attempt gets 4 minutes and there is one retry; a second failure fails the job.
+        run: |
+          for attempt in 1 2; do
+            timeout 240 npx playwright install --with-deps "$BROWSER" && exit 0
+            echo "::warning title=Browser install::attempt $attempt failed or timed out"
+          done
+          exit 1
         env:
           BROWSER: ${{ matrix.browser }}
       - name: Critical journeys
