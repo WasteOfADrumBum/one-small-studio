@@ -69,7 +69,7 @@ jobs:
   browser:
     name: Build and browser tests (Chromium ${{ matrix.project }})
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     permissions:
       contents: read
     strategy:
@@ -88,12 +88,15 @@ jobs:
       - run: npm run build
       - run: npm run budgets
       - name: Install Chromium
-        # The browser download has hung for 15 minutes on GitHub's runners (run 42097707310). Each
-        # attempt gets 4 minutes and there is one retry; a second failure fails the job.
+        # Browser and apt downloads have hung on GitHub's runners (runs 42097707310, 42137086921).
+        # Each attempt gets 6 minutes. Before the retry, wait (up to 2 minutes) for any apt-get the
+        # first attempt left behind, which would otherwise hold the dpkg lock. A second failure
+        # fails the job.
         run: |
           for attempt in 1 2; do
-            timeout 240 npx playwright install --with-deps chromium && exit 0
+            timeout 360 npx playwright install --with-deps chromium && exit 0
             echo "::warning title=Browser install::attempt $attempt failed or timed out"
+            for _ in $(seq 24); do pgrep -x 'apt-get|dpkg' >/dev/null || break; sleep 5; done
           done
           exit 1
       - name: Browser, API integration and accessibility tests
@@ -114,7 +117,7 @@ jobs:
   cross-browser:
     name: Critical journeys (${{ matrix.project }})
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     permissions:
       contents: read
     strategy:
@@ -136,12 +139,15 @@ jobs:
       - run: npm ci
       - run: npm run build
       - name: Install ${{ matrix.browser }}
-        # The browser download has hung for 15 minutes on GitHub's runners (run 42097707310). Each
-        # attempt gets 4 minutes and there is one retry; a second failure fails the job.
+        # Browser and apt downloads have hung on GitHub's runners (runs 42097707310, 42137086921).
+        # Each attempt gets 6 minutes. Before the retry, wait (up to 2 minutes) for any apt-get the
+        # first attempt left behind, which would otherwise hold the dpkg lock. A second failure
+        # fails the job.
         run: |
           for attempt in 1 2; do
-            timeout 240 npx playwright install --with-deps "$BROWSER" && exit 0
+            timeout 360 npx playwright install --with-deps "$BROWSER" && exit 0
             echo "::warning title=Browser install::attempt $attempt failed or timed out"
+            for _ in $(seq 24); do pgrep -x 'apt-get|dpkg' >/dev/null || break; sleep 5; done
           done
           exit 1
         env:
