@@ -1,20 +1,20 @@
-<!-- generated from .engineering/state.json (revision 7) -->
+<!-- generated from .engineering/state.json (revision 8) -->
 
 # Handoff: one-small-studio
 
 Read this, then **verify against GitHub** (branch head, open PRs, CI) before continuing. Nothing below is independently verified.
 
-- Checkpoint: revision 7, `ckpt-0007-cicd-post-merge`, 2026-11-06T18:30:00Z by Claude Code
+- Checkpoint: revision 8, `ckpt-0008-timeline-condense`, 2026-11-06T23:45:00Z by Claude Code
 - Written by: a local edit that the agent then pushed; confirm the branch head matches
 - Uncommitted work outside this checkpoint: **none**
 
 ## Continue with
 
-CI/CD is in place (docs/ci/README.md, docs/ci/requirements-evidence.md, score 89). Check PR #28 on GitHub: if merged, confirm the push run on main and the Production smoke run from that deployment are green. The remaining points need the two owner settings in handoff.blockers.
+Check PR #30 on GitHub: CI gate, then Joshua Small's feedback on the phone timeline. Desktop/ultrawide must stay pixel-identical. Owner settings in handoff.blockers still apply.
 
 ## Unfinished
 
-- Merge PR #28, then check its push run on main and the first Production smoke run from the merge deployment
+- PR #30 waiting for CI gate and Joshua Small's review of the condensed phone timeline
 
 ## Blockers
 

@@ -796,11 +796,6 @@
     padding: 5px 6px;
   }
 
-  .navButton {
-    min-height: 32px;
-    padding: 0 8px;
-  }
-
   .navLabel {
     position: absolute;
     width: 1px;
@@ -812,20 +807,16 @@
 
   .counter {
     margin-left: auto;
-    padding: 3px 8px;
   }
 
   .counter[data-kind='selection'] {
     display: none;
   }
 
-  .counterValue {
-    font-size: 0.95rem;
-  }
-
   .trackHead {
     grid-template-columns: 5px 1fr;
     column-gap: 6px;
+    row-gap: 1px;
   }
 
   .trackNum {
@@ -834,12 +825,98 @@
 
   .trackName {
     grid-column: 2;
-    font-size: 0.8rem;
+    font-size: 0.74rem;
   }
 
   .trackState {
     grid-column: 2;
+    font-size: 0.5rem;
+  }
+
+  /*
+   * The phone's 16:9 screen is only a few hundred pixels tall, so the transport, ruler and tracks
+   * all run condensed and more of the story fits on screen at once.
+   */
+  .window {
+    --ruler-h: 36px;
+    --row-min: 30px;
+    --row-max: 40px;
+  }
+
+  .toolbar {
+    padding: 3px 6px;
+  }
+
+  .navButton {
+    min-height: 24px;
+    padding: 0 6px;
+  }
+
+  .counter {
+    gap: 6px;
+    padding: 1px 7px;
+  }
+
+  .counterLabel {
     font-size: 0.55rem;
+  }
+
+  .counterValue {
+    font-size: 0.82rem;
+  }
+
+  .corner {
+    font-size: 0.56rem;
+  }
+
+  .decades {
+    height: 14px;
+  }
+
+  .decades span {
+    top: 2px;
+    bottom: 2px;
+    padding: 0 6px;
+    font-size: 0.56rem;
+    line-height: 10px;
+  }
+
+  .years {
+    height: 21px;
+  }
+
+  .years span {
+    padding-top: 5px;
+    background-size: 100% 5px;
+    font-size: 0.6rem;
+  }
+
+  .selectionBand {
+    height: 3px;
+  }
+
+  .playhead {
+    top: 14px;
+  }
+
+  .playhead::before {
+    left: -4px;
+    border-width: 5px;
+    border-top-width: 7px;
+  }
+
+  .clip {
+    top: calc(var(--ruler-h) + var(--r) * var(--row-h) + 4px);
+    height: calc(var(--row-h) - 8px);
+  }
+
+  .clipName {
+    padding: 1px 6px;
+    font-size: 0.68rem;
+  }
+
+  .clipYears {
+    font-size: 0.56rem;
   }
 }
 
