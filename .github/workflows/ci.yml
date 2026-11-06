@@ -63,15 +63,19 @@ jobs:
       - run: npm ci
       - run: npm test
 
-  # Build once, check the budgets, then test that same dist/ in Chromium on desktop and a phone
-  # profile. The build takes about 2 s, so the other browser job builds for itself rather than
-  # paying more than that to move an artifact between jobs.
+  # Each job builds once, checks the budgets, then runs the full suite against that same dist/ in
+  # Chromium, one job per profile so the two halves run side by side. The build takes about 2 s, so
+  # each job builds for itself rather than paying more than that to move an artifact between jobs.
   browser:
-    name: Build and browser tests (Chromium)
+    name: Build and browser tests (Chromium ${{ matrix.project }})
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [desktop, phone]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -93,12 +97,14 @@ jobs:
           done
           exit 1
       - name: Browser, API integration and accessibility tests
-        run: npm run e2e -- --project=desktop --project=phone
+        run: npm run e2e -- --project="$PROJECT"
+        env:
+          PROJECT: ${{ matrix.project }}
       - name: Keep the report, traces and screenshots
         if: ${{ failure() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: playwright-chromium-${{ github.run_attempt }}
+          name: playwright-chromium-${{ matrix.project }}-${{ github.run_attempt }}
           path: |
             playwright-report/
             test-results/
