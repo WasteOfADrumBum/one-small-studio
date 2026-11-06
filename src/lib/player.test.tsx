@@ -53,6 +53,7 @@ function Probe() {
       <button onClick={() => p.play(2)}>skip</button>
       <button onClick={() => p.setVolume(140)}>loud</button>
       <button onClick={() => p.loadAlbum(releases[1].id, true)}>load</button>
+      <button onClick={() => p.loadAlbum(releases[2].id)}>load third</button>
     </div>
   );
 }
@@ -171,5 +172,40 @@ describe('PlayerProvider', () => {
     await mount();
     act(() => fake.fire('error'));
     expect(text('status')).toBe('error');
+  });
+
+  it('ignores a slow answer for an album the visitor has already left', async () => {
+    await mount();
+    act(() => fake.fire('ready'));
+    act(() => screen.getByText('load').click());
+    act(() => screen.getByText('load third').click());
+    const [first, second] = fake.widget.load.mock.calls.map(
+      (c) => c[1] as { callback: () => void },
+    );
+    // The second album answers first, then the first album's late callback arrives.
+    act(() => second.callback());
+    expect(text('album')).toBe(releases[2].id);
+    expect(text('status')).toBe('ready');
+    act(() => first.callback());
+    expect(text('album')).toBe(releases[2].id);
+    // The abandoned album asked to autoplay; its late answer must not start sound.
+    expect(fake.widget.play).not.toHaveBeenCalled();
+  });
+
+  it('takes its listeners off the widget when it unmounts', async () => {
+    await mount();
+    const bound = fake.widget.bind.mock.calls.map(([event]) => event).sort();
+    expect(bound).toEqual(['error', 'finish', 'pause', 'play', 'progress', 'ready']);
+    cleanup();
+    const unbound = fake.widget.unbind.mock.calls.map(([event]) => event).sort();
+    expect(unbound).toEqual(bound);
+  });
+
+  it('never times out into an error after it has unmounted', async () => {
+    vi.useFakeTimers();
+    await mount();
+    cleanup();
+    expect(() => vi.advanceTimersByTime(WIDGET_TIMEOUT_MS * 2)).not.toThrow();
+    expect(vi.getTimerCount()).toBe(0);
   });
 });

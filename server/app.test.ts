@@ -44,6 +44,22 @@ describe('API', () => {
     expect(res.headers['x-powered-by']).toBeUndefined();
   });
 
+  it('reports the running commit and whether the talkback line is wired, never its settings', async () => {
+    expect((await request(app).get('/api/health')).body).toMatchObject({
+      commit: null,
+      contact: 'not-configured',
+    });
+    connect();
+    process.env.VERCEL_GIT_COMMIT_SHA = 'a'.repeat(40);
+    try {
+      const res = await request(app).get('/api/health');
+      expect(res.body).toMatchObject({ commit: 'a'.repeat(40), contact: 'configured' });
+      expect(JSON.stringify(res.body)).not.toMatch(/re_test|inbox@example/);
+    } finally {
+      delete process.env.VERCEL_GIT_COMMIT_SHA;
+    }
+  });
+
   it('answers unknown API paths with a JSON 404', async () => {
     const res = await request(app).get('/api/nope');
     expect(res.status).toBe(404);
@@ -178,6 +194,92 @@ describe('API', () => {
     it('refuses a body far larger than any real message', async () => {
       const res = await post({ ...valid, message: 'x'.repeat(20_000) });
       expect(res.status).toBe(413);
+    });
+
+    it('says the email was accepted, not delivered, and answers bots the same way', async () => {
+      connect();
+      const real = await post(valid);
+      const bot = await post({ ...valid, website: 'https://spam.test' });
+      expect(real.body).toEqual({ ok: true, delivery: 'accepted' });
+      expect(bot.status).toBe(real.status);
+      expect(bot.body).toEqual(real.body);
+    });
+
+    it.each([
+      ['an empty object', {}],
+      ['a message that is too long', { ...valid, message: 'x'.repeat(2001) }],
+      ['an unknown reason', { ...valid, reason: 'booking' }],
+      ['a name that is only spaces', { ...valid, name: '   ' }],
+      ['fields of the wrong type', { ...valid, name: 42 }],
+      ['an array', [valid]],
+    ])('rejects %s before any email is sent', async (_label, body) => {
+      connect();
+      const res = await post(body);
+      expect(res.status).toBe(400);
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      ['text/plain', JSON.stringify(valid)],
+      ['application/x-www-form-urlencoded', 'name=Sam&email=sam%40example.com'],
+    ])('only reads JSON: a %s body is a 400 and sends nothing', async (type, body) => {
+      connect();
+      const res = await request(app)
+        .post('/api/contact')
+        .set('Host', 'studio.test')
+        .set('Origin', ORIGIN)
+        .set('Content-Type', type)
+        .send(body);
+      expect(res.status).toBe(400);
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('only accepts POST', async () => {
+      expect((await request(app).get('/api/contact')).status).toBe(404);
+      const put = await request(app)
+        .put('/api/contact')
+        .set('Host', 'studio.test')
+        .set('Origin', ORIGIN)
+        .send(valid);
+      expect(put.status).toBe(404);
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('does not let a client dodge the rate limit by writing its own X-Forwarded-For', async () => {
+      connect();
+      // Vercel puts the real client address last; anything before it came from the client.
+      const spoofed = (n: number) =>
+        request(app)
+          .post('/api/contact')
+          .set('Host', 'studio.test')
+          .set('Origin', ORIGIN)
+          .set('X-Forwarded-For', `10.0.0.${n}, 203.0.113.7`)
+          .send(valid);
+      for (let i = 0; i < 3; i++) expect((await spoofed(i)).status).toBe(201);
+      expect((await spoofed(99)).status).toBe(429);
+    });
+
+    it('counts different clients separately', async () => {
+      connect();
+      const from = (ip: string) =>
+        request(app)
+          .post('/api/contact')
+          .set('Host', 'studio.test')
+          .set('Origin', ORIGIN)
+          .set('X-Forwarded-For', ip)
+          .send(valid);
+      for (let i = 0; i < 3; i++) await from('203.0.113.1');
+      expect((await from('203.0.113.1')).status).toBe(429);
+      expect((await from('203.0.113.2')).status).toBe(201);
+    });
+
+    it('never puts the visitor message or the provider answer in the log', async () => {
+      connect();
+      const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      fetchMock.mockRejectedValue(new TypeError('fetch failed'));
+      await post({ ...valid, message: 'a private message only Josh should read' });
+      const logged = JSON.stringify(spy.mock.calls.map((c) => String(c[1] ?? c[0])));
+      expect(logged).not.toContain('private message');
     });
   });
 });

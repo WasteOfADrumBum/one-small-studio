@@ -1,0 +1,32 @@
+# Keeps the pinned action SHAs and npm packages current. Updates arrive as PRs that go through
+# the same CI gate as any other change; nothing merges on its own.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      actions:
+        patterns: ['*']
+    commit-message:
+      prefix: ci
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      # Minor and patch updates together; majors one at a time so each can be reviewed.
+      minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # Playwright is pinned to the browser build in the cloud dev environment; bump it by hand,
+      # together with playwright-core (docs/ci/README.md).
+      - dependency-name: '@playwright/test'
+      - dependency-name: playwright-core
+    commit-message:
+      prefix: deps

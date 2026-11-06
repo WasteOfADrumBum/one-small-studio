@@ -135,6 +135,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     if (!first?.playerUrl || !frame.current) return;
     const iframe = frame.current;
     let cancelled = false;
+    // Set once the listeners are bound, so leaving the page takes them off the widget again.
+    let unbindAll: (() => void) | null = null;
     // A blocked or very slow SoundCloud never sends READY: after a while, say so and offer the
     // SoundCloud link instead of leaving the player on "Loading". A late READY still recovers.
     later(() => {
@@ -159,12 +161,16 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         w.bind(FINISH, () => setPlaying(false));
         w.bind(PLAY_PROGRESS, (e) => setProgress(e?.relativePosition ?? 0));
         w.bind(ERROR, () => setStatus('error'));
+        unbindAll = () =>
+          [READY, PLAY, PAUSE, FINISH, PLAY_PROGRESS, ERROR].forEach((e) => w.unbind(e));
       })
       .catch(() => !cancelled && setStatus('error'));
 
     return () => {
       cancelled = true;
       timers.current.forEach(clearTimeout);
+      unbindAll?.();
+      widget.current = null;
     };
   }, []);
 

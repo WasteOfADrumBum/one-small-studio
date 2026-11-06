@@ -10,7 +10,7 @@ export default defineConfig({
   test: {
     // Browser-side tests opt in to jsdom with a `@vitest-environment jsdom` comment.
     environment: 'node',
-    include: ['src/**/*.test.{ts,tsx}', 'server/**/*.test.ts'],
+    include: ['src/**/*.test.{ts,tsx}', 'server/**/*.test.ts', 'scripts/ci/*.test.ts'],
     restoreMocks: true,
   },
 });

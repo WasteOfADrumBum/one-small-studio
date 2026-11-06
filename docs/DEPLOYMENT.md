@@ -32,17 +32,15 @@ talkback line is not connected yet." (HTTP 503). That is the expected state on p
 ## Checks (what CI runs on every pull request and every push to `main`)
 
 ```sh
-npm run format:check
-npm run lint
-npm run check          # TypeScript
-npm test               # Vitest: API, player, content
-npm run build
+npm run verify          # format, lint, types, unit/API tests, build, budgets, Chromium browser tests
 npx playwright install --with-deps chromium   # once per machine
-npm run test:e2e       # Playwright + axe, desktop 1440px and Pixel 7
+npm run test:e2e:all    # adds the Firefox and WebKit critical journeys (install those browsers first)
 ```
 
-The browser tests stub SoundCloud (`e2e/fixtures.ts`) and run against `vite preview`, which sends the
-same security headers as production (`vite.config.ts` reads them from `vercel.json`).
+The browser tests run against the production build served by `server/preview.ts`, which applies
+`vercel.json`'s rewrites and headers and runs the real Express API with a mail sink in place of
+Resend. SoundCloud is stubbed (`e2e/fixtures.ts`). Pipeline, jobs, timings and triage:
+[ci/README.md](ci/README.md).
 
 ## Environment variables (Vercel > Project > Settings > Environment Variables)
 
@@ -61,7 +59,9 @@ any of them, redeploy production for the change to take effect.
   Vercel account can open it).
 - Merging to `main` deploys to production automatically: `studio.onesmall.company` and
   `one-small-studio.vercel.app`.
-- Merge only with CI green. Release approval belongs to Josh.
+- Merge only with the `gate` check green. Release approval belongs to Josh.
+- After each production deployment, `.github/workflows/smoke.yml` checks the live site read-only
+  and opens a `production-smoke` issue if it fails (see [ci/README.md](ci/README.md)).
 
 ## Security headers and caching
 
@@ -103,6 +103,8 @@ Free-tier, no extra service:
 - Vercel emails the account owner when a production deployment fails.
 - Resend > Emails shows every send and bounce; Resend > Usage shows the daily and monthly caps.
 - GitHub Actions emails on a failed CI run on `main`.
+- The production smoke (after each deploy and every 6 hours) opens or updates one
+  `production-smoke` issue on failure and closes it on recovery.
 
 ## Rollback
 

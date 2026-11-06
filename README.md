@@ -17,7 +17,7 @@ This is a personal, non-commercial showcase: no rates, booking or sales. It runs
 | Email    | Resend: the contact form emails each message to Josh      |
 | Music    | SoundCloud Widget API, driven by the profile in `site.ts` |
 | Hosting  | Vercel Hobby                                              |
-| CI       | GitHub Actions: format, lint, type check, tests and build |
+| CI       | GitHub Actions: checks, browser tests, security, smoke    |
 
 ## Develop
 
@@ -28,15 +28,17 @@ npm install
 npm run dev      # site on http://localhost:5173, API on http://localhost:3001
 ```
 
-| Command            | What it does                                       |
-| ------------------ | -------------------------------------------------- |
-| `npm run dev`      | Start the site and the API                         |
-| `npm run build`    | Build the site for production                      |
-| `npm run check`    | Type check                                         |
-| `npm run lint`     | Lint with ESLint                                   |
-| `npm test`         | Unit and API tests (Vitest)                        |
-| `npm run test:e2e` | Browser and accessibility tests (Playwright + axe) |
-| `npm run format`   | Format with Prettier                               |
+| Command            | What it does                                                                   |
+| ------------------ | ------------------------------------------------------------------------------ |
+| `npm run dev`      | Start the site and the API                                                     |
+| `npm run build`    | Build the site for production                                                  |
+| `npm run check`    | Type check                                                                     |
+| `npm run lint`     | Lint with ESLint                                                               |
+| `npm test`         | Unit and API tests (Vitest)                                                    |
+| `npm run test:e2e` | Build, then browser, API and accessibility tests                               |
+| `npm run verify`   | CI's Chromium path, locally (not the security, Firefox, WebKit or CodeQL jobs) |
+| `npm run smoke`    | Read-only check of the live site                                               |
+| `npm run format`   | Format with Prettier                                                           |
 
 ## Layout
 
@@ -55,6 +57,8 @@ rollback are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). The contact form needs
 and `CONTACT_TO` in Vercel's Production environment; see `.env.example`.
 
 ## Release and roadmap
+
+- CI/CD, smoke checks and rollback: [docs/ci/README.md](docs/ci/README.md)
 
 - Release evidence: [docs/release/studio-release-evidence.md](docs/release/studio-release-evidence.md)
 - Acceptance record for sign-off: [docs/release/studio-release-acceptance.md](docs/release/studio-release-acceptance.md)

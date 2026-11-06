@@ -1,35 +1,255 @@
+# Pull request and main-branch validation. The one check to require is "CI / gate".
+# Layout, timings and failure triage: docs/ci/README.md.
 name: CI
 
 on:
   pull_request:
   push:
     branches: [main]
+  merge_group:
+  workflow_dispatch:
+
+# Every job asks for what it needs; nothing gets a write token by default.
+permissions: {}
 
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  # PRs share one group per PR, so a new push cancels the old run. Every other run (push to main,
+  # merge queue, dispatch) gets a group of its own commit, so no run there is ever cancelled or
+  # replaced while pending: each merge commit needs its own gate result, because Vercel's
+  # Deployment Checks wait for it before serving that commit.
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  CI: 'true'
+  # Keep npm quiet and offline-first; the lockfile is the source of truth.
+  npm_config_audit: 'false'
+  npm_config_fund: 'false'
 
 jobs:
-  verify:
+  static:
+    name: Format, lint, types
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - name: Format
-        run: npm run format:check
-      - name: Lint
-        run: npm run lint
-      - name: Type check
-        run: npm run check
-      - name: Unit and API tests
-        run: npm test
-      - name: Build
-        run: npm run build
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run check
+
+  unit:
+    name: Unit and API tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  # Each job builds once, checks the budgets, then runs the full suite against that same dist/ in
+  # Chromium, one job per profile so the two halves run side by side. The build takes about 2 s, so
+  # each job builds for itself rather than paying more than that to move an artifact between jobs.
+  browser:
+    name: Build and browser tests (Chromium ${{ matrix.project }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [desktop, phone]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run budgets
       - name: Install Chromium
-        run: npx playwright install --with-deps chromium
-      - name: Browser and accessibility tests
-        run: npm run test:e2e
+        # Browser and apt downloads have hung on GitHub's runners (runs 42097707310, 42137086921).
+        # Each attempt gets 6 minutes. Before the retry, wait (up to 2 minutes) for any apt-get the
+        # first attempt left behind, which would otherwise hold the dpkg lock. A second failure
+        # fails the job.
+        run: |
+          for attempt in 1 2; do
+            timeout 360 npx playwright install --with-deps chromium && exit 0
+            echo "::warning title=Browser install::attempt $attempt failed or timed out"
+            for _ in $(seq 24); do pgrep -x 'apt-get|dpkg' >/dev/null || break; sleep 5; done
+          done
+          exit 1
+      - name: Browser, API integration and accessibility tests
+        run: npm run e2e -- --project="$PROJECT"
+        env:
+          PROJECT: ${{ matrix.project }}
+      - name: Keep the report, traces and screenshots
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-chromium-${{ matrix.project }}-${{ github.run_attempt }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  cross-browser:
+    name: Critical journeys (${{ matrix.project }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: firefox
+            browser: firefox
+          - project: webkit-phone
+            browser: webkit
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Install ${{ matrix.browser }}
+        # Browser and apt downloads have hung on GitHub's runners (runs 42097707310, 42137086921).
+        # Each attempt gets 6 minutes. Before the retry, wait (up to 2 minutes) for any apt-get the
+        # first attempt left behind, which would otherwise hold the dpkg lock. A second failure
+        # fails the job.
+        run: |
+          for attempt in 1 2; do
+            timeout 360 npx playwright install --with-deps "$BROWSER" && exit 0
+            echo "::warning title=Browser install::attempt $attempt failed or timed out"
+            for _ in $(seq 24); do pgrep -x 'apt-get|dpkg' >/dev/null || break; sleep 5; done
+          done
+          exit 1
+        env:
+          BROWSER: ${{ matrix.browser }}
+      - name: Critical journeys
+        run: npm run e2e -- --project="$PROJECT"
+        env:
+          PROJECT: ${{ matrix.project }}
+      - name: Keep the report, traces and screenshots
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-${{ matrix.project }}-${{ github.run_attempt }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  security:
+    name: Security checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Built from source by Go, whose module proxy and checksum database verify every download.
+      # Versions are pinned here and bumped by hand (docs/ci/README.md).
+      - name: Install actionlint and gitleaks
+        # Each install is checked, and retried once: the Go module proxy has dropped a download
+        # mid-stream (run 42138200075).
+        run: |
+          get() { go install "$1" || { sleep 5; go install "$1"; }; }
+          get github.com/rhysd/actionlint/cmd/actionlint@v1.7.12 & a=$!
+          get github.com/zricethezav/gitleaks/v8@v8.30.1 & g=$!
+          wait "$a"
+          wait "$g"
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+      # Before npm ci, so the scan covers the repository and not node_modules.
+      - name: Secrets in the candidate tree (gitleaks)
+        run: gitleaks dir --config .gitleaks.toml --redact --verbose --no-banner --exit-code 1 .
+      - name: Workflow syntax and expressions (actionlint)
+        run: actionlint -color
+      - name: Dangerous workflow patterns (zizmor)
+        run: pipx run zizmor==1.32.0 --offline --format=github .github/workflows
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Dependency vulnerabilities (all dependencies, moderate and above)
+        run: npm audit --audit-level=moderate
+      - name: Registry signatures and provenance of installed packages
+        run: npm audit signatures
+
+  codeql:
+    name: CodeQL
+    # Fork PRs get a read-only token that cannot upload results; the gate accepts that one skip.
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [javascript-typescript, actions]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+          queries: security-extended
+      - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          category: /language:${{ matrix.language }}
+
+  # The one required check. It runs even when something before it failed or was cancelled, and
+  # passes only if every job succeeded; the only skip it accepts is CodeQL on a fork PR.
+  gate:
+    name: gate
+    if: ${{ always() }}
+    needs: [static, unit, browser, cross-browser, security, codeql]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: scripts/ci
+      - name: Check every job's result
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+          FORK: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
+        # The decision lives in scripts/ci/gate.mjs, unit-tested in scripts/ci/gate.test.ts.
+        run: node scripts/ci/gate.mjs

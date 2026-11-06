@@ -1,4 +1,4 @@
-import { expect, test } from './fixtures';
+import { expect, playerReady, stubSoundCloud, test } from './fixtures';
 import { test as raw } from '@playwright/test';
 
 /**
@@ -6,7 +6,7 @@ import { test as raw } from '@playwright/test';
  * connection on the talkback form, and visitors who ask for less motion.
  */
 raw.describe('when SoundCloud is unavailable', () => {
-  raw('a blocked widget script falls back to a SoundCloud link', async ({ page }) => {
+  raw('a blocked widget script falls back to a SoundCloud link @critical', async ({ page }) => {
     await page.route(/soundcloud\.com/, (r) => r.abort());
     await page.goto('/');
     const bar = page.getByRole('banner').first();
@@ -30,7 +30,10 @@ raw.describe('when SoundCloud is unavailable', () => {
     await page.route(/w\.soundcloud\.com\/player\/\?/, (r) =>
       r.fulfill({ body: '<html></html>', contentType: 'text/html' }),
     );
-    await page.route(/soundcloud\.com\/oembed/, (r) => r.fulfill({ status: 404, body: '' }));
+    await page.route(
+      (url) => url.hostname === 'soundcloud.com' && url.pathname === '/oembed',
+      (r) => r.fulfill({ status: 404, body: '' }),
+    );
     await page.goto('/');
     const bar = page.getByRole('banner').first();
     await expect(bar.getByText(/^Loading /)).toBeVisible();
@@ -101,4 +104,75 @@ test.describe('reduced motion', () => {
     );
     expect(looping).toEqual([]);
   });
+});
+
+raw.describe('slow or broken SoundCloud pieces', () => {
+  raw('a player iframe that fails to load is reported, not left on Loading', async ({ page }) => {
+    await page.clock.install();
+    await stubSoundCloud(page, { readyAfter: -1 });
+    // The real widget only answers from inside its iframe; with the iframe blocked it never does.
+    await page.route(/w\.soundcloud\.com\/player\/\?/, (r) => r.abort());
+    await page.goto('/');
+    const bar = page.getByRole('banner').first();
+    await expect(bar.getByText(/^Loading /)).toBeVisible();
+    await page.clock.runFor(16_000);
+    await expect(bar.getByText('SoundCloud is not responding')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Listen there instead' }).first()).toBeAttached();
+  });
+
+  raw('a widget that is slow to start recovers once it answers', async ({ page }) => {
+    await page.clock.install();
+    await stubSoundCloud(page, { readyAfter: 20_000 });
+    await page.goto('/');
+    const bar = page.getByRole('banner').first();
+    await page.clock.runFor(16_000);
+    await expect(bar.getByText('SoundCloud is not responding')).toBeVisible();
+    await page.clock.runFor(5_000);
+    await expect(bar.getByText('Cued')).toBeVisible();
+    await expect(bar.getByRole('button', { name: 'Play' })).toBeEnabled();
+  });
+
+  raw('cover art lookups that fail leave the shelf usable', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    await stubSoundCloud(page);
+    await page.route(
+      (url) => url.hostname === 'soundcloud.com' && url.pathname === '/oembed',
+      (r) => r.abort(),
+    );
+    await page.goto('/');
+    await playerReady(page);
+    const shelf = page.locator('#catalog').getByRole('list', { name: 'Releases' });
+    await expect(shelf.getByRole('button')).toHaveCount(5);
+    await shelf.getByRole('button', { name: /untranslated/ }).click();
+    await expect(page.locator('#catalog').getByRole('heading', { level: 3 })).toHaveText(
+      'untranslated',
+    );
+    expect(errors).toEqual([]);
+  });
+
+  raw(
+    'switching records while one is still loading settles on the last one picked',
+    async ({ page }) => {
+      await page.clock.install();
+      // Album switches never finish, so the visitor keeps picking while the widget is busy.
+      await stubSoundCloud(page, { loadAfter: -1 });
+      await page.goto('/');
+      await page.clock.runFor(100);
+      await playerReady(page);
+      const catalog = page.locator('#catalog');
+      await catalog.getByRole('button', { name: /When the Stones Weep/ }).click();
+      await catalog.getByRole('button', { name: /untranslated/ }).click();
+      await expect(catalog.getByRole('heading', { level: 3 })).toHaveText('untranslated');
+      await expect(catalog.getByRole('button', { name: /untranslated/ })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+      // Neither load finished, so the watchdog reports it instead of waiting forever.
+      await page.clock.runFor(16_000);
+      await expect(
+        page.getByRole('banner').first().getByText('SoundCloud is not responding'),
+      ).toBeVisible();
+    },
+  );
 });

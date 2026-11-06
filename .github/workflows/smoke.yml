@@ -1,0 +1,170 @@
+# Read-only checks of the live site, https://studio.onesmall.company.
+#
+# - After each successful Vercel production deployment (deployment_status from Vercel's GitHub
+#   app), waiting until the site serves that deployment's commit.
+# - Every six hours, as detection: it finds problems, it does not prevent them.
+# - On demand (Actions > Production smoke > Run workflow).
+#
+# It never sends a talkback message or touches SoundCloud accounts. It uses no repository secrets,
+# only the run's own token: read-only in the smoke job, and issues: write in the notify jobs, to
+# open or close one tracking issue.
+name: Production smoke
+
+on:
+  deployment_status:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: Full commit SHA production should be serving (optional)
+        required: false
+        default: ''
+      wait_seconds:
+        description: How long to wait for that commit to go live (0-900 s)
+        required: false
+        default: '600'
+
+permissions: {}
+
+# Deployment checks queue behind each other (a newer deployment waits rather than racing the
+# previous check). Scheduled and manual runs have their own queue, so they can never replace a
+# pending deployment check.
+concurrency:
+  group: production-smoke-${{ github.event_name == 'deployment_status' && 'deploy' || 'other' }}
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    name: Smoke production
+    # Only Vercel's own events for a successful Production deployment of this repository. Preview,
+    # failed and cancelled deployments, and deployments created by anyone else, are ignored.
+    if: >-
+      ${{ github.event_name != 'deployment_status' || (
+        github.event.deployment_status.state == 'success' &&
+        github.event.deployment.environment == 'Production' &&
+        github.event.deployment_status.creator.login == 'vercel[bot]' &&
+        github.repository == 'WasteOfADrumBum/one-small-studio'
+      ) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    outputs:
+      readiness_failed: ${{ steps.http.outputs.readiness_failed }}
+    env:
+      CI: 'true'
+      # Fixed: the URL in the deployment event is never fetched.
+      SMOKE_URL: https://studio.onesmall.company
+      # The commit to wait for. Validated as a 40-character SHA by the script before use.
+      EXPECTED_SHA: ${{ github.event.deployment.sha || inputs.expected_sha }}
+      WAIT_SECONDS: ${{ inputs.wait_seconds || '600' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: HTTP checks (pages, headers, assets, API, metadata)
+        id: http
+        run: npm run smoke
+        env:
+          # Read-only (contents: read): used only to ask GitHub whether a live commit is newer.
+          GH_TOKEN: ${{ github.token }}
+      - name: Install Chromium
+        # Browser and apt downloads have hung on GitHub's runners (runs 42097707310, 42137086921).
+        # Each attempt gets 6 minutes. Before the retry, wait (up to 2 minutes) for any apt-get the
+        # first attempt left behind, which would otherwise hold the dpkg lock. A second failure
+        # fails the job.
+        run: |
+          for attempt in 1 2; do
+            timeout 360 npx playwright install --with-deps chromium && exit 0
+            echo "::warning title=Browser install::attempt $attempt failed or timed out"
+            for _ in $(seq 24); do pgrep -x 'apt-get|dpkg' >/dev/null || break; sleep 5; done
+          done
+          exit 1
+      - name: Browser checks
+        run: npm run smoke:browser
+      - name: Keep the report and traces
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: smoke-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            playwright-smoke-report/
+            test-results/
+          retention-days: 14
+          if-no-files-found: ignore
+
+  # One open issue tracks a failing production; later failures comment on it instead of opening
+  # more, so a long outage is one notification thread, not one per run. When the failure is only
+  # "the merged commit never went live", the issue also gets the production-smoke-readiness label,
+  # and only a run that checked a specific commit can close it (a scheduled pass proves nothing
+  # about whether the merge went live).
+  notify-failure:
+    name: Open or update the smoke issue
+    needs: smoke
+    if: ${{ failure() && needs.smoke.result == 'failure' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      TRIGGER: ${{ github.event_name }}
+      SHA: ${{ github.event.deployment.sha || inputs.expected_sha || github.sha }}
+      READINESS: ${{ needs.smoke.outputs.readiness_failed }}
+    steps:
+      - run: |
+          set -euo pipefail
+          gh label create production-smoke --color B60205 \
+            --description "Production smoke check is failing" 2>/dev/null || true
+          gh label create production-smoke-readiness --color FBCA04 \
+            --description "A merged commit did not go live" 2>/dev/null || true
+          body="Production smoke failed (${TRIGGER}, commit ${SHA}). Run: ${RUN_URL}"
+          open=$(gh issue list --label production-smoke --state open --json number --jq '.[0].number // empty')
+          if [ -n "$open" ]; then
+            gh issue comment "$open" --body "$body"
+          else
+            open=$(gh issue create --label production-smoke \
+              --title "Production smoke check is failing" \
+              --body "$body
+
+          Triage: docs/ci/README.md#when-the-production-smoke-fails. This issue closes itself when a later smoke passes." | sed 's#.*/##')
+          fi
+          if [ "$READINESS" = "true" ]; then
+            gh issue edit "$open" --add-label production-smoke-readiness
+          fi
+
+  notify-recovery:
+    name: Close the smoke issue
+    needs: smoke
+    if: ${{ needs.smoke.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      CHECKED_SHA: ${{ github.event.deployment.sha || inputs.expected_sha }}
+    steps:
+      - run: |
+          set -euo pipefail
+          # Assigned first, so a failed lookup fails the step instead of looping over nothing.
+          issues=$(gh issue list --label production-smoke --state open --json number,labels \
+            --jq '.[] | "\(.number):\([.labels[].name] | index("production-smoke-readiness") != null)"')
+          for n in $issues; do
+            num=${n%%:*}; readiness=${n##*:}
+            if [ "$readiness" = "true" ] && [ -z "$CHECKED_SHA" ]; then
+              echo "Leaving #$num open: it is about a commit not going live, and this run checked no commit."
+              continue
+            fi
+            gh issue close "$num" --comment "Production smoke passed again: ${RUN_URL}"
+          done
