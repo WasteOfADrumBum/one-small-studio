@@ -57,8 +57,12 @@ external warning) or that audio plays on a device (manual).
 
 ### Flakes, retries and diagnostics
 
-- Browser downloads (infrastructure, not tests) get 6 minutes and one retry, with a warning on
-  the run; a download once hung for 15 minutes and cancelled both cross-browser jobs.
+- Browser jobs run inside Playwright's own image (`mcr.microsoft.com/playwright`, pinned by tag
+  and digest), so no job downloads a browser or runs apt. Those downloads hung three times on
+  GitHub's runners, once on the merge to `main` (run 42262920215). When `@playwright/test` is
+  bumped, move the three `image:` lines to the same version and digest;
+  `scripts/ci/playwright-image.test.ts` fails until they match. To try a smoke change before
+  merging, dispatch Production smoke on the branch (it only reads production).
 - CI retries a failed test once to classify it, and `failOnFlakyTests` fails the run when a test
   only passed on retry. Flakes are reported, never absorbed.
 - On failure the job uploads `playwright-report/` and `test-results/` (traces, screenshots, error
