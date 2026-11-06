@@ -1,18 +1,18 @@
-<!-- generated from .engineering/state.json (revision 7); edit state.json through a checkpoint, not this file -->
+<!-- generated from .engineering/state.json (revision 8); edit state.json through a checkpoint, not this file -->
 
 # one-small-studio: development status
 
 All values are **agent-reported**, not independently verified. Check GitHub before relying on them.
 
-- Milestone: CI/CD to an evidence-backed standard
-- Active task: PR #28: browser CI in the pinned Playwright image, plus the post-merge CI/CD evidence
-- Branch: claude/project-thread-wp6cz1
-- Recorded commit: `c4137a8` on `claude/project-thread-wp6cz1`
-- Last checkpoint: 2026-11-06T18:30:00Z by Claude Code
+- Milestone: Post-release polish
+- Active task: PR #30: condense the story timeline on phones only
+- Branch: claude/project-thread-s54c2v
+- Recorded commit: `a0e4ed6` on `claude/project-thread-s54c2v`
+- Last checkpoint: 2026-11-06T23:45:00Z by Claude Code
 
 ## Next action
 
-Merge PR #28 after its gate passes; check its push run on main and the deployment smoke. Owner: turn on Vercel Deployment Checks for gate and add a main ruleset (docs/ci/README.md).
+Check PR #30's gate and Joshua Small's review of the phone timeline.
 
 ## Completed
 
