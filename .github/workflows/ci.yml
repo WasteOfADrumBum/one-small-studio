@@ -29,7 +29,7 @@ env:
 jobs:
   static:
     name: Format, lint, types
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: read
@@ -48,7 +48,7 @@ jobs:
 
   unit:
     name: Unit and API tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: read
@@ -68,7 +68,7 @@ jobs:
   # each job builds for itself rather than paying more than that to move an artifact between jobs.
   browser:
     name: Build and browser tests (Chromium ${{ matrix.project }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     # Playwright's own image already holds the browsers and every system library they need, so no
     # job downloads a browser or runs apt (both hung on GitHub's runners: runs 42097707310,
@@ -112,7 +112,7 @@ jobs:
 
   cross-browser:
     name: Critical journeys (${{ matrix.project }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     # Playwright's own image already holds the browsers and every system library they need, so no
     # job downloads a browser or runs apt (both hung on GitHub's runners: runs 42097707310,
@@ -155,7 +155,7 @@ jobs:
 
   security:
     name: Security checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: read
@@ -196,7 +196,7 @@ jobs:
     name: CodeQL
     # Fork PRs get a read-only token that cannot upload results; the gate accepts that one skip.
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: read
@@ -224,7 +224,7 @@ jobs:
     name: gate
     if: ${{ always() }}
     needs: [static, unit, browser, cross-browser, security, codeql]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
       contents: read
