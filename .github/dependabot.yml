@@ -24,6 +24,10 @@ updates:
       minor-and-patch:
         update-types: [minor, patch]
     ignore:
+      # TypeScript 7 is unsupported: typescript-eslint (latest 8.72.1) peers typescript <6.1.0.
+      # Revisit when a typescript-eslint release widens that peer range to include 7.
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
       # Playwright is pinned to the browser build in the cloud dev environment; bump it by hand,
       # together with playwright-core (docs/ci/README.md).
       - dependency-name: '@playwright/test'
