@@ -46,7 +46,7 @@ jobs:
         github.event.deployment_status.creator.login == 'vercel[bot]' &&
         github.repository == 'WasteOfADrumBum/one-small-studio'
       ) }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     # Playwright's own image already holds the browsers and every system library they need, so no
     # job downloads a browser or runs apt (both hung on GitHub's runners: runs 42097707310,
@@ -104,7 +104,7 @@ jobs:
     name: Open or update the smoke issue
     needs: smoke
     if: ${{ failure() && needs.smoke.result == 'failure' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
       issues: write
@@ -141,7 +141,7 @@ jobs:
     name: Close the smoke issue
     needs: smoke
     if: ${{ needs.smoke.result == 'success' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
       issues: write
