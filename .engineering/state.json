@@ -37,9 +37,7 @@
       "Share card: public/og-image.png redrawn from scripts/og-image/card.html (npm run og:image); twitter:* tags added; src/lib/share-card.test.ts (PR #22, merged as 6268635)",
       "Owner-reported (Joshua Small, project thread, 2026-11-02 18:15 UTC): 'A and B were tested' (live headers check and screen reader check); no failures reported. Recorded in the acceptance record (PR #21)"
     ],
-    "inProgress": [
-      "PR #28 waiting for its gate on the evidence commit, then merge"
-    ],
+    "inProgress": ["PR #28 waiting for its gate on the evidence commit, then merge"],
     "nextAction": "Merge PR #28 after its gate passes; check its push run on main and the deployment smoke. Owner: turn on Vercel Deployment Checks for gate and add a main ruleset (docs/ci/README.md)."
   },
   "decisions": {
