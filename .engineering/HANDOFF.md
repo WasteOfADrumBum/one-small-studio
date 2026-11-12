@@ -1,10 +1,10 @@
-<!-- generated from .engineering/state.json (revision 8) -->
+<!-- generated from .engineering/state.json (revision 9) -->
 
 # Handoff: one-small-studio
 
 Read this, then **verify against GitHub** (branch head, open PRs, CI) before continuing. Nothing below is independently verified.
 
-- Checkpoint: revision 8, `ckpt-0008-timeline-condense`, 2026-11-06T23:45:00Z by Claude Code
+- Checkpoint: revision 9, `repair-schema-2026-11-12`, 2026-11-12T02:08:48Z by Claude Code
 - Written by: a local edit that the agent then pushed; confirm the branch head matches
 - Uncommitted work outside this checkpoint: **none**
 
