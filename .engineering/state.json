@@ -1,7 +1,7 @@
 {
   "stateVersion": 1,
-  "revision": 8,
-  "checkpointId": "ckpt-0008-timeline-condense",
+  "revision": 9,
+  "checkpointId": "repair-schema-2026-11-12",
   "projectId": "one-small-studio",
   "repository": "https://github.com/WasteOfADrumBum/one-small-studio",
   "hub": "https://github.com/WasteOfADrumBum/one-small-engineering",
@@ -12,11 +12,14 @@
   "recorded": {
     "branch": "claude/project-thread-s54c2v",
     "commit": "a0e4ed69ad00d124d2b3c505b3c2e8e8cd3ec4c1",
-    "recordedAt": "2026-11-06T23:45:00Z"
+    "recordedAt": "2026-11-12T02:08:48Z"
   },
   "development": {
     "milestone": "Post-release polish",
-    "activeTask": "PR #30: condense the story timeline (transport row, Era/Year ruler, tracks) on phones only",
+    "activeTask": {
+      "id": "studio-pr-30",
+      "title": "PR #30: condense the story timeline (transport row, Era/Year ruler, tracks) on phones only"
+    },
     "workingBranch": "claude/project-thread-s54c2v",
     "activePr": 30,
     "lastCompleted": [
@@ -24,16 +27,19 @@
       "PR #28 merged to main as c833e03 (CI/CD in pinned Playwright image)",
       "PR #24 merged by Joshua Small as ad79b90 (2026-11-06 17:34 UTC): parallel CI with one gate, Firefox/WebKit critical journeys, real-API browser tests, security scans, CodeQL, production smoke",
       "Production deployment dpl_4wTowxZNhSNuX6xEPfEyiUuwTXR6 from ad79b90 READY; no runtime errors in the following hour (Vercel MCP)",
-      "Production smoke from the deployment event passed: 13 ok, 0 failed; browser 4 passed (run 42262992396). First scheduled run passed (42270297999)",
-      "Failure path observed: dispatch with a never-live SHA opened issue #29 with the readiness label (42265174080); a passing dispatch closed it (42265321855)",
-      "Push CI on ad79b90: attempt 1 failed in Install Chromium (apt hung, no test ran), attempt 2 green (42262920215)",
-      "PR #28: browser, cross-browser and smoke jobs run in mcr.microsoft.com/playwright:v1.63.0-noble pinned by digest; scripts/ci/playwright-image.test.ts keeps it matched to package.json. CI jobs green in the container (42265165091); smoke job green in the container from a dispatch on the PR branch against production (42270867413)",
+      "Production smoke from the deployment event passed: 13 ok, 0 failed; browser 4 passed (run https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42262992396). First scheduled run passed (https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42270297999)",
+      "Failure path observed: dispatch with a never-live SHA opened issue #29 with the readiness label (https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42265174080); a passing dispatch closed it (https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42265321855)",
+      "Push CI on ad79b90: attempt 1 failed in Install Chromium (apt hung, no test ran), attempt 2 green (https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42262920215)",
+      "PR #28: browser, cross-browser and smoke jobs run in mcr.microsoft.com/playwright:v1.63.0-noble pinned by digest; scripts/ci/playwright-image.test.ts keeps it matched to package.json.",
+      "CI jobs green in the container (https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42265165091); smoke job green in the container from a dispatch on the PR branch against production (https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42270867413)",
       "Score recorded in docs/ci/requirements-evidence.md: 89/100; remaining 11 are two owner settings",
       "PR #21 merged by Joshua Small as 4c46d0d: acceptance record shows checks A (headers) and B (screen reader) as owner-reported tested",
       "Share card: public/og-image.png redrawn from scripts/og-image/card.html (npm run og:image); twitter:* tags added; src/lib/share-card.test.ts (PR #22, merged as 6268635)",
       "Owner-reported (Joshua Small, project thread, 2026-11-02 18:15 UTC): 'A and B were tested' (live headers check and screen reader check); no failures reported. Recorded in the acceptance record (PR #21)"
     ],
-    "inProgress": ["PR #28 waiting for its gate on the evidence commit, then merge"],
+    "inProgress": [
+      "PR #28 waiting for its gate on the evidence commit, then merge"
+    ],
     "nextAction": "Merge PR #28 after its gate passes; check its push run on main and the deployment smoke. Owner: turn on Vercel Deployment Checks for gate and add a main ruleset (docs/ci/README.md)."
   },
   "decisions": {
@@ -125,29 +131,29 @@
         "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42265165091"
       },
       {
-        "command": "GitHub CI push on main ad79b90",
-        "result": "attempt 1 fail (browser install), attempt 2 pass",
+        "command": "GitHub CI push on main ad79b90 (attempt 1 fail (browser install), attempt 2 pass)",
+        "result": "pass",
         "commit": "ad79b90a0d44c4f79d9396ff07b063892d6310f3",
         "at": "2026-11-06T17:58:00Z",
         "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42262920215"
       },
       {
-        "command": "Production smoke (deployment_status)",
-        "result": "pass (13 ok; 4 browser)",
+        "command": "Production smoke (deployment_status) (pass (13 ok; 4 browser))",
+        "result": "pass",
         "commit": "ad79b90a0d44c4f79d9396ff07b063892d6310f3",
         "at": "2026-11-06T17:37:28Z",
         "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42262992396"
       },
       {
-        "command": "Production smoke (dispatch, never-live SHA, expected failure)",
-        "result": "fail as intended; issue #29 opened",
+        "command": "Production smoke (dispatch, never-live SHA, expected failure) (fail as intended; issue #29 opened)",
+        "result": "fail",
         "commit": "ad79b90a0d44c4f79d9396ff07b063892d6310f3",
         "at": "2026-11-06T17:50:16Z",
         "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42265174080"
       },
       {
-        "command": "Production smoke (dispatch, ad79b90)",
-        "result": "pass; issue #29 closed",
+        "command": "Production smoke (dispatch, ad79b90) (pass; issue #29 closed)",
+        "result": "pass",
         "commit": "ad79b90a0d44c4f79d9396ff07b063892d6310f3",
         "at": "2026-11-06T17:51:41Z",
         "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-studio/actions/runs/42265321855"
@@ -179,7 +185,7 @@
       "tool": "Claude Code",
       "model": null
     },
-    "checkpointedAt": "2026-11-06T23:45:00Z",
+    "checkpointedAt": "2026-11-12T02:08:48Z",
     "unfinished": [
       "PR #30 waiting for CI gate and Joshua Small's review of the condensed phone timeline"
     ],
